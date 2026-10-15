@@ -1,0 +1,1744 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}</style>
+<title>OT/IT Labløype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky exercise index (left) + reading column (right); index collapses above the reader on phones. */
+:root{
+  --bg:#f3f6f7; --surface:#ffffff; --fg:#13212a; --muted:#566772; --line:#d3dce1;
+  --accent:#0d7a69; --accent-soft:#dcf1ec; --amber:#a96a0c; --amber-soft:#fbefd9;
+  --code-bg:#0f1b22; --code-fg:#d5e3e9; --code-line:#223540;
+  --font-display:'IBM Plex Sans Condensed','Arial Narrow',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1418; --surface:#131f25; --fg:#e2edf1; --muted:#8ea1ac; --line:#25353e;
+  --accent:#3fc9ae; --accent-soft:#12332e; --amber:#e3ac52; --amber-soft:#33270f;
+  --code-bg:#091015; --code-fg:#d5e3e9; --code-line:#1f303a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1418; --surface:#131f25; --fg:#e2edf1; --muted:#8ea1ac; --line:#25353e;
+  --accent:#3fc9ae; --accent-soft:#12332e; --amber:#e3ac52; --amber-soft:#33270f;
+  --code-bg:#091015; --code-fg:#d5e3e9; --code-line:#1f303a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--font-body);
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,h4{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.2}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between}
+.top h1{font-size:30px;font-weight:700;letter-spacing:.01em}
+.top p{margin:4px 0 0;color:var(--muted);max-width:52ch}
+.prog{flex:1 1 320px;max-width:460px;min-width:0}
+.prog-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--muted)}
+.prog-row strong{font:600 22px var(--font-display);color:var(--fg);font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.lvls{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font:12px var(--font-mono);color:var(--muted)}
+.lvls b{color:var(--fg);font-weight:500}
+
+/* shell */
+.shell{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.shell{grid-template-columns:minmax(0,1fr)}}
+.index{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+@media (min-width:861px){.index{position:sticky;top:max(16px,env(safe-area-inset-top,0px));max-height:calc(100vh - 32px);overflow:auto}
+  .index>summary{pointer-events:none}.index>summary::after{display:none}}
+.index>summary{list-style:none;cursor:pointer;padding:12px 14px;font:600 13px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.index>summary::-webkit-details-marker{display:none}
+.index>summary::after{content:"Vis/skjul";font:12px var(--font-mono);text-transform:none;letter-spacing:0}
+.lv{padding:4px 0 8px;border-top:1px solid var(--line)}
+.lv h3{font-size:15px;font-weight:600;padding:10px 14px 2px;display:flex;justify-content:space-between;gap:8px}
+.lv h3 span{font:12px var(--font-mono);color:var(--muted);font-weight:400}
+.lv ul{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:22px 28px minmax(0,1fr);align-items:center;gap:4px;padding:0 10px 0 12px}
+.row:hover{background:var(--bg)}
+.row.sel{background:var(--accent-soft)}
+.row input{margin:0;width:16px;height:16px;accent-color:var(--accent)}
+.row .n{font:12px var(--font-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.row a{color:inherit;text-decoration:none;padding:6px 0;line-height:1.35;font-size:14px;overflow-wrap:anywhere}
+.row.planned a{color:var(--muted)}
+.row.done a{text-decoration:line-through;text-decoration-color:var(--muted)}
+.lamp{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;border:1.5px solid var(--muted);vertical-align:1px}
+.row.ready .lamp{border-color:var(--amber);background:var(--amber)}
+.row.done .lamp{border-color:var(--accent);background:var(--accent)}
+
+/* reader */
+.reader{min-width:0;display:flex;flex-direction:column;gap:18px}
+.head{display:flex;flex-direction:column;gap:8px;padding-bottom:14px;border-bottom:2px solid var(--fg)}
+.kick{font:500 12px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.head h2{font-size:34px;font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:12px var(--font-mono);border:1px solid var(--line);padding:2px 8px;border-radius:3px;color:var(--muted);background:var(--surface)}
+.tag.st{color:var(--amber);border-color:var(--amber);background:var(--amber-soft)}
+.tag.st.ok{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.blk{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.blk h3{font-size:19px;font-weight:600;display:flex;gap:10px;align-items:baseline}
+.blk h3 .no{font:500 12px var(--font-mono);color:var(--muted);min-width:2ch;font-variant-numeric:tabular-nums}
+.blk p,.blk ul,.blk ol{margin:0}
+.blk ul,.blk ol{padding-left:1.3em}
+.blk li+li{margin-top:4px}
+.step{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chk{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font:600 16px/1.35 var(--font-display)}
+.chk input{margin:2px 0 0;width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.chk input:checked+span{color:var(--muted);text-decoration:line-through}
+.step+.step{border-top:1px dashed var(--line);padding-top:12px}
+code{font:13px var(--font-mono);background:var(--bg);border:1px solid var(--line);padding:0 4px;border-radius:3px;overflow-wrap:anywhere}
+.code{position:relative;min-width:0}
+.code pre{margin:0;background:var(--code-bg);color:var(--code-fg);border:1px solid var(--code-line);border-radius:5px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--font-mono);tab-size:4}
+.code pre code{background:none;border:0;padding:0;color:inherit;font:inherit;overflow-wrap:normal}
+.code .fn{position:absolute;top:0;left:0;font:11px var(--font-mono);color:var(--muted);background:var(--bg);border:1px solid var(--line);border-bottom:0;padding:1px 8px;border-radius:5px 5px 0 0;transform:translateY(-100%)}
+.code.hasfn{margin-top:20px}
+.code button{position:absolute;top:6px;right:6px;font:11px var(--font-mono);background:#1c3140;color:#cfe0e8;border:1px solid #2c4658;border-radius:3px;padding:2px 8px;cursor:pointer}
+.code button:hover{background:#25414f}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:7px 10px}
+th{font:600 12px var(--font-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.callout{border-left:3px solid var(--amber);background:var(--amber-soft);padding:10px 14px;border-radius:0 4px 4px 0}
+.confirm{display:flex;flex-direction:column;gap:6px;border:2px solid var(--accent);background:var(--accent-soft);border-radius:6px;padding:16px 18px}
+.confirm .chk{font-size:18px}
+.confirm p{margin:0 0 0 28px;color:var(--muted);font-size:14px}
+.locked{display:flex;flex-direction:column;gap:6px}
+.save{font:12px var(--font-mono);color:var(--muted)}
+/* case + animation */
+.case{border-color:var(--accent);border-width:2px}
+.case h3 .no{color:var(--accent)}
+.lab{font:600 12px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px;margin:0;padding:0;list-style:none}
+.blk .cast{padding-left:0}
+.cast li{margin:0;font-size:14px;line-height:1.45}
+.cast b{font:600 15px var(--font-display);display:block}
+.anim{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.anim svg{width:100%;height:auto;max-width:100%;display:block}
+.ctl{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 13px var(--font-body);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.45;cursor:default}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.meter{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.meter b{font:600 22px var(--font-display);color:var(--fg);font-variant-numeric:tabular-nums}
+.mbar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.mbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.mbar.warn i{background:var(--amber)}
+.cap{margin:0;min-height:3.2em;font-style:italic;color:var(--muted)}
+.ln{stroke:var(--line);stroke-width:1.2}
+.dt.p2p{fill:var(--amber)}
+.dt.broker{fill:var(--accent)}
+.nd rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
+.nd text{fill:var(--fg);font:12px var(--font-body);text-anchor:middle;dominant-baseline:central}
+.nd.hot rect{stroke:var(--amber);stroke-width:2.5}
+.nd.new rect{stroke:var(--accent);stroke-dasharray:4 2}
+.nd.brk rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.nd.brk text{font-weight:600}
+.col{fill:var(--muted);font:600 10px var(--font-mono);letter-spacing:.1em;text-anchor:middle}
+tr.rec td{background:var(--accent-soft)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.sketch{border:1px dashed var(--muted);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.sketch b{font:600 17px var(--font-display)}
+.flt{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.chip{font:12px var(--font-mono);border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:12px;padding:2px 9px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.bd{font:10px var(--font-mono);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:5px;white-space:nowrap;vertical-align:1px}
+.thread{border-left:3px solid var(--accent);background:var(--surface);padding:10px 14px;margin:0 0 18px;border-radius:0 5px 5px 0;display:flex;flex-direction:column;gap:4px}
+.thread p{margin:0;font-size:14px}
+.thread .nx{color:var(--muted)}
+.tl{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tl a{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:baseline;color:inherit;text-decoration:none;padding:4px 0}
+.tl a:hover b{text-decoration:underline}
+.tl .tk{font:500 12px var(--font-mono);color:var(--muted);text-align:center}
+.tl .done .tk{color:var(--accent);font-weight:700}
+.topo figure{margin:0}
+.topo figcaption{font-size:14px;margin-top:8px;max-width:70ch}
+.tctl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tb{font:500 13px var(--font-mono);padding:5px 12px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg);cursor:pointer}
+.tb[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);color:var(--fg)}
+.tb.ghost{margin-left:auto;color:var(--muted)}
+.cmd{display:grid;grid-template-columns:minmax(150px,max-content) 1fr;gap:6px 16px;margin:10px 0 0;font-size:13.5px}
+.cmd dt{font:12.5px var(--font-mono);color:var(--accent);overflow-wrap:anywhere}
+.cmd dd{margin:0;color:var(--muted)}
+.cmdh{margin:12px 0 0;font:500 12px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+@media(max-width:600px){.cmd{grid-template-columns:1fr}.cmd dd{margin-bottom:6px}}
+#pre .chk span{font-weight:400}
+.restore{display:flex;gap:6px;margin-top:6px}
+.restore input{flex:1;min-width:0;font:12px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:4px 8px}
+.restore .tb{padding:3px 10px;font-size:12px}
+.blk.closed>*:not(h3){display:none}
+.blk.closed{gap:0}
+.blk h3.fh{cursor:pointer;user-select:none}
+.blk h3.fh::before{content:'▾';color:var(--muted);font-size:14px;width:1ch;flex:none}
+.blk.closed h3.fh::before{content:'▸'}
+.blk h3.fh:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+.foldbar{display:flex;gap:8px;justify-content:flex-end}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 16px}
+.calc label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.calc input{font:14px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;width:100%;min-width:0}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.res>div{border:1px solid var(--line);border-radius:5px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;background:var(--bg)}
+.res b{font:600 22px var(--font-display);font-variant-numeric:tabular-nums}
+.res span{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 28px}
+.two>div{min-width:0}
+.two ul{margin:6px 0 0;padding-left:1.2em}
+.bak{background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.bak>summary{cursor:pointer;padding:12px 14px;font:600 13px var(--font-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bak-in{display:flex;flex-direction:column;gap:10px;padding:0 14px 14px;max-width:70ch}
+.bak-in p{margin:0}
+.bak textarea{width:100%;font:13px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:8px;resize:vertical}
+@media (prefers-reduced-motion:reduce){.bar>i,.mbar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>OT/IT Labløype</h1>
+      <p>MQTT 5, OPC UA og industriell integrasjon, én øvelse om gangen. Kryss av når du har bekreftet at øvelsen fungerer.</p>
+    </div>
+    <div class="prog" aria-live="polite">
+      <div class="prog-row"><span>Fullførte øvelser</span><strong id="pcount">0 / 0</strong></div>
+      <div class="bar"><i id="pbar"></i></div>
+      <div class="lvls" id="plv"></div>
+      <div class="save" id="store" aria-live="polite">Lagring: sjekker …</div>
+      <div class="restore"><input id="rs-in" type="text" placeholder="Fremdriftskode (otit1:…)" aria-label="Fremdriftskode"><button class="tb" id="rs-go" type="button">Gjenopprett</button><button class="tb" id="rs-copy" type="button">Kopier kode</button></div>
+      <div class="save" id="rsmsg" aria-live="polite"></div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <details class="index" id="index" open>
+      <summary>Øvelser</summary>
+      <div id="idx"></div>
+    </details>
+    <main class="reader" id="reader"></main>
+  </div>
+  <details class="bak" id="bak">
+    <summary>Sikkerhetskopi av fremdrift</summary>
+    <div class="bak-in">
+      <p>I en isolert nettleser kan lokal lagring forsvinne mellom øktene. Kopier koden og lim den inn i et notat på maskinen din, eller last den ned som fil. Lim koden inn her igjen for å gjenopprette.</p>
+      <div class="ctl">
+        <button class="btn" id="bk-copy" type="button">Kopier fremdriftskode</button>
+        <button class="btn" id="bk-dl" type="button">Last ned som fil</button>
+      </div>
+      <label for="bk-in" class="lab">Gjenopprett</label>
+      <textarea id="bk-in" rows="3" placeholder="Lim inn fremdriftskode, for eksempel otit1:ex1,ex1.s1"></textarea>
+      <div class="ctl">
+        <button class="btn" id="bk-imp" type="button">Importer</button>
+        <span class="save" id="bk-msg" aria-live="polite"></span>
+      </div>
+    </div>
+  </details>
+  <div class="save" id="save"></div>
+</div>
+
+<template id="tpl-1">
+  <section class="blk case" id="c1">
+    <h3><span class="no">CASE</span>Agder Fiskeforedling AS: «Alle spør PLC-en»</h3>
+    <p class="lab">Rollene</p>
+    <ul class="cast">
+      <li><b>Gunnhild, driftssjef</b>Vil ha ett tall for hvor mye fisk som faktisk er pakket. Ikke fem tall som er uenige.</li>
+      <li><b>Terje, IT-sjef</b>Eier serverrommet. Serverrommet er også kosteskapet.</li>
+      <li><b>Knut, automasjonstekniker</b>31 år i huset og kan alle passord utenat. De står i et regneark som heter «Passord_NY_endelig2.xlsx».</li>
+      <li><b>Randi, økonomisjef</b>Vil vite hva det koster, og når det slutter å koste.</li>
+      <li><b>Du, OT-arkitekt</b>Skal få alt til å snakke sammen uten at noen må bytte PLC.</li>
+    </ul>
+    <p class="lab">Utfordringen</p>
+    <p>Fabrikken har fire datakilder: to PLC-er (fra 2004 og 2012), en temperaturgateway og en vekt som snakker RS-232. Fire konsumenter henter data direkte fra dem: SCADA, MES, et dashboard og Knuts Excel-makro. Forrige gang noen la til ett dashboard til, stoppet pakkelinjen i fire minutter. Det var ingen feil i PLC-en. Det var elleve samtidige lesere. Nå vil kvalitetsavdelingen ha et KI-kamera, og økonomi vil ha data inn i ERP.</p>
+    <p class="lab">Prøv selv: koble på flere konsumenter</p>
+    <div class="anim">
+      <div class="ctl">
+        <button class="btn" type="button" data-act="p2p" aria-pressed="true">Punkt-til-punkt</button>
+        <button class="btn" type="button" data-act="broker" aria-pressed="false">Via broker</button>
+        <button class="btn" type="button" data-act="add">+ KI-kamera</button>
+        <button class="btn" type="button" data-act="reset">Nullstill</button>
+        <button class="btn" type="button" data-act="pause" aria-pressed="false">Pause</button>
+      </div>
+      <svg viewBox="0 0 480 330" role="img" aria-label="Fire datakilder til sine konsumenter, enten direkte eller via en MQTT-broker. Piler viser dataflyt."></svg>
+      <div class="meters">
+        <div class="meter"><span>Koblinger å vedlikeholde</span><b data-o="links">16</b></div>
+        <div class="meter"><span>Samtidige lesere per PLC</span><b data-o="load">4</b><div class="mbar" data-o="mbar"><i style="width:0"></i></div></div>
+      </div>
+      <p class="cap" data-o="cap" aria-live="polite"></p>
+    </div>
+    <p class="lab">Valgene</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Alternativ</th><th>Brownfield</th><th>Økosystem</th><th>Økonomi</th><th>Tid</th></tr></thead>
+      <tbody>
+        <tr><td><b>A.</b> Alle spør PLC-en direkte</td><td>Virker uten endringer, men presser gamle PLC-er.</td><td>Én driver per konsument og leverandør.</td><td>Billig i dag. Kostnaden vokser som kilder × konsumenter.</td><td>Dager per kobling, for alltid.</td></tr>
+        <tr><td><b>B.</b> Stor integrasjonsplattform</td><td>Tunge adaptere og agenter på gamle maskiner.</td><td>Lisens og leverandørlås.</td><td>Lisens pluss implementering. Randi vil ha et møte.</td><td>9–12 måneder til første dashboard.</td></tr>
+        <tr class="rec"><td><b>C.</b> Edge-gateway og MQTT-broker som knutepunkt</td><td>Gateway leser hver PLC én gang. Ingen endringer i PLC-programmene.</td><td>Åpen standard. Klienter finnes i PLC-er, Python, Node-RED og ERP-mellomvare.</td><td>Åpen kildekode eller lav lisens. Vokser som kilder + konsumenter.</td><td>Pilot på omtrent 3 uker.</td></tr>
+      </tbody></table></div>
+    <p class="note">Tidsanslag og kostnadsnivå er illustrative for dette caset.</p>
+    <p class="lab">Hvorfor C</p>
+    <ul>
+      <li>Gamle PLC-er har fast last, uansett hvor mange som lytter. Gatewayen leser, brokeren deler ut.</li>
+      <li>Ny konsument betyr én ny kobling, ikke fire. Kostnaden vokser lineært i stedet for multiplikativt.</li>
+      <li>Beslutningen kan reverseres. Piloten kan stoppes uten at et eneste PLC-program er endret.</li>
+    </ul>
+    <p class="lab">Der løsningen har grenser</p>
+    <ul>
+      <li>En broker husker ikke historikk. Langtidslagring krever en historian eller database ved siden av.</li>
+      <li>Uten topic-struktur ender du med «temp2_ny_FINAL». Det tar vi i øvelse 2.</li>
+    </ul>
+    <div class="callout"><b>IEC 62443:</b> Brokeren hører hjemme i en egen edge-sone, og trafikken mellom OT og IT går gjennom definerte conduits (sone- og conduit-modellen i 62443-3-2). I denne øvelsen kjører vi anonymt og i klartekst, kun i lab. I produksjon krever FR1 identifisering og autentisering (SR 1.1 og 1.2), og FR4 krever konfidensialitet og kryptografi (SR 4.1 og 4.3). Det bygger vi i øvelse 23 og 24.</div>
+  </section>
+
+  <section class="blk" id="cust1">
+    <h3><span class="no">KUNDE</span>Hva du må hente fra kunden</h3>
+    <p>Ta med fem av disse i første møte og resten i oppfølgingen. Svarene avgjør om caset er enkelt eller et brownfield-prosjekt med skjulte avhengigheter.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Spørsmål</th><th>Hvorfor det betyr noe</th><th>Rødt flagg</th></tr></thead>
+      <tbody>
+        <tr><td>Hvilke PLC-er og enheter finnes? Merke, modell, årgang og firmware.</td><td>Avgjør hvilke protokoller og drivere gatewayen trenger.</td><td>Ingen oversikt, eller «vi vet ikke hva som står i skapet».</td></tr>
+        <tr><td>Hvilke protokoller snakker de? S7, Modbus, EtherNet/IP, OPC DA eller OPC UA.</td><td>Brownfield: bestemmer om en gateway holder, eller om PLC-programmet må endres.</td><td>Bare OPC DA over DCOM.</td></tr>
+        <tr><td>Hvem leser fra PLC-ene i dag, og hvor ofte?</td><td>Teller samtidige lesere. Det er lasten som stopper linja.</td><td>Ingen vet det, og en av leserne er et Excel-ark.</td></tr>
+        <tr><td>Hvilke signaler trengs, og med hvilken oppløsning (sekund, minutt)?</td><td>Dimensjonerer broker og nettverk, og hindrer at alt publiseres «bare i tilfelle».</td><td>«Alle tags», uten et formål.</td></tr>
+        <tr><td>Hvor går grensen mellom OT og IT, og hvem eier OT-nettet?</td><td>Bestemmer hvor gateway og broker plasseres (soner og conduits, IEC 62443-3-2).</td><td>Flatt nettverk fra PLC til kontorpulten.</td></tr>
+        <tr><td>Finnes det krav til sikkerhetsnivå, revisjon eller NIS2/62443?</td><td>Styrer hvilke sikkerhetsfunksjoner som må være på plass fra dag én.</td><td>Kravene finnes, men ingen eier dem.</td></tr>
+        <tr><td>Hva koster en stans, og når kan dere gjøre endringer?</td><td>Setter risikoterskel og tidsplan for piloten.</td><td>Linja går døgnet rundt og det finnes ingen testlinje.</td></tr>
+        <tr><td>Hvem eier løsningen etter piloten? Drift, support og budsjett.</td><td>En broker uten eier blir et nytt skjult system.</td><td>«IT tror OT tar den, og OT tror IT tar den.»</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section class="blk" id="arch1">
+    <h3><span class="no">ARK</span>TOGAF og systemteknikk i caset</h3>
+    <div class="two">
+      <div>
+        <p class="lab">TOGAF</p>
+        <ul>
+          <li><b>Fase A, Arkitekturvisjon:</b> Gunnhilds «ett tall». Lag en interessentkart med bekymringene til Gunnhild, Terje, Knut og Randi.</li>
+          <li><b>Prinsipper (preliminærfasen):</b> «Data publiseres én gang og brukes mange ganger.» «Ingen endring i PLC-programmer uten endringsprosess.» «Åpne standarder foran leverandørspesifikke løsninger.»</li>
+          <li><b>Fase B–D, domenene:</b> Forretning (ett felles OEE-tall), Data (signaler og topic-navn), Applikasjon (SCADA, MES, dashboard, KI-kamera, ERP) og Teknologi (gateway, broker, nettverkssoner).</li>
+          <li><b>Byggeklosser:</b> arkitekturbyggeblokken (ABB) «meldingsformidler» realiseres som løsningsbyggeblokk (SBB), Mosquitto i labben og HiveMQ Edge som gateway.</li>
+          <li><b>Fase E og F, gap og migrasjon:</b> baseline er punkt-til-punkt, målbildet er en hub. Gap: gateway, broker, topic-struktur og sikkerhet. Pilot først, så utrulling.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="lab">Systemteknikk</p>
+        <ul>
+          <li><b>Interessentbehov til krav:</b> «Ny konsument skal ikke øke lasten på PLC-en.» «En endring i en måling skal nå alle konsumenter innen 1 sekund.» Begge er eksempelkrav som må avklares med kunden.</li>
+          <li><b>Systemkontekst og grensesnitt:</b> tegn systemgrensen rundt gateway og broker. Hver kobling får en grensesnittbeskrivelse med topic, nyttelast, QoS og frekvens.</li>
+          <li><b>Trade study:</b> tabellen i caset er en enkel versjon. Gi kriteriene vekt og poeng for å gjøre valget etterprøvbart.</li>
+          <li><b>Verifikasjon og validering:</b> Wireshark og broker-loggen verifiserer at kravene er oppfylt. Validering er at Gunnhild faktisk får ett tall hun stoler på.</li>
+          <li><b>Risiko:</b> brokeren er et enkeltpunkt som kan feile. Redundans tar vi i øvelse 41.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="erp1">
+    <h3><span class="no">ERP</span>ERP-landskapet i løypa</h3>
+    <p>Fra øvelse 19 simulerer vi ERP med et REST API og SQLite. Simulatoren bruker nøytrale navn, og hver ERP-øvelse viser hvordan det samme mappes til SAP S/4HANA, Infor og Microsoft Dynamics 365. I caset bruker Randi Infor M3.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>System</th><th>Relevante moduler for OT/IT</th><th>Typiske grensesnitt</th></tr></thead>
+      <tbody>
+        <tr><td><b>SAP S/4HANA</b></td><td>PP (produksjon), MM/IM (lager), QM (kvalitet), PM (vedlikehold) og EWM (utvidet lager). SAP Digital Manufacturing er SAPs MES.</td><td>OData-API-er, blant annet API_PRODUCTION_ORDER_2_SRV (ordrer) og API_PROD_ORDER_CONFIRMATION_2_SRV (bekreftelser). IDoc og BAPI i eldre oppsett. SAP BTP Integration Suite som integrasjonslag.</td></tr>
+        <tr><td><b>Infor</b> (M3, LN, CloudSuite Industrial)</td><td>Produksjon, lager og kvalitet. Funksjonene varierer mellom M3, LN og CloudSuite Industrial (SyteLine).</td><td>Via Infor OS og ION: API Gateway (OAuth 2.0), asynkrone BOD-meldinger, M3 MI-programmer (REST), LN OData og CloudSuite Industrial IDO (REST).</td></tr>
+        <tr><td><b>Microsoft Dynamics 365</b></td><td>Supply Chain Management (produksjon, lager, kvalitet, aktiva). Business Central for mindre virksomheter.</td><td>Data entities via OData, business events og Dataverse. Eget grensesnitt for tredjeparts MES. Azure-tjenester som Service Bus og Event Grid er vanlige integrasjonslag.</td></tr>
+      </tbody></table></div>
+    <p class="note">Grensesnitt og API-navn endres mellom versjoner. Sjekk SAP Business Accelerator Hub, Infor-dokumentasjonen og Microsoft Learn for kundens versjon før du lover noe.</p>
+  </section>
+
+  <section class="blk" id="uns1">
+    <h3><span class="no">UNS</span>Unified Namespace i caset</h3>
+    <p>Et Unified Namespace (UNS) er ett felles navnerom for sanntidsdata i hele virksomheten. Alle systemer publiserer tilstanden sin dit, og alle som trenger data leser derfra. Det er et arkitekturprinsipp og ikke et produkt. En MQTT-broker er den vanligste måten å bygge det på, men ikke den eneste. Hierarkiet følger ofte ISA-95: foretak, anlegg, område, linje og celle.</p>
+    <div class="code"><pre><code>agderfisk/mandal/pakkeri/linje1/pakking/temperatur
+agderfisk/mandal/pakkeri/linje1/pakking/tilstand
+agderfisk/mandal/pakkeri/linje1/vekt/nettovekt</code></pre></div>
+    <p>Brokeren i denne øvelsen er første steg. Navnerommet får struktur i øvelse 2, og det er først da brokeren blir en UNS i stedet for en postkasse.</p>
+  </section>
+
+  <section class="blk" id="sec1">
+    <h3><span class="no">SIKKERHET</span>IEC 62443 og regelverk i caset</h3>
+    <p>Skisse for brokerløsningen, i tankegangen fra 62443-3-2. Den faktiske soneinndelingen og mål-SL må komme fra en risikovurdering hos kunden.</p>
+    <div class="code"><pre><code> OT-SONE (pakkeri)                EDGE-SONE                     IT-SONE
+ PLC Pakking  ─┐                                          ┌─▶ ERP (Infor M3)
+ PLC Fryser   ─┼─ A (kun lesing) ─▶ Gateway ─▶ Broker ─ C ┼─▶ Dashboard og MES
+ Temp-gateway ─┤                                          └─▶ KI-kamera
+ Vekt         ─┘
+ Leverandør ── B (egen conduit via DMZ) ──▶ Edge-sone, aldri rett inn i OT</code></pre></div>
+    <ul>
+      <li><b>Conduit A:</b> fra OT til edge, kun lesing. IT skriver ikke til PLC-ene.</li>
+      <li><b>Conduit C:</b> fra edge til IT, med TLS og autentisering. Det bygger vi i øvelse 23 og 24.</li>
+      <li><b>Conduit B:</b> leverandørtilgang går via DMZ og aldri rett inn i OT-sonen.</li>
+      <li><b>Mål-SL:</b> for eksempel SL-T 2 for edge-sonen. Eksemplet må avklares i risikovurderingen.</li>
+    </ul>
+    <div class="callout"><b>Regelverk i Norge:</b> digitalsikkerhetsloven har gjeldt siden 1. oktober 2025, med NSM som tilsynsmyndighet. Den gjelder leverandører av samfunnsviktige tjenester i blant annet energi, transport, helse, vannforsyning, digital infrastruktur og finans, og bygger hovedsakelig på det første NIS-direktivet. NIS2 er ikke innført i norsk rett (status januar 2026, sjekk oppdatert status). Matproduksjon står ikke i lovens sektorliste, mens NIS2 omfatter deler av matsektoren. Avklar kundens situasjon, og husk at kunder kan stille kontraktskrav uansett.</div>
+  </section>
+
+  <section class="blk"><h3><span class="no">1</span>Konseptet</h3>
+    <p>MQTT er en lettvekts meldingsprotokoll over TCP. Klienter snakker aldri direkte med hverandre. De kobler seg til en <b>broker</b> som mottar meldinger og ruter dem til abonnenter. Utgiver og abonnent kjenner ikke hverandre (løs kobling).</p></section>
+
+  <section class="blk"><h3><span class="no">2</span>Bruk i industrien</h3>
+    <p>Maskiner, sensorer og gatewayer publiserer data til en sentral broker, ofte i en Unified Namespace. MES, historian, dashboard og ERP-integrasjon abonnerer uavhengig av hverandre. Forretningsbehovet er å slippe punkt-til-punkt-integrasjoner som må endres hver gang noe nytt kobles på.</p></section>
+
+  <section class="blk"><h3><span class="no">3</span>Arkitektur</h3>
+    <div class="code"><pre><code> [mosquitto_pub]──┐                 ┌──▶[mosquitto_sub]
+ [Python-klient]──┼──▶ BROKER ──────┼──▶[MQTT Explorer (Windows)]
+                  │  (Mosquitto,    └──▶[Python-abonnent]
+                  │   WSL2:1883)
+              TCP 1883</code></pre></div></section>
+
+  <section class="blk"><h3><span class="no">4–5</span>Steg og kommandoer (Ubuntu/WSL2)</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.s1"><span>Steg 1: Lag en minimal broker-konfig</span></label>
+      <div class="code"><pre><code>mkdir -p ~/lab/ex01 &amp;&amp; cd ~/lab/ex01
+cat &gt; mosquitto.conf &lt;&lt;'EOF'
+listener 1883
+allow_anonymous true
+EOF</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>mkdir -p ~/lab/ex01</dt><dd>Lager mappen. <code>-p</code> lager også manglende overmapper og gir ikke feil hvis mappen finnes. <code>~</code> er hjemmemappen din.</dd><dt>&amp;&amp;</dt><dd>Kjør neste kommando bare hvis den forrige lyktes.</dd><dt>cd ~/lab/ex01</dt><dd>Går inn i mappen.</dd><dt>cat &gt; mosquitto.conf &lt;&lt;'EOF' … EOF</dt><dd>Skriver alt mellom <code>EOF</code>-linjene til filen <code>mosquitto.conf</code>. Enkeltfnuttene rundt <code>EOF</code> hindrer at skallet tolker spesialtegn i teksten.</dd><dt>listener 1883</dt><dd>Brokeren lytter på TCP-port 1883, som er standard for MQTT uten kryptering.</dd><dt>allow_anonymous true</dt><dd>Tillater tilkobling uten brukernavn og passord. Bare for lab.</dd></dl>
+      <p>Anonym tilgang er kun for lab. Vi låser den ned i TLS- og ACL-modulene.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.s2"><span>Steg 2: Stopp bakgrunnstjenesten og start broker i forgrunnen (terminal 1)</span></label>
+      <div class="code"><pre><code>sudo service mosquitto stop 2&gt;/dev/null
+mosquitto -c mosquitto.conf -v</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>sudo service mosquitto stop</dt><dd>Stopper bakgrunnstjenesten slik at port 1883 er ledig. <code>sudo</code> kjører kommandoen som administrator.</dd><dt>2&gt;/dev/null</dt><dd>Kanal 2 er feilmeldinger. Her kastes de, så du slipper støy hvis tjenesten ikke kjørte.</dd><dt>mosquitto -c mosquitto.conf -v</dt><dd>Starter brokeren i forgrunnen. <code>-c</code> peker på konfigfilen, og <code>-v</code> (verbose) skriver hver tilkobling og melding til loggen.</dd></dl>
+      <p>Terminal 1 blir stående som broker-logg.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.s3"><span>Steg 3: Abonner (terminal 2)</span></label>
+      <div class="code"><pre><code>mosquitto_sub -h localhost -p 1883 -V mqttv5 -t "lab/ex01/#" -v</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>mosquitto_sub</dt><dd>Kommandolinje-abonnent som skriver ut meldinger den mottar.</dd><dt>-h localhost</dt><dd>Vert (host) å koble til. Her maskinen selv.</dd><dt>-p 1883</dt><dd>Port. 1883 er standard og kan utelates.</dd><dt>-V mqttv5</dt><dd>Bruk MQTT versjon 5.</dd><dt>-t "lab/ex01/#"</dt><dd>Topic-filter. <code>#</code> er wildcard for alle nivåer under <code>lab/ex01/</code>.</dd><dt>-v</dt><dd>Skriver topic foran meldingen, slik at du ser hvor den kom fra.</dd></dl>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.s4"><span>Steg 4: Publiser (terminal 3)</span></label>
+      <div class="code"><pre><code>mosquitto_pub -h localhost -V mqttv5 -t "lab/ex01/temperatur" -m "21.5"
+mosquitto_pub -h localhost -V mqttv5 -t "lab/ex01/status" -m "RUNNING"</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>mosquitto_pub</dt><dd>Kommandolinje-utgiver som sender én melding og avslutter.</dd><dt>-h localhost -V mqttv5</dt><dd>Samme som for abonnenten. Porten utelates fordi 1883 er standard.</dd><dt>-t "lab/ex01/temperatur"</dt><dd>Topic meldingen publiseres på.</dd><dt>-m "21.5"</dt><dd>Meldingens innhold (payload). MQTT bryr seg ikke om formatet. Det er bare bytes.</dd></dl>
+      <p>Terminal 2 skal vise begge meldingene med topic.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.s5"><span>Steg 5: MQTT Explorer (Windows)</span></label>
+      <p>Koble til <code>localhost</code>, port <code>1883</code>, protokoll MQTT 5. Publiser en melding fra Explorer og se den i terminal 2.</p>
+    </div>
+  </section>
+
+  <section class="blk"><h3><span class="no">7</span>Python-klient</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.py"><span>Python-abonnent og -publisher fungerer</span></label>
+      <div class="code"><pre><code>cd ~/lab/ex01
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install paho-mqtt</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>python3 -m venv .venv</dt><dd>Lager et isolert Python-miljø i mappen <code>.venv</code>, slik at pakker ikke havner i systemets Python.</dd><dt>source .venv/bin/activate</dt><dd>Aktiverer miljøet. Prompten får <code>(.venv)</code>, og <code>python</code> og <code>pip</code> peker nå på miljøet.</dd><dt>pip install paho-mqtt</dt><dd>Installerer MQTT-biblioteket for Python (versjon 2.x).</dd></dl>
+      <div class="code hasfn"><span class="fn">sub.py</span><pre><code>import paho.mqtt.client as mqtt
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    print("Connected:", reason_code)
+    client.subscribe("lab/ex01/#", qos=0)
+
+def on_message(client, userdata, msg):
+    print(f"{msg.topic}: {msg.payload.decode()}")
+
+c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
+                client_id="py-sub", protocol=mqtt.MQTTv5)
+c.on_connect = on_connect
+c.on_message = on_message
+c.connect("localhost", 1883)
+c.loop_forever()</code></pre></div>
+      <div class="code hasfn"><span class="fn">pub.py</span><pre><code>import time
+import paho.mqtt.client as mqtt
+
+c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
+                client_id="py-pub", protocol=mqtt.MQTTv5)
+c.connect("localhost", 1883)
+c.loop_start()
+for i in range(5):
+    info = c.publish("lab/ex01/teller", str(i), qos=0)
+    info.wait_for_publish()
+    time.sleep(1)
+c.loop_stop()
+c.disconnect()</code></pre></div>
+      <p>Kjør <code>python sub.py</code> i én terminal og <code>python pub.py</code> i en annen.</p>
+    </div>
+  </section>
+
+  <section class="blk"><h3><span class="no">8</span>Verifisering</h3>
+    <ul>
+      <li>Broker-loggen viser <code>New client connected</code>, <code>Received PUBLISH</code> og <code>Sending PUBLISH</code>.</li>
+      <li>Alle tre abonnenter (mosquitto_sub, Explorer, Python) mottar de samme meldingene.</li>
+      <li>Meldinger på <code>lab/ex01/...</code> vises, men ikke på <code>annet/topic</code>.</li>
+    </ul></section>
+
+  <section class="blk"><h3><span class="no">9</span>Feilsøking</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Symptom</th><th>Årsak / tiltak</th></tr></thead>
+      <tbody>
+        <tr><td><code>Connection refused</code></td><td>Broker kjører ikke, eller feil port. Sjekk <code>ss -tlnp | grep 1883</code>.</td></tr>
+        <tr><td><code>address already in use</code></td><td>Tjenesten kjører allerede. Kjør <code>sudo service mosquitto stop</code>.</td></tr>
+        <tr><td>Windows-Explorer får ikke kontakt</td><td>Prøv WSL-IP (<code>hostname -I</code>) i stedet for <code>localhost</code>, eller aktiver mirrored networking i <code>.wslconfig</code>.</td></tr>
+        <tr><td>Ingen meldinger mottatt</td><td>Sjekk topic-stavemåte, og at abonnenten startet før publiseringen (QoS 0 lagres ikke).</td></tr>
+        <tr><td>Python-feil på <code>Client(...)</code></td><td>paho-mqtt 2.x krever <code>CallbackAPIVersion</code>, som koden over bruker.</td></tr>
+      </tbody></table></div>
+    <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>ss -tlnp</dt><dd>Viser lyttende porter. <code>-t</code> TCP, <code>-l</code> lyttende, <code>-n</code> tall i stedet for navn, <code>-p</code> hvilken prosess.</dd><dt>| grep 1883</dt><dd>Filtrerer utdataen til linjer som inneholder 1883.</dd><dt>hostname -I</dt><dd>Viser maskinens IP-adresser. Brukes for å finne WSL-adressen.</dd></dl></section>
+
+  <section class="blk"><h3><span class="no">10</span>Hva skjer på protokollnivå</h3>
+    <ol>
+      <li>TCP-handshake mot port 1883.</li>
+      <li><b>CONNECT</b>: klient-ID, protokollnivå 5, keep-alive, clean start, session expiry.</li>
+      <li><b>CONNACK</b>: reason code 0 (Success) pluss broker-egenskaper, for eksempel max QoS og retain available.</li>
+      <li><b>SUBSCRIBE</b>: topic-filter med opsjoner, besvart av <b>SUBACK</b> med reason code per filter.</li>
+      <li><b>PUBLISH</b>: topic, payload, QoS-flagg. Brokeren matcher topic mot alle filtre og videresender.</li>
+      <li><b>PINGREQ/PINGRESP</b> holder forbindelsen i live ved inaktivitet.</li>
+      <li><b>DISCONNECT</b> gir en ryddig avslutning. Uten den utløses eventuell Last Will.</li>
+    </ol></section>
+
+  <section class="blk"><h3><span class="no">11</span>Wireshark</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.ws"><span>Fanget og leste MQTT-pakkene i Wireshark</span></label>
+      <p>Trafikken går internt i WSL2, så fang den der og pipe til Wireshark. Kjør fra PowerShell:</p>
+      <div class="code"><pre><code>wsl -d Ubuntu sudo tcpdump -U -i lo -w - "port 1883" | &amp; "C:\Program Files\Wireshark\Wireshark.exe" -k -i -</code></pre></div>
+      <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>wsl -d Ubuntu</dt><dd>Kjører resten av kommandoen inne i WSL-distroen <code>Ubuntu</code> fra PowerShell.</dd><dt>sudo tcpdump</dt><dd>Fanger nettverkspakker. Trenger administratorrettigheter.</dd><dt>-U</dt><dd>Skriver hver pakke ut med en gang i stedet for å buffre. Nødvendig for live visning i Wireshark.</dd><dt>-i lo</dt><dd>Fanger på loopback-grensesnittet, der trafikk til <code>localhost</code> går.</dd><dt>-w -</dt><dd>Skriver rå pcap-data til standard ut. Tegnet <code>-</code> betyr stdout.</dd><dt>"port 1883"</dt><dd>Capture-filter: bare pakker på port 1883.</dd><dt>|</dt><dd>Sender utdataen til neste kommando (pipe).</dd><dt>&amp; "C:\Program Files\Wireshark\Wireshark.exe"</dt><dd>I PowerShell kjører <code>&amp;</code> en fil gitt med sti i anførselstegn.</dd><dt>-k -i -</dt><dd><code>-k</code> starter fangsten med en gang, og <code>-i -</code> leser pakker fra standard inn, altså pipen.</dd></dl>
+      <p>Finn distronavnet med <code>wsl -l</code> hvis det ikke er <code>Ubuntu</code>. Alternativt: <code>sudo tcpdump -i lo -w ex01.pcap port 1883</code> i WSL, og åpne filen i Wireshark.</p>
+      <p>Bruk displayfilter <code>mqtt</code>. Se etter CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Utvid <i>MQTT Header → Version</i> og sjekk at den viser 5. Klikk på CONNECT og finn <i>Properties</i>, for eksempel Session Expiry Interval.</p>
+    </div></section>
+
+  <section class="blk"><h3><span class="no">12</span>Ekstra utfordring</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex1.ch"><span>Utfordringen er løst</span></label>
+      <ol>
+        <li>Start to <code>mosquitto_sub</code>-abonnenter med ulike filtre (<code>lab/ex01/#</code> og <code>lab/ex01/status</code>) og publiser til begge topics. Forklar hvem som får hva.</li>
+        <li>I Wireshark: finn PUBLISH-pakken og les ut topic, payload og QoS direkte fra bytene.</li>
+        <li>Skriv en Python-publisher som sender en JSON-melding, for eksempel <code>{"temp": 21.5, "unit": "C"}</code>, hvert sekund, og la abonnenten parse den.</li>
+      </ol>
+    </div></section>
+
+  <div class="confirm">
+    <label class="chk"><input type="checkbox" data-k="ex1"><span>Øvelse 1 fungerer</span></label>
+    <p>Skriv en kort beskrivelse til Claude av hva du så i Wireshark, for eksempel hvilke properties som lå i CONNECT. Da får du øvelse 2: Topics, wildcards og topic-design (UNS-struktur).</p>
+  </div>
+</template>
+
+<template id="tpl-tool">
+  <section class="blk"><h3><span class="no">MAL</span>Discovery-workshop på to timer</h3>
+    <p>Bruk den første gangen du møter kunden. Hent spørsmål fra «Spør kunden om» i øvelsen som passer, og sett dem inn under punkt 2 og 4.</p>
+    <div class="code"><pre><code>Discovery-workshop (2 timer)
+Deltakere: drift, automasjon/OT, IT, økonomi og kvalitet. Den som eier beslutningen må være med.
+
+0:00  Mål og rammer (10 min): hva skal bli bedre, og hvordan måler vi det?
+0:10  Dagens situasjon (30 min): systemoversikt, hvem leser fra hva, siste hendelse som gikk galt
+0:40  Data og beslutninger (25 min): hvilke beslutninger mangler data, hvilke signaler, hvilken oppløsning
+1:05  Sikkerhet og drift (20 min): soner, eierskap, endringsvindu, krav (62443 og regelverk)
+1:25  Økonomi og tid (15 min): kostnad ved stans, budsjett, tidsramme
+1:40  Prioritering (15 min): rask gevinst, pilot og risiko
+1:55  Oppsummering (5 min): eiere og neste steg
+
+Leveranse: én side med funn, antakelser, åpne spørsmål og forslag til pilot.</code></pre></div></section>
+
+  <section class="blk"><h3><span class="no">MAL</span>Arkitekturbeslutning (ADR)</h3>
+    <div class="code"><pre><code>Arkitekturbeslutning (ADR)
+Tittel:
+Dato og status: Foreslått | Besluttet | Erstattet
+Kontekst: hvilket problem, og hvilke begrensninger (brownfield, økosystem, økonomi, tid)
+Alternativer: A, B og C med korte fordeler og ulemper
+Beslutning: hva velges
+Begrunnelse: hvorfor, koblet til kriteriene
+Konsekvenser: hva blir enklere, hva blir vanskeligere, nye risikoer
+Verifikasjon: hvordan vet vi at det virker
+Eier og revisjonsdato:</code></pre></div></section>
+
+  <section class="blk"><h3><span class="no">MAL</span>Anbefalingsnotat på én side</h3>
+    <div class="code"><pre><code>Anbefalingsnotat (1 side)
+1. Situasjon (tre linjer)
+2. Anbefaling (én setning)
+3. Hvorfor (tre punkter, koblet til kundens egne mål)
+4. Kostnad og tid til effekt (bruk kundens tall, ikke eksempeltall)
+5. Risiko og tiltak, inkludert sikkerhet: soner og mål-SL
+6. Pilotforslag: omfang, varighet og suksesskriterier
+7. Beslutning som trengs fra kunden, og frist</code></pre></div></section>
+
+  <section class="blk" id="tco"><h3><span class="no">REGNER</span>Kostnadskalkulator: punkt-til-punkt mot hub</h3>
+    <p>Sammenlign å koble alle kilder til alle konsumenter direkte mot en hub med broker. Alle tallene under er eksempler. Bytt dem ut med kundens tall før du viser dem frem.</p>
+    <div class="calc">
+      <label for="t-k">Antall kilder<input id="t-k" type="number" min="0" value="4"></label>
+      <label for="t-n">Antall konsumenter<input id="t-n" type="number" min="0" value="6"></label>
+      <label for="t-h1">Timer per punkt-til-punkt-integrasjon<input id="t-h1" type="number" min="0" value="40"></label>
+      <label for="t-h2">Timer per tilkobling til hub<input id="t-h2" type="number" min="0" value="15"></label>
+      <label for="t-hs">Timer for oppsett av hub<input id="t-hs" type="number" min="0" value="120"></label>
+      <label for="t-r">Timepris (kr)<input id="t-r" type="number" min="0" value="1200"></label>
+      <label for="t-l">Lisens og drift av hub per år (kr)<input id="t-l" type="number" min="0" value="0"></label>
+      <label for="t-y">Horisont (år)<input id="t-y" type="number" min="1" value="3"></label>
+      <label for="t-m1">Vedlikehold punkt-til-punkt (% av bygging per år)<input id="t-m1" type="number" min="0" value="15"></label>
+      <label for="t-m2">Vedlikehold hub (% av bygging per år)<input id="t-m2" type="number" min="0" value="10"></label>
+    </div>
+    <div class="res" aria-live="polite">
+      <div><span>Punkt-til-punkt, total</span><b id="t-o-p2p">0 kr</b><span id="t-o-p2pd"></span></div>
+      <div><span>Hub, total</span><b id="t-o-hub">0 kr</b><span id="t-o-hubd"></span></div>
+    </div>
+    <p id="t-o-diff"></p>
+  </section>
+</template>
+
+<script>
+(function(){
+  var LEVELS=[
+    {id:'b',name:'Beginner',weeks:'uke 1–2'},
+    {id:'i',name:'Intermediate',weeks:'uke 3–5'},
+    {id:'a',name:'Advanced',weeks:'uke 6–9'},
+    {id:'e',name:'Expert',weeks:'uke 10–12'},
+    {id:'t',name:'Tillegg',weeks:'valgfri'}
+  ];
+  var RAW=[
+    ['b','Broker og klienter','Mosquitto, pub/sub, Python, Wireshark',1],
+    ['b','Topics, wildcards og topic-design (UNS)','+ og #, navnerom, UNS-struktur'],
+    ['b','QoS 0, 1 og 2','Leveringsgarantier og handshake'],
+    ['b','Retained messages','Siste kjente verdi'],
+    ['b','OPC UA: Address Space og noder','Prosys-server og OPC UA Browser'],
+    ['b','OPC UA: Client-Server og variabler','Lese, skrive og abonnere'],
+    ['b','MQTT → Python','Abonnent med parsing og logging'],
+    ['b','MQTT → Node-RED → Dashboard','Første visualisering'],
+    ['i','Last Will and Testament','Maskinstatus ved frakobling'],
+    ['i','Session Expiry og Message Expiry','Levetid for sesjon og melding'],
+    ['i','User Properties og Topic Alias','Metadata og kortere topics'],
+    ['i','Shared Subscriptions','Lastfordeling mellom konsumenter'],
+    ['i','Request-Response','Response Topic og Correlation Data'],
+    ['i','OPC UA: Methods og Events','Kall metoder, motta hendelser'],
+    ['i','OPC UA: DataTypes og References','Typer og relasjoner i modellen'],
+    ['i','OPC UA → Python','Klient med asyncua'],
+    ['i','OPC UA → Node-RED → MQTT','Første OT/IT-bro'],
+    ['i','OPC UA → HiveMQ Edge → MQTT','Protokollkonvertering i edge'],
+    ['i','ERP-simulator: REST API og SQLite','Lager og artikler'],
+    ['i','ERP: produksjonsregistrering og arbeidsordre','Fra maskin til ordre'],
+    ['i','SO-101: grunnleggende styring','LeRobot og kalibrering'],
+    ['i','Teleoperasjon med PS5-kontroller','Manuell styring'],
+    ['a','TLS og sertifikater','OpenSSL, CA og brokersertifikat'],
+    ['a','Enhanced Authentication og ACL','Brukere og tilgangsregler'],
+    ['a','Broker bridging','Edge-til-sentral'],
+    ['a','MQTT 3.1.1 vs 5, designmønstre og feilsøking','Migrering og mønstre'],
+    ['a','OPC UA: Security Policies og sertifikater','Sikker kanal og brukerautentisering'],
+    ['a','OPC UA: Discovery','Finne servere'],
+    ['a','OPC UA: Historikk, alarmer og events','Historical Access og Alarms & Conditions'],
+    ['a','MQTT → OPC UA','Skrive tilbake til maskinmodell'],
+    ['a','OPC UA ↔ MQTT med HiveMQ Edge','Toveis i edge'],
+    ['a','OPC UA ↔ MQTT med Node-RED','Toveis med flyt'],
+    ['a','Sparkplug B med MQTT','Birth, death og data'],
+    ['a','OPC UA PubSub','Over MQTT'],
+    ['a','Companion Specifications og informasjonsmodeller','Industrielle datamodeller'],
+    ['a','ERP: maskinstans, kvalitetsavvik og sporbarhet','Hendelser inn i forretningssystemet'],
+    ['a','ERP: OEE og KPI-dashboard','Tilgjengelighet, ytelse, kvalitet'],
+    ['a','Robotstyring og status via MQTT','SO-101 over broker'],
+    ['a','Robotstyring via OPC UA','Metoder og variabler for roboten'],
+    ['a','Robotdata til ERP','Lager oppdateres når roboten flytter deler'],
+    ['e','Produksjonsarkitektur: UNS, HA-broker, edge/cloud','Helhetlig lagdeling'],
+    ['e','Kameraintegrasjon','To USB-kameraer'],
+    ['e','LeRobot: datasettopptak','Demonstrasjoner med kamera'],
+    ['e','Trening av modeller','Policy for SO-101'],
+    ['e','Edge AI','Inferens ved maskinen'],
+    ['e','Capstone: SO-101 → OPC UA → MQTT → ERP → KPI','Hele kjeden, digital tvilling-tankegang'],
+    ['t','IEC 62443: soner og conduits på caset','Risikovurdering og mål-SL'],
+    ['t','NIS2 og 62443: kravmapping og leverandørkrav','Regelverk og tiltak'],
+    ['t','Historian og tidsserie, med AVEVA som alternativ','InfluxDB eller TimescaleDB og Grafana'],
+    ['t','Asset Administration Shell og digital tvilling','AAS, OPC UA og Isaac Sim'],
+    ['t','Edge-drift og OT-overvåking','Docker eller k3s og passiv overvåking'],
+    ['t','ISA-95, ISA-88 og PackML i navnerommet','Modellene bak hierarkiet'],
+    ['t','Safety mot security for roboter','Nødstopp, soner og ansvar']
+  ];
+  /* Case-skisser: [kunde, hook, tags]. D=Digitalisering, B=Brownfield, S=IEC 62443, A=Physical AI */
+  var CASE=[
+    ['Agder Fiskeforedling AS','Alle spør PLC-en, og til slutt svarer den ikke','DBS'],
+    ['Nordlys Meieri','Topic-navn som «temp2_ny_FINAL» i produksjon','D'],
+    ['Smolt Settefisk AS','Oksygenmålinger over et mobilnett som blinker. Hva skjer med meldingene?','DB'],
+    ['Vestfold Bryggeri','Dashboardet er blankt etter restart. Brygger Olav tror det er brann.','D'],
+    ['Anlegg med fire PLC-merker','Fire leverandører, fire språk. Finnes det en felles modell?','DB'],
+    ['Kommunalt vannverk','SCADA-migrering fra OPC DA og DCOM som ingen tør å røre','BS'],
+    ['Stålvarefabrikken Sør','Kvalitet vil ha avviksdeteksjon uten tilgang til PLC-en','D'],
+    ['Nordlys Meieri','Driftssjefen vil ha en TV i kantina. Kantina vil helst ha kaffemaskinen.','D'],
+    ['Pumpestasjoner i en kommune','Er RTU-en stille eller død? Last Will svarer.','DS'],
+    ['Hurtigbåt med ustabil satellitt','Tre timer gammel temperatur skal ikke utløse alarm','DB'],
+    ['Gruvedrift på smalbånd','Hver byte koster. Topic Alias og metadata uten overhead.','DB'],
+    ['Pakkesortering','Tre konsumenter, én strøm av hendelser, ingen dobbeltbehandling','D'],
+    ['Lager med AMR-flåte','Roboten må svare «jeg tar oppdraget» før to roboter tar det samme','DA'],
+    ['Pakkemaskin med oppskriftsbytte','Operatøren bytter oppskrift. Metoden skal kreve riktig rolle.','DS'],
+    ['Pumpeprodusent','Tre pumpestørrelser, én typemodell','D'],
+    ['Dataforsker uten PLC-tilgang','Data science vil ha data, ikke styringssystemet','D'],
+    ['Linje fra 1999 med moderne SCADA','Lavkost-bro på to dager, uten å rive noe','B'],
+    ['Brownfield-anlegg med S7 og Modbus','Protokolloversetter ved kanten i stedet for ny PLC','BS'],
+    ['Grossist med Visma-ERP','ERP sier 120 paller. Hylla sier 117.','D'],
+    ['Plastprodusent','Produksjonsmengde på papirlapp, tastet inn fredag kl. 15','D'],
+    ['Lavkost robotlab','Physical AI starter med en liten arm og store spørsmål','A'],
+    ['Demonstrasjoner til robotlæring','Teleoperasjon er måten roboten lærer jobben på','A'],
+    ['Kundens sikkerhetsrevisjon','«Alt går i klartekst.» Revisoren hadde rett.','DS'],
+    ['Vedlikeholdsleverandør med fjerntilgang','Leverandøren skal lese tre topics, ikke skru av fryseren','S'],
+    ['Tre fabrikker, ett datasenter','Bridge fra edge til sentral uten å åpne alt','DS'],
+    ['Gateway som bare snakker 3.1.1','Migrering uten å stoppe produksjonen','B'],
+    ['Prosessanlegg med mål-SL 2','«Security None» var standard fordi «det virket»','S'],
+    ['Anlegg med femti OPC UA-servere','Hvem er egentlig koblet til hva? Discovery og GDS.','S'],
+    ['Alarmflom i kontrollrom','200 alarmer i timen. Operatøren leser ingen av dem.','D'],
+    ['Lager- og styringssystem (WMS)','IT vil sende oppdrag til maskinen. OT vil beholde kontrollen.','BS'],
+    ['Pakkeri med to protokoller','Toveis i edge uten egen kode','B'],
+    ['Fabrikk uten utviklerressurser','Toveis med lavkode. Hva brekker først?','B'],
+    ['Fem anlegg, én felles tilstand','Sparkplug: vet vi at enheten lever, eller bare at den har sagt noe?','D'],
+    ['Maskinbygger med PubSub-krav','PubSub over MQTT i stedet for klient-server','D'],
+    ['Sprøytestøping og pakking','Euromap 77 og PackML i stedet for hjemmelagde modeller','DB'],
+    ['Matprodusent med tilbakekalling','Hvilke partier inneholdt råvaren? Svar på 15 minutter, ikke 3 dager.','D'],
+    ['Tre OEE-tall i tre møter','Ett tall, én definisjon','D'],
+    ['AMR-flåte med sikkerhetskrav','Robotstyring over MQTT og hvem som får lov å styre','AS'],
+    ['Robotcelle med OPC UA','Metoder og variabler for roboten, med informasjonsmodell','AD'],
+    ['Plukkrobot i lager','Roboten flytter delen. ERP-lageret oppdaterer seg selv.','AD'],
+    ['Konsern med ti fabrikker','Edge, sentral og sky: hvem eier hva?','DS'],
+    ['Kvalitetskontroll med kamera','To kameraer, én avvisningsbeslutning på noen hundre millisekunder','AD'],
+    ['Robotlæring fra demonstrasjoner','Datasett: lite, rent og godt merket','A'],
+    ['Trening på cloud GPU','Trening i skyen, kjøring ved maskinen','A'],
+    ['Edge AI på produksjonsgulvet','Inferens nær maskinen: latens, vedlikehold og oppdateringer','AS'],
+    ['Capstone: smartfabrikk i miniatyr','Hele kjeden fra robotarm til KPI-dashboard','DSA'],
+    ['Agder Fiskeforedling AS, del 2','Revisor Silje vil se sonetegningen. Terje viser kosteskapet.','S'],
+    ['Leverandør til kritiske samfunnsfunksjoner','Digitalsikkerhetsloven gjelder allerede, NIS2 er ikke på plass. Hva gjør dere på mandag?','S'],
+    ['Nordlys Meieri, del 2','Temperaturkurver for hvert parti, i fem år, uten å fylle brokeren','D'],
+    ['Maskinbygger med digitalt produktpass','Maskinen skal beskrive seg selv, og tvillingen i Isaac Sim skal få data fra navnerommet','A'],
+    ['Anlegg med ti edge-noder','Ti edge-noder og én tekniker. Hvem ser at en av dem har sluttet å snakke?','DS'],
+    ['Matprodusent med batch og kontinuerlig drift','Ett navnerom for resept, batch og pakkelinje','D'],
+    ['Robotcelle med nødstopp','Nødstopp skal aldri gå over MQTT. Hva skal da?','AS']
+  ];
+  /* Kundespørsmål per øvelse (3 hver for planlagte øvelser; øvelse 1 har full tabell i malen) */
+  var CUST=[
+    [],
+    ['Finnes det en navnestandard eller et ISA-95-hierarki i dag?','Hvilke systemer skal publisere og abonnere, og hvem eier hver gren?','Hvordan identifiseres anlegg, linje og maskin på tvers av stedene?'],
+    ['Hvor stabil er forbindelsen (mobil, satellitt, kabel), og hvor ofte brytes den?','Hva skjer hvis én måling går tapt, og hva skjer hvis den kommer to ganger?','Hva er meldingsrate og størrelse per sensor?'],
+    ['Hvilke verdier må et nytt abonnement få med en gang (status, setpunkt)?','Hvor ofte endres de, og hvor gamle kan de være før de blir misvisende?','Hvem skal kunne slette eller overskrive siste kjente verdi?'],
+    ['Hvilke leverandører og PLC-merker finnes, og støtter de OPC UA innebygd?','Finnes det en informasjonsmodell eller navnestandard for maskinene?','Hvem eier tag-listene og kan forklare hva hver tag betyr?'],
+    ['Hvilke OPC-klienter og -servere finnes i dag (DA eller UA), og hvilke versjoner?','Hvor mange samtidige klienter og subscriptions tåler serverne?','Hvilke Windows-versjoner og hvilket DCOM-oppsett er involvert?'],
+    ['Hvilket avvik eller varsel skal scriptet finne, og hvem handler på det?','Hvilke historiske data finnes for å definere «normal»?','Hvor skal scriptet kjøre, og hvem drifter det?'],
+    ['Hvem skal se dashboardet, og hvilken beslutning skal det støtte?','Hvilke KPI-er og definisjoner gjelder allerede?','Hvor skal skjermen stå, og hvilke nettleser- og nettverkskrav gjelder?'],
+    ['Hvordan oppdager dere i dag at en stasjon har falt ut?','Hva er akseptabel tid fra utfall til varsel?','Hvem varsles, og hva gjør de?'],
+    ['Hvor lenge er en måling eller kommando gyldig?','Hva skjer med meldinger som ligger i kø mens forbindelsen er nede?','Hvor lenge kan en enhet være borte før sesjonen må ryddes?'],
+    ['Hva er båndbredden, og hva koster den per megabyte?','Hvilken metadata trengs (enhet, kvalitet, tidsstempel, kilde)?','Hvor lange er topic-navnene i dag, og hvor ofte sendes de?'],
+    ['Hvor mange meldinger per sekund, og hva er toppen?','Må rekkefølgen bevares, eller kan meldinger behandles parallelt?','Hva skjer hvis en konsument faller ut midt i behandlingen?'],
+    ['Hvilke kommandoer eller spørringer skal besvares, og hvor raskt?','Hva er konsekvensen av en tapt eller dobbel kommando?','Hvem har lov til å sende kommandoer, og hvem logger dem?'],
+    ['Hvilke operasjoner kan operatører utføre i dag, og med hvilke roller?','Hvilke hendelser og alarmer trengs utenfor SCADA?','Finnes det en endringsprosedyre for oppskrifter og parametere?'],
+    ['Hvor mange varianter av samme utstyrstype finnes?','Hvilke felles egenskaper og enheter skal alle varianter ha?','Hvilke relasjoner mellom utstyr er viktige (eier, plassering, avhengighet)?'],
+    ['Hvilke data trenger analysen, og i hvilken oppløsning?','Hvem godkjenner tilgang, og skal den være kun lesetilgang?','Hvor kjører analysen, og kan den påvirke produksjonsnettet?'],
+    ['Hvilken SCADA og hvilke OPC-servere står i veien?','Hvem vedlikeholder flowene, og finnes det en endringsprosess?','Hva skjer med dataflyten hvis maskinen som kjører Node-RED stopper?'],
+    ['Hvilke protokoller finnes på gulvet (S7, Modbus, EtherNet/IP)?','Hvor mange enheter og tags skal gatewayen lese, og hvor ofte?','Hvilken maskinvare og hvilket nettverk kan edge-noden stå på?'],
+    ['Hvilket ERP-system er i bruk, og hvilke grensesnitt tilbyr det?','Hvilke lagertransaksjoner finnes (innleveranse, uttak, forbruk), og hvem bokfører dem?','Hvor nøyaktig må lagersaldoen være, og hvem teller manuelt i dag?'],
+    ['Hvordan opprettes og lukkes en arbeidsordre i dag?','Hvilke produksjonsdata registreres manuelt, og hvor ofte?','Hvilke felt krever ERP for å godkjenne en rapportering?'],
+    ['Hvilken oppgave skal roboten løse, og hvor presis må den være?','Hvilken arbeidsflate, hvilket lys og hvilke objekter finnes?','Hvilke sikkerhetskrav gjelder rundt roboten?'],
+    ['Hvilke oppgaver skal demonstreres, og av hvem?','Hvor mange demonstrasjoner kan dere realistisk lage?','Hvordan skal mislykkede forsøk merkes?'],
+    ['Hvem utsteder sertifikater i dag, og finnes det en intern CA?','Hvilke enheter kan ikke gjøre TLS (gamle PLC-er, gatewayer)?','Hvem fornyer sertifikater, og hva skjer når de utløper?'],
+    ['Hvem og hva skal få koble til (personer, tjenester, leverandører)?','Hvilke topics skal hver rolle kunne lese og skrive?','Hvordan gis og trekkes tilgang, og hvor logges den?'],
+    ['Hvor mange anlegg, og hvilken båndbredde finnes mot sentralt?','Hvilke topics skal gå til sentralt, og hvilke skal forbli lokale?','Hva skal skje lokalt hvis forbindelsen til sentralt faller ut?'],
+    ['Hvilke klienter og biblioteker finnes, og hvilke støtter MQTT 5?','Hvilke MQTT 5-funksjoner trengs egentlig?','Kan migreringen skje trinnvis, med begge versjoner side om side?'],
+    ['Hva er mål-SL fra risikovurderingen (62443-3-2)?','Hvilke security policies og brukertyper støtter serverne og klientene?','Hvordan håndteres sertifikater, og hvem godkjenner tillit?'],
+    ['Hvor mange OPC UA-servere finnes, og hvem har oversikten?','Er discovery tillatt i nettverkssonene, og hvordan er nettet segmentert?','Finnes det en sentral registrering (GDS), eller bare manuelle lister?'],
+    ['Hvilke alarmer finnes, og hvem gjør noe med dem?','Hvor lenge skal historikk lagres, og hvor?','Finnes det en alarmfilosofi (for eksempel ISA-18.2 eller EEMUA 191)?'],
+    ['Hvilke verdier og kommandoer skal skrives til maskinen?','Hvem godkjenner skriving, og hva er grensene?','Hvordan sikres det at OT kan avvise en ugyldig ordre?'],
+    ['Hvilken retning har dataene, og hva er latenskravet?','Hvilke tags skal skrives tilbake, og hvem eier dem?','Hva er driftsmodellen for gatewayen (oppdateringer, overvåking)?'],
+    ['Hvem skal vedlikeholde flowene over tid?','Hvilken belastning og hvilket antall tags er realistisk?','Finnes det test og versjonsstyring for flowene?'],
+    ['Hvor mange noder og enheter, og hvilke SCADA- og IIoT-plattformer skal bruke dem?','Hvordan håndteres Birth og Death ved omstart?','Er topic-hierarkiet allerede fastlagt, eller skal Sparkplug styre det?'],
+    ['Hvilke produsenter og konsumenter må snakke sammen, og over hvilken transport?','Hvilke krav gjelder for tid og determinisme?','Støtter utstyret PubSub, eller trengs en gateway?'],
+    ['Hvilke maskintyper finnes, og støtter leverandørene en companion spec?','Hvilke deler av modellen trengs i praksis?','Hvem krever standarden: kunden, leverandøren eller regelverket?'],
+    ['Hvilke batch-, parti- og serienumre følges i dag, og hvordan?','Hva kreves ved tilbakekalling, og hvor lang tid har dere?','Hvilke hendelser (stans, avvik) skal inn i ERP eller kvalitetssystemet?'],
+    ['Hvordan defineres tilgjengelighet, ytelse og kvalitet, og av hvem?','Hva regnes som planlagt stans, og hvem avgjør det?','Hvor kommer idealtakt og stoppårsaker fra?'],
+    ['Hvilke kommandoer må roboten ta imot, og hvem har lov til å sende dem?','Hva skjer ved tap av forbindelse (stopp, fortsett, parker)?','Hvilke sikkerhetsfunksjoner ligger utenfor nettverket (nødstopp, sikkerhetssone)?'],
+    ['Hvilken robotleverandør, og støtter styringen OPC UA for Robotics?','Hvilke metoder og variabler må eksponeres?','Hvordan skilles sikkerhetsfunksjoner fra dataforbindelsen?'],
+    ['Hvilke bevegelser skal gi lagertransaksjoner, og hva er riktig enhet?','Hvordan bekreftes det at roboten faktisk flyttet delen?','Hva skjer med lagersaldoen hvis roboten feiler midt i en flytting?'],
+    ['Hvor mange anlegg, og hvilke sentrale systemer skal de dele data med?','Hva er kravet til oppetid og gjenoppretting?','Hvem eier edge, sentral og sky, og hvem betaler?'],
+    ['Hva skal kameraet avgjøre, og hva er konsekvensen av en feil avgjørelse?','Hvilke lysforhold, hastigheter og hvilken bildekvalitet gjelder?','Hvor skal bildene lagres, og hvem har tilgang (personvern)?'],
+    ['Hvilken oppgave skal læres, og hva regnes som vellykket?','Hvor mange demonstrasjoner kan dere lage, og med hvilke variasjoner?','Hvordan merkes og versjoneres datasettet?'],
+    ['Hvilken maskinvare og hvilket budsjett finnes for trening?','Hvordan måles det at modellen er god nok?','Hvem godkjenner at en trent modell får kjøre på roboten?'],
+    ['Hva er latenskravet, og hva skjer hvis modellen ikke svarer?','Hvordan oppdateres modeller og programvare på edge-enheten?','Hvilke sikkerhetskrav gjelder for oppdateringer og for modellens opphav?'],
+    ['Hvilket forretningsspørsmål skal hele kjeden besvare?','Hvilke deler finnes fra før, og hvilke må bygges?','Hvem eier hver del etter at piloten er over?'],
+    ['Finnes det en systemoversikt og nettverkstegning, og er den oppdatert?','Hvilke konsekvenser har et angrep (sikkerhet, miljø, produksjon, omdømme)?','Hvem godkjenner risikoakseptanse og mål-SL?'],
+    ['Er kunden omfattet av digitalsikkerhetsloven, eller av NIS2 gjennom et annet regelverk eller kontrakter?','Hvilke sikkerhetskrav stiller kundens egne kunder?','Hvem er ansvarlig for sikkerhet i OT, og har de mandat?'],
+    ['Hvor lenge skal historikk lagres, og hva krever regelverk eller kunde?','Hvilken oppløsning og hvor mange signaler skal lagres?','Hvilke historianere eller tidsseriesystemer finnes allerede (AVEVA eller andre)?'],
+    ['Hvem trenger en digital beskrivelse av maskinen (kunde, myndighet, leverandør)?','Hvilke data skal være statiske (typeskilt, dokumentasjon), og hvilke skal være live?','Hvilken modell eller standard bruker bransjen allerede?'],
+    ['Hvor mange edge-noder finnes, og hvilke operativsystemer og containere brukes?','Hvem oppdaterer og overvåker dem, og hva sier avtalen?','Hvilken nettverksovervåking finnes i OT i dag?'],
+    ['Hvilke ISA-95-nivåer og ISA-88-begreper bruker kunden i dag?','Hvordan identifiseres batch, ordre og resept på tvers av systemer?','Hvilke maskiner støtter PackML?'],
+    ['Hvilke sikkerhetsfunksjoner finnes i robotcellen, og hvem har sertifisert dem?','Hvilke kommandoer går over nettverk, og hva er konsekvensen av en feil?','Hvem eier risikovurderingen for maskinsikkerhet?']
+  ];
+  /* Arkitekturkobling per øvelse: [TOGAF, systemteknikk]. Tom streng betyr at koblingen ikke passer. Øvelse 1 har full seksjon i malen. */
+  var ARCH=[
+    ['Fase A–G i caset','Behov, krav, grensesnitt og V&V i caset'],
+    ['Dataarkitektur (fase C): felles datamodell og navnestandard som katalog.','Grensesnittdefinisjon: topic-treet er en grensesnittsavtale mellom alle systemer.'],
+    ['Teknologiarkitektur (fase D): valg av tjenestekvalitet som prinsipp per datatype.','Ikke-funksjonelle krav (pålitelighet) og avveiing mellom ytelse og leveringsgaranti.'],
+    ['','Tilstand ved oppstart: krav om gyldig initialtilstand, beskrevet i et driftskonsept (kald start).'],
+    ['Data- og applikasjonsarkitektur: informasjonsmodellen som byggeblokk (ABB) for maskindata.','Domenemodell og felles terminologi før krav kan skrives.'],
+    ['Gap-analyse (fase E): baseline OPC DA/DCOM mot målbildet OPC UA, med migrasjonsløp.','Grensesnittmigrering uten funksjonstap: regresjonstest mot gammel oppførsel.'],
+    ['','Funksjonell dekomposisjon: hva er funksjonen «oppdage avvik», og hvilke krav stiller den til dataene?'],
+    ['Interessentkart (fase A): hvem trenger hvilken visning (viewpoints).','Validering mot brukerbehov: viser dashboardet det operatøren trenger å vite?'],
+    ['','Feilmodus og -effekt (FMEA): hva skjer når en node faller ut, og hvordan oppdages det?'],
+    ['','Tidskrav og dataverdi: levetid som egenskap ved dataene i kravspesifikasjonen.'],
+    ['Datastandarder: metadatamodell som felles dataprinsipp.','Ressursbudsjett (båndbredde) som begrensning i systemdesignet.'],
+    ['Teknologiarkitektur: skalerbarhet som kvalitetsattributt i fase D.','Allokering av funksjon til komponent: hvor skal lastfordelingen ligge?'],
+    ['Applikasjonsarkitektur: tjenestekontrakter mellom komponenter.','Sekvensdiagram og tilstandsmodell for kommando og kvittering (SysML).'],
+    ['Applikasjonsarkitektur: tjenestekatalog for maskinfunksjoner.','Roller og tillatelser avledet av interessentbehov og konsekvens ved feil.'],
+    ['Dataarkitektur: logisk datamodell og gjenbrukbare typer som byggeblokker.','Modellbasert tilnærming (MBSE): modeller typer og relasjoner, ikke hver instans.'],
+    ['','Grensesnittkontroll: lesetilgang som eksplisitt krav, med verifikasjon.'],
+    ['Overgangsarkitektur (fase E og F): midlertidig bro med planlagt levetid.','Trade study: lavkost-bro mot permanent løsning, med vektede kriterier.'],
+    ['Teknologiportefølje: protokollgateway som standardkomponent (SBB).','Systemgrense og kontekst: hva er innenfor edge-systemet, og hva er utenfor?'],
+    ['Applikasjonsarkitektur: grensesnittmatrise mellom MES, lager og ERP.','Simulering som verifikasjonsmiljø før integrasjon mot reelt system.'],
+    ['Forretningsarkitektur (fase B): verdistrøm og prosess fra ordre til registrering.','Krav og sporbarhet: hvert felt i ERP kobles til en datakilde i OT.'],
+    ['','Driftskonsept: operasjonelt scenario for oppgaven før teknologivalg.'],
+    ['','Menneske-system-grensesnitt: operatørrolle og mapping fra kontroller til funksjon.'],
+    ['Sikkerhetsarkitektur (tverrgående): sertifikatstyring som del av teknologiarkitekturen.','Sikkerhetskrav og nytte mot kostnad: hva beskyttes, mot hvem, og hva koster tiltaket?'],
+    ['Arkitekturstyring (fase G): tilgangsmodell som del av arkitekturkontrakten med leverandører.','Roller og rettigheter avledet fra interessentbehov (minste privilegium).'],
+    ['Teknologiarkitektur: edge-sentral som lagdelt mønster, med migrasjonsplan.','Systemgrenser og grensesnitt mellom delsystemer, med feilmodus ved nettbrudd.'],
+    ['Migrasjonsplanlegging (fase E og F): trinnvis overgang med kompatibilitet.','Konfigurasjonsstyring og versjonskontroll av grensesnitt.'],
+    ['Sikkerhetsarkitektur: soner og conduits kobles til arkitekturdomenene.','Sikkerhetskrav avledet fra risikovurdering, og verifikasjon mot hvert krav.'],
+    ['Arkitekturrepositoriet: oversikt over servere som del av arkitekturbeskrivelsen.','Konfigurasjonsstyring: vet hva som er tilkoblet og i hvilken versjon.'],
+    ['Data- og applikasjonsarkitektur: historian som egen komponent med retensjonsprinsipper.','Menneskelige faktorer: alarmbelastning som ytelseskrav på systemet.'],
+    ['Arkitekturprinsipp: OT beholder kontrollen, IT er rådgivende kilde.','Sikkerhetskritiske grensesnitt: validering av inngangsdata og avvisningsregler.'],
+    ['Byggeblokker: gjenbrukbar gateway-konfigurasjon (SBB) per anleggstype.','Ytelseskrav og latensbudsjett for toveis dataflyt.'],
+    ['Arkitekturstyring: grenser for lavkode i produksjon (krav til test og versjonering).','Verifikasjon og testbarhet: lavkode uten testmiljø er en risiko.'],
+    ['Data- og teknologiarkitektur: tilstandsmodell som felles standard (prinsipp).','Tilstandsmaskin (SysML): Birth, Death og data som tilstander og overganger.'],
+    ['Teknologiarkitektur: valg av transportmønster dokumentert som arkitekturbeslutning.','Trade study: klient-server mot PubSub mot MQTT på tid, kostnad og økosystem.'],
+    ['Standards Information Base: bruk av bransjestandarder foran egne modeller.','Gjenbruk av domenemodeller og interoperabilitet som krav.'],
+    ['Forretnings- og dataarkitektur: sporbarhetsmodell på tvers av domener.','Krav til sporbarhet fra regelverk til data og test.'],
+    ['Forretningsarkitektur: KPI-er som egen informasjonsmodell.','Tekniske ytelsesmål (TPM) og felles definisjon som krav.'],
+    ['Teknologiarkitektur: styringsgrensesnitt og sikkerhet som egne lag.','Funksjonell sikkerhet og informasjonssikkerhet som separate analyser med separate krav.'],
+    ['Applikasjonsarkitektur: roboten som tjeneste i informasjonsmodellen.','Grensesnittdefinisjon mot robotstyringen, med verifikasjon.'],
+    ['Forretningsarkitektur: lagerprosess fra fysisk flytting til bokføring.','End-to-end-verifikasjon: fysisk tilstand mot digital tilstand.'],
+    ['Hele ADM-syklusen: visjon, domener, muligheter, migrasjon og styring på konsernnivå.','Systemarkitektur på flere nivåer (ISA-95/Purdue), med oppetidskrav allokert.'],
+    ['','Ytelsesanalyse: presisjon, treffsikkerhet og konsekvens av falske positive og negative.'],
+    ['','Datakvalitet som systemkrav, og versjonskontroll av treningsdata.'],
+    ['Arkitekturbeslutninger: trening i skyen og kjøring på edge, dokumentert med begrunnelse.','Verifikasjon og validering av modellen mot akseptkriterier før frigivelse.'],
+    ['Teknologiarkitektur: edge-komponent med livssyklus (oppdatering, overvåking, utfasing).','Livssyklusprosesser (ISO/IEC/IEEE 15288): drift, vedlikehold og utfasing.'],
+    ['Full ADM-gjennomgang i miniatyr, fra visjon til styring.','Fullt V-modell-løp: behov, krav, arkitektur, integrasjon, verifikasjon og validering.'],
+    ['Sikkerhetsarkitektur: soner og conduits som del av teknologiarkitekturen, med risiko inn i arkitekturbeslutningene.','Risikobasert kravavledning: trusler, konsekvens og mål-SL blir krav som kan verifiseres.'],
+    ['Arkitekturstyring (fase G): krav og etterlevelse som del av arkitekturkontrakten.','Kravsporbarhet fra regelverk og standard til tiltak og test.'],
+    ['Dataarkitektur: retensjon, eierskap og tilgang som datakrav og prinsipper.','Ytelses- og kapasitetskrav: skriverate, lagringsvolum og spørretid.'],
+    ['Dataarkitektur: digital tvilling som felles informasjonsmodell på tvers av domener.','Modellbasert systemutvikling (MBSE): modellen er kilden, ikke et vedlegg.'],
+    ['Teknologiarkitektur: drift og livssyklus for edge-komponenter.','Drift, vedlikehold og overvåking som systemkrav fra starten.'],
+    ['Forretnings- og dataarkitektur: referansemodeller (ISA-95 og ISA-88) som felles språk.','Domenemodell og terminologi: felles ordforråd mellom OT og IT.'],
+    ['Arkitekturprinsipp: sikkerhetsfunksjoner er uavhengige av nettverket.','Separate analyser og krav for funksjonell sikkerhet og informasjonssikkerhet, med tydelig grensesnitt mellom dem.']
+  ];
+  /* ERP-kobling per øvelse (nøkkel = øvelsesnummer): [SAP S/4HANA, Infor, Dynamics 365]. Øvelse 1 har full tabell i malen. */
+  var ERPL={
+    1:['ERP-landskapet i løypa','',''],
+    19:['Lagerbevegelser bokføres som materialdokumenter: bevegelsestype 101 (varemottak mot ordre), 261 (uttak til ordre) og 311 (flytting). Se materialdokument-API i SAP Business Accelerator Hub.',
+        'Lagertransaksjoner i M3 eller CloudSuite Industrial via REST (MI-program eller IDO), eller som BOD-meldinger gjennom ION.',
+        'Lagerjournaler og lagerbeholdning via data entities (OData). Supply Chain Management har lagerstyring og lagerhåndtering.'],
+    20:['Produksjonsordre i PP. Rapportering fra gulvet er en bekreftelse per operasjon: API_PRODUCTION_ORDER_2_SRV leser ordrer, API_PROD_ORDER_CONFIRMATION_2_SRV oppretter bekreftelser.',
+        'Produksjonsordre i M3 eller LN. Ordre og rapportering via REST (M3 MI-program, LN OData) eller BOD.',
+        'Produksjonsordre i Supply Chain Management. Rapportering via produksjonsjournaler (forbruk, rapportert som ferdig) og grensesnittet for tredjeparts MES.'],
+    29:['Vedlikeholdsmelding (PM notification) som kan bli en vedlikeholdsordre i Plant Maintenance.',
+        'Vedlikeholdsmodulen varierer mellom M3, LN og CloudSuite Industrial. Avklar hva kunden faktisk bruker.',
+        'Asset Management: arbeidsordre og feilmeldinger på eiendeler, og nedetid kan registreres fra produksjon.'],
+    30:['En frigitt produksjonsordre er signalet om at maskinen kan starte. Ordrer kan leses per plant via produksjonsordre-API-et.',
+        'En frigitt produksjonsordre kan meldes som BOD gjennom ION, eller leses via REST.',
+        'Produksjonsordre med status Frigitt. Ordrer hentes via MES-integrasjonen eller data entities.'],
+    36:['Batch management og serienumre for sporbarhet, kvalitetsmelding og inspeksjonsparti i QM, og stans som vedlikeholdsmelding.',
+        'Parti- og serienummersporing i ERP-et. Kvalitetsfunksjonene varierer mellom produktene.',
+        'Batch- og serienummersporing i lager, kvalitetsordrer i Quality management, og nedetid registrert mot ressurs.'],
+    37:['OEE beregnes vanligvis i MES- eller edge-laget. ERP-et mottar grunnlaget: bekreftet mengde, skrapmengde og tid i produksjonsbekreftelsen.',
+        'OEE beregnes utenfor ERP-et. Produsert mengde, skrap og tid rapporteres inn mot produksjonsordren.',
+        'OEE beregnes utenfor ERP-et. Mengde, skrap og tid rapporteres i produksjonsjournaler.'],
+    40:['Robotflytting blir en bokføring, for eksempel overføring (311) eller varemottak mot ordre (101). I større lager brukes EWM.',
+        'Lagerflytting via REST eller BOD, med bekreftelse tilbake til roboten.',
+        'Lagerjournal (flytting) via data entity. Lagerhåndtering i Supply Chain Management.'],
+    41:['SAP BTP Integration Suite som integrasjonslag mot S/4HANA.',
+        'Infor OS med ION som integrasjonslag: API Gateway (OAuth 2.0) og BOD-meldinger.',
+        'Azure-baserte integrasjoner, for eksempel Service Bus og Event Grid, Power Automate eller Dataverse.'],
+    46:['Adapter som lager produksjonsbekreftelse og materialdokument fra hendelsene i kjeden.',
+        'Adapter som sender BOD eller kaller REST mot M3 eller CloudSuite Industrial.',
+        'Adapter som kaller data entities eller MES-grensesnittet.']
+  };
+  /* UNS-kobling per øvelse (nøkkel = øvelsesnummer). Øvelse 1 har full seksjon i malen. */
+  var UNSL={
+    1:'Unified Namespace i caset',
+    2:'Dette er hjertet i øvelsen: bygg navnerommet etter ISA-95 (foretak, anlegg, område, linje, celle) og bestem hvem som eier hver gren.',
+    3:'Ulike QoS-nivåer per type data i navnerommet: tilstand, målinger og hendelser har ulike krav.',
+    4:'Retained gir UNS sin siste kjente tilstand: nye konsumenter får hele bildet med en gang de kobler til.',
+    8:'Dashboardet abonnerer på en gren av navnerommet, ikke på enkeltmaskiner.',
+    11:'Metadata og datakvalitet i nyttelasten gjør navnerommet selvbeskrivende, så konsumentene slipper egne tag-lister.',
+    17:'Gatewayen mapper OPC UA-noder til topics i navnerommet. Mappingtabellen er et arkitekturdokument.',
+    18:'Protokollgatewayen publiserer til riktig sti i navnerommet, uavhengig av om kilden er S7, Modbus eller OPC UA.',
+    19:'ERP-simulatoren abonnerer på tilstand fra navnerommet og publiserer ordrehendelser tilbake.',
+    25:'Nivåene foretak og anlegg i navnerommet gjør at flere anlegg kan kobles sammen uten kollisjoner.',
+    30:'Ordre ned til maskin går i en egen gren for kommandoer, adskilt fra tilstand.',
+    33:'Sparkplug har en fast topic-struktur (spBv1.0/...), så UNS og Sparkplug kombineres ofte med en oversetter.',
+    35:'Companion specs gir strukturen til modellene som publiseres i navnerommet.',
+    36:'Stans og avvik publiseres som hendelser i navnerommet og plukkes opp av ERP-adapteren.',
+    37:'OEE og andre KPI-er publiseres som egne topics, slik at alle bruker samme tall.',
+    40:'Robotens bevegelser og lagerstatus publiseres i navnerommet, og ERP-adapteren abonnerer.',
+    41:'Navnerommet er en sentral arkitekturbeslutning: HA-broker, navnestandard, eierskap og styring på tvers av fabrikker.',
+    46:'Hele kjeden publiserer til og leser fra navnerommet: robot, edge, ERP-adapter og KPI-dashboard.',
+    49:'Historianen abonnerer på navnerommet og lagrer det som skal ha historikk.',
+    50:'Tvillingen leser og skriver i navnerommet.',
+    51:'Overvåking av edge-nodene publiseres i navnerommet.',
+    52:'ISA-95 gir strukturen til navnerommet, ISA-88 gir begreper for batch og prosedyre, og PackML gir tilstandsnavn for pakkelinjer.'
+  };
+  /* IEC 62443 og regelverk per øvelse (nøkkel = øvelsesnummer). Øvelse 1 har full seksjon i malen. */
+  var SECL={
+    6:'FR1 og FR4: DCOM-oppsett er svak sikkerhet. OPC UA gir sikker kanal og autentisering. Plasser OPC-serveren i riktig sone.',
+    9:'FR6 og FR7: Last Will gir rask deteksjon av utfall, som del av overvåking og tilgjengelighet (SR 6.2 og SR 7.x).',
+    14:'FR2: metodekall krever riktig rolle (SR 2.1 autorisasjonshåndhevelse), og brukeren må identifiseres (SR 1.1).',
+    18:'Gatewayen er en komponent i en sone. Egen conduit mellom OT og edge, og komponentkravene i 62443-4-2.',
+    23:'FR4: konfidensialitet (SR 4.1) og bruk av kryptografi (SR 4.3). Sertifikatlevetid og håndtering er krav i seg selv.',
+    24:'FR1 identifisering og autentisering (SR 1.1 og 1.2) og FR2 autorisasjon (SR 2.1).',
+    25:'Conduit mellom edge-sone og sentral sone. FR5 begrenset dataflyt (SR 5.1 nettverkssegmentering).',
+    27:'Mål-SL (SL-T) fra 62443-3-2 styrer valg av security policy. Oppnådd SL (SL-A) dokumenteres gjennom verifikasjon.',
+    28:'Discovery må kontrolleres: beskyttelse av sonegrenser (SR 5.2) og oversikt over hva som er tilkoblet.',
+    30:'FR3: OT skal validere inngangsdata (SR 3.5). Skriving til maskin er sikkerhetskritisk og krever autorisasjon.',
+    38:'Roboten er en del av en sone, og kommandoer krever autorisasjon (SR 2.1). Maskinsikkerhet håndteres separat.',
+    45:'Patching og oppdatering av edge-enheter (62443-2-3), og kontroll på modellers og programvares opphav.',
+    47:'Hovedøvelsen: soner og conduits for caset, risikovurdering etter 62443-3-2 og valg av mål-SL per sone.',
+    48:'Kravmapping fra 62443-3-3 til tiltak i løypa, og leverandørkrav fra 62443-4-1 og 4-2. Digitalsikkerhetsloven gjelder siden 1. oktober 2025. NIS2 er ikke innført i Norge (status januar 2026, sjekk oppdatert status).',
+    51:'FR6: rask respons på hendelser, blant annet kontinuerlig overvåking (SR 6.2). Passiv nettverksovervåking bygger på Wireshark-øvelsene.',
+    53:'Safety og security er separate analyser. 62443 dekker informasjonssikkerhet. Nødstopp og sikkerhetsfunksjoner følger maskinsikkerhetsstandardene, for eksempel ISO 13849 og ISO 10218.'
+  };
+  /* Digital tvilling og AAS per øvelse */
+  var VL={
+    5:'AAS beskriver maskinen med submodeller (identifikasjon, tekniske data, dokumentasjon). OPC UA gir live-data. Avklar hva som er kilde for hva.',
+    15:'Typer og relasjoner i OPC UA-modellen kan speiles i AAS-submodeller for samme utstyr.',
+    21:'Bygg en simulert tvilling av SO-101 i Isaac Sim som speiler leddvinklene til den fysiske armen.',
+    35:'IDTA publiserer submodell-maler for AAS, og OPC Foundation og IDTA samarbeider om hvordan AAS og OPC UA kobles sammen.',
+    39:'Roboten som AAS, med OPC UA som grensesnitt for live-data. Hold modellene konsistente.',
+    43:'Simulering kan gi flere demonstrasjoner, men forskjellen mellom simulering og virkelighet må måles.',
+    44:'Evaluer i simulering før den trente modellen kjøres på den fysiske armen.',
+    46:'Tvillingen holder tilstand fra navnerommet og kan brukes til å teste endringer før de kjøres på roboten.',
+    50:'AAS er IDTAs format for digitale tvillinger. Koblingen til OPC UA er i endring: OPC 30270 er avviklet, og IDTA og OPC Foundation utvikler etterfølgere for AAS V3.0, blant annet Asset Interface Description. Isaac Sim-tvillingen av SO-101 leser fra og skriver til navnerommet.'
+  };
+  /* Historian og tidsserie per øvelse, med AVEVA der det passer */
+  var HL={
+    7:'Skriv MQTT-data til en tidsseriedatabase fra Python. Det viser hvorfor en broker ikke er en historian.',
+    16:'Lagre OPC UA-verdier med tidsstempel og kvalitet i en tidsseriedatabase, ikke bare siste verdi.',
+    29:'Alarm- og hendelseshistorikk lagres i en historian, for eksempel AVEVA PI System eller AVEVA Historian, ikke i brokeren.',
+    36:'Historikk gir dokumentasjon per parti, for eksempel temperaturkurver. Oppbevaringstid følger regelverk og kundekrav.',
+    37:'OEE-grunnlaget hentes fra historikk: tilstandsendringer og tellere over tid.',
+    41:'Historian i sentral eller sky, med buffering på edge. Avklar hvem som eier historikken og hvor lenge den lagres. AVEVA PI System og AVEVA Historian er vanlige valg i store anlegg.',
+    46:'KPI-dashboardet leser fra tidsserielageret, ikke direkte fra brokeren.',
+    49:'Labløsning: InfluxDB eller TimescaleDB med Grafana bak navnerommet. Kommersielle alternativer: AVEVA PI System (blant annet Data Archive, Asset Framework, PI Vision og PI Web API) og AVEVA Historian (bygget på Microsoft SQL Server, med SQL utvidet for tidsserier og tilgang via REST og SDK). AVEVA har også PI-koblinger og adaptere for OPC UA og MQTT. Sjekk AVEVA-dokumentasjonen for kundens versjon.'
+  };
+  var TAGN={D:'Digitalisering',B:'Brownfield',S:'IEC 62443',A:'Physical AI',T:'TOGAF',E:'Systemteknikk',R:'ERP',U:'UNS',V:'Digital tvilling',H:'Historian'};
+  var TAGB={D:'DIG',B:'BF',S:'62443',A:'AI',T:'TOGAF',E:'SE',R:'ERP',U:'UNS',V:'DT',H:'HIST'};
+  var filt='';
+  function tagChips(e){return e.g.split('').map(function(c){return '<span class="tag">'+TAGN[c]+'</span>'}).join('')}
+  var EX=RAW.map(function(r,i){var c=CASE[i]||['','',''],a=ARCH[i]||['',''];return {n:i+1,l:r[0],t:r[1],d:r[2],ready:!!r[3],k:c[0],h:c[1],g:c[2]+(a[0]?'T':'')+(a[1]?'E':'')+(ERPL[i+1]?'R':'')+(UNSL[i+1]?'U':'')+(VL[i+1]?'V':'')+(HL[i+1]?'H':''),q:CUST[i]||[],a:a,r:ERPL[i+1]||null,u:UNSL[i+1]||'',s:SECL[i+1]||'',v:VL[i+1]||'',hz:HL[i+1]||''}});
+  var TOTAL=EX.length;
+
+  var state={}, dbDoc=null, sel=1, saveChain=Promise.resolve();
+  var LS='otit-labloype-v1';
+  try{state=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){state={}}
+
+  var $=function(id){return document.getElementById(id)};
+  var idx=$('idx'), reader=$('reader'), saveEl=$('save');
+
+  function isDone(n){return !!state['ex'+n]}
+
+  function persistLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+  function save(){
+    persistLocal();
+    if(!dbDoc){return}
+    var copy=JSON.parse(JSON.stringify(state));
+    saveChain=saveChain.then(function(){return dbDoc.set({checks:copy})}).then(function(){
+      saveEl.textContent='Fremdrift lagret';setStore('Lagring: på kontoen din. Sist lagret '+new Date().toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}));
+    },function(){saveEl.textContent='Fremdrift lagret kun i denne nettleseren';setStore('Lagring: kontolagring feilet. Lagret kun i denne nettleseren. Eksporter koden.')});
+  }
+
+  function buildIndex(){
+    var h='<div class="lv"><h3>Rød tråd<span>Nordlys Mat</span></h3><ul><li class="row ready'+(sel==='thread'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#rodtrad" data-go="thread"><span class="lamp"></span>Historien gjennom alle øvelsene</a></li></ul></div><div class="lv"><h3>Verktøykasse<span>maler</span></h3><ul><li class="row ready'+(sel==='tool'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#verktoy" data-go="tool"><span class="lamp"></span>Workshop, ADR, anbefaling og kalkulator</a></li></ul></div>';
+    LEVELS.forEach(function(L){
+      var items=EX.filter(function(e){return e.l===L.id&&(!filt||e.g.indexOf(filt)>-1)});
+      if(!items.length)return;
+      h+='<div class="lv"><h3>'+L.name+'<span>'+L.weeks+'</span></h3><ul>';
+      items.forEach(function(e){
+        var cls='row '+(e.ready?'ready':'planned')+(isDone(e.n)?' done':'')+(e.n===sel?' sel':'');
+        h+='<li class="'+cls+'" data-n="'+e.n+'" style="display:grid">'
+          +'<input type="checkbox" aria-label="Øvelse '+e.n+' fullført" data-idx="'+e.n+'"'+(isDone(e.n)?' checked':'')+(e.ready?'':' disabled')+'>'
+          +'<span class="n">'+(e.n<10?'0':'')+e.n+'</span>'
+          +'<a href="#ex'+e.n+'" data-go="'+e.n+'"><span class="lamp"></span>'+e.t+e.g.split('').map(function(c){return '<span class="bd">'+TAGB[c]+'</span>'}).join('')+'</a></li>';
+      });
+      h+='</ul></div>';
+    });
+    idx.innerHTML=h;
+  }
+
+  function updateProgress(){
+    var done=EX.filter(function(e){return isDone(e.n)}).length;
+    $('pcount').textContent=done+' / '+TOTAL;
+    $('pbar').style.width=(done/TOTAL*100)+'%';
+    $('plv').innerHTML=LEVELS.map(function(L){
+      var it=EX.filter(function(e){return e.l===L.id});
+      var d=it.filter(function(e){return isDone(e.n)}).length;
+      return '<span>'+L.name+' <b>'+d+'/'+it.length+'</b></span>';
+    }).join('');
+  }
+
+  function addCopyButtons(root){
+    root.querySelectorAll('.code').forEach(function(box){
+      var pre=box.querySelector('pre'); if(!pre||box.querySelector('button'))return;
+      var b=document.createElement('button'); b.type='button'; b.textContent='Kopier';
+      b.addEventListener('click',function(){
+        var txt=pre.innerText;
+        function ok(){b.textContent='Kopiert';setTimeout(function(){b.textContent='Kopier'},1400)}
+        function fallback(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Markert'}
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fallback)}else{fallback()}
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function syncChecks(){
+    reader.querySelectorAll('input[data-k]').forEach(function(c){c.checked=!!state[c.getAttribute('data-k')]});
+  }
+
+
+  /* Rød tråd: ett konsern gjennom alle øvelsene. [anlegg, hva du legger til, hvorfor den følger forrige] */
+  var ACTS=[
+    {id:'b',n:1,name:'Akt 1: Støy i ett anlegg',sum:'Fra punkt-til-punkt til en broker og et navnerom. Terje får sin TV.'},
+    {id:'i',n:2,name:'Akt 2: Flere kilder, ERP og roboten',sum:'Flere anlegg og protokoller kobles på, ERP-simulatoren kommer, og SO-101 flytter inn i robotlabben.'},
+    {id:'a',n:3,name:'Akt 3: Sikkert, toveis og ekte data',sum:'Revisoren kommer. Sikkerhet, toveis kommunikasjon, Sparkplug, ERP-sporbarhet og robotstyring.'},
+    {id:'e',n:4,name:'Akt 4: Konsernet',sum:'Arkitektur for alle anlegg, kamera, trening av modeller og hele kjeden samlet.'},
+    {id:'t',n:5,name:'Akt 5: Revisjon og modning',sum:'Soner og krav, historikk, digital tvilling, drift og safety. Det som gjør løsningen driftbar.'}
+  ];
+  var CORP={
+    name:'Nordlys Mat AS',
+    intro:'Nordlys Mat er et familieeid matkonsern i Agder med seks anlegg: fiskeforedling, meieri, settefisk, pakkeri, sentrallager og et lite brygghus. Det kjøres på blandede PLC-er, ERP er Infor M3 (SAP eller Dynamics 365 brukes som sammenligning), og nylig kjøpte de en robotlab. Alt i øvelsene er fiktivt. Hver øvelse viser en typisk situasjon fra en bransje, og i løypa er den lagt til et av Nordlys sine anlegg.',
+    cast:[['Terje','driftssjef som gjerne ser det han kan peke på'],['Ingrid','IT-sjef som vil ha færre integrasjoner å passe på'],['Silje','revisor som vil se tegninger'],['Du','arkitekten som skal få det til å henge sammen']]
+  };
+  var THREAD=[
+    ['Fiskeforedlingen','Mosquitto-broker, PLC-simulator og de første klientene','Startpunktet: alle spør PLC-en direkte, og brokeren tar over rollen som mellomledd.'],
+    ['Meieriet','Navnerom (UNS) som du bruker videre i alle øvelser','Brokeren fra øvelse 1 fylles opp, og meieriet krever en navnekonvensjon.'],
+    ['Settefisk-anlegget','QoS-valg per signaltype i navnerommet','Settefisk-anlegget sender over mobilnett, så leveringsgarantier må velges med vilje.'],
+    ['Brygghuset','Retained status-topics','Dashboardet skal ha en verdi fra første sekund, også etter restart.'],
+    ['Pakkeriet','OPC UA-modell for pakkeriet (Prosys)','Pakkeriet har fire PLC-merker, og en felles modell trengs før noe kan flyttes.'],
+    ['Prosessvann på Fiskeforedlingen','OPC UA-klient mot variablene','Vannbehandlingen går fortsatt på gammel OPC DA, og vi leser først, sikkert.'],
+    ['Kvalitetsavdelingen','Python-klient som lytter på navnerommet','Kvalitet vil ha avvik uten tilgang til PLC-en, og leser fra brokeren du har bygget.'],
+    ['Meieriet','Node-RED-dashboard (Terjes TV)','Det første synlige resultatet på toppen av navnerommet.'],
+    ['Pumpestasjonene','Last Will for RTU-status','Fjernstasjoner dør uten å si fra, og status må være eksplisitt.'],
+    ['Kjølebåten','Utløpstid for økter og meldinger','Kjølebåten mister og får dekning, og gamle verdier skal ikke utløse alarmer.'],
+    ['Fjernanlegg på smalbånd','Topic Alias og User Properties','Hver byte koster, så meldingene må slankes uten å miste metadata.'],
+    ['Pakkeriet (sortering)','Shared subscriptions for flere konsumenter','Flere konsumenter deler én strøm uten dobbeltbehandling.'],
+    ['Sentrallageret','Request-response for oppdrag til AMR-flåten','Lageret trenger kvittering, og MQTT 5 har mønsteret for det.'],
+    ['Pakkeriet (oppskriftsbytte)','OPC UA-metoder og events','Oppskriftsbytte er en handling, ikke en verdi, og krever rolle.'],
+    ['Prosessanlegget','Typemodell for pumper med DataTypes og referanser','Modellen fra øvelse 5 utvides til flere typer av samme utstyr.'],
+    ['Datateamet','Python-lesing fra OPC UA uten å røre PLC-en','Data science vil ha data, og får dem fra en OPC UA-server.'],
+    ['Fryselageret','Node-RED-bro fra OPC UA til MQTT','Fryselageret fra 1999 kobles på uten å rive noe.'],
+    ['Fiskeforedlingen (S7 og Modbus)','HiveMQ Edge som protokolloversetter','Samme jobb som Node-RED-broen, men som produkt med driftsfunksjoner.'],
+    ['Hovedkontoret','ERP-simulator (REST og SQLite)','ERP kommer inn i bildet: lageret sier ett tall og hylla et annet.'],
+    ['Plastlinjen i Pakkeriet','Produksjonsregistrering og arbeidsordre mot ERP','Papirlappen fredag kl. 15 erstattes av meldinger fra linjen.'],
+    ['Robotlabben','SO-101 med grunnleggende styring','Roboten flytter inn, og Physical AI-sporet starter.'],
+    ['Robotlabben','Teleoperasjon som gir demonstrasjoner','Demonstrasjoner er råmaterialet for robotlæring senere.'],
+    ['Revisjon (Silje)','TLS på brokeren','Revisoren kom, og alt gikk i klartekst. Fra nå krypteres brokeren.'],
+    ['Vedlikeholdsleverandøren','Autentisering og ACL per bruker','Leverandøren skal lese tre topics og ikke mer.'],
+    ['Alle tre anlegg','Bridge fra edge-broker til sentral broker','Anleggene kobles til et felles datasenter uten å åpne alt.'],
+    ['Gamle gatewayer','Migrering fra MQTT 3.1.1 til 5','Eldre utstyr må leve videre mens resten flyttes.'],
+    ['Prosessanlegget','OPC UA security policies og sertifikater','Samme trusselbilde som TLS, nå på OPC UA-siden.'],
+    ['Hele OPC UA-parken','Discovery og oversikt over servere','Etter flere servere trengs det oversikt over hvem som er koblet til hva.'],
+    ['Kontrollrommet','Historikk, alarmer og events','Alarmflom, og historikk som ikke hører hjemme i brokeren.'],
+    ['Sentrallageret (WMS)','MQTT til OPC UA for oppdrag til maskin','IT vil sende oppdrag ned, og OT beholder kontrollen.'],
+    ['Pakkeriet','Toveis i edge med HiveMQ Edge','Toveis uten egen kode, bygget på øvelse 18.'],
+    ['Anlegg uten utviklere','Toveis med Node-RED','Samme toveis-mønster som lavkodealternativ.'],
+    ['Fem anlegg','Sparkplug B med tilstandshåndtering','Felles tilstandsmodell på tvers av anlegg.'],
+    ['Pakkemaskin-leverandøren','OPC UA PubSub over MQTT','Leverandøren vil bruke PubSub, og vi sammenligner med klient-server.'],
+    ['Sprøytestøping og pakking','Companion specifications i stedet for egne modeller','Modellarbeidet fra øvelse 5 og 15 møter standardene.'],
+    ['Fiskeforedlingen','Stans, avvik og sporbarhet mot ERP','En tilbakekalling må besvares på 15 minutter.'],
+    ['Konsernledelsen','Ett OEE-tall med én definisjon','Tre møter har tre tall, og dashboardet må vise ett.'],
+    ['Sentrallageret','Robotstyring og status over MQTT','Robotflåten trenger styring med tilgangskontroll.'],
+    ['Robotlabben','Robotstyring over OPC UA','Samme robot med OPC UA-modell, og vi sammenligner.'],
+    ['Plukkrobot i lageret','Robotdata til ERP','Roboten flytter delen, og ERP-lageret skal oppdatere seg selv.'],
+    ['Hele konsernet','Arkitektur med HA-broker, edge og sky','Alt du har bygget settes sammen til en referansearkitektur.'],
+    ['Kvalitetskontrollen','Kamera i kjeden med avvisningsbeslutning','Kamera gir nye data og strenge tidskrav.'],
+    ['Robotlabben','Datasett fra LeRobot','Demonstrasjonene fra øvelse 22 blir et datasett.'],
+    ['Cloud GPU','Trent modell','Datasettet fra 43 trener en modell i skyen.'],
+    ['Robotlabben og produksjonsgulvet','Inferens ved maskinen','Modellen flyttes fra skyen ned til edge.'],
+    ['Hele Nordlys','Hele kjeden samlet: robot, OPC UA, MQTT, ERP og KPI','Alle bitene fra akt 1 til 4 kjøres sammen.'],
+    ['Fiskeforedlingen (revisjon)','Soner og conduits med mål-SL','Revisor Silje kommer tilbake, og nå skal det være tegninger.'],
+    ['Nordlys som leverandør','Kravmapping og leverandørkrav','Kunder og regelverk stiller krav til hele Nordlys.'],
+    ['Meieriet','Historikk og tidsserie bak navnerommet','Temperaturkurver per parti i fem år, uten å fylle brokeren.'],
+    ['Robotlabben og pakkemaskinen','AAS og digital tvilling','Maskinen skal beskrive seg selv, og tvillingen leser fra navnerommet.'],
+    ['Alle edge-nodene','Drift og overvåking av edge','Ti edge-noder og én tekniker.'],
+    ['Pakkeriet og meieriet','ISA-95, ISA-88 og PackML i navnerommet','Strukturen under navnerommet får navn og modell.'],
+    ['Robotlabben','Safety og security som separate lag','Nødstopp går aldri over MQTT, og det ligger til slutt i arkitekturen.']
+  ];
+  function actOf(e){return ACTS.filter(function(a){return a.id===e.l})[0]}
+  function threadPanel(e){
+    var t=THREAD[e.n-1]; if(!t)return '';
+    var a=actOf(e), prev=e.n>1?THREAD[e.n-2]:null, nx=THREAD[e.n]?EX[e.n].t:null;
+    return '<aside class="thread"><span class="lab">Rød tråd · '+a.name+'</span>'
+      +'<p><b>Hvor i Nordlys:</b> '+t[0]+'</p>'
+      +(prev?'<p><b>Fra forrige øvelse:</b> '+prev[1]+'. '+t[2]+'</p>':'<p>'+t[2]+'</p>')
+      +'<p><b>Du legger til:</b> '+t[1]+'</p>'
+      +(nx?'<p class="nx">Neste: øvelse '+(e.n+1)+', '+nx+'</p>':'')
+      +'</aside>';
+  }
+  function renderThread(){
+    var h='<div class="head"><div class="kick">Rød tråd</div><h2>'+CORP.name+' gjennom alle øvelsene</h2><div class="tags"><span class="tag">Én historie fra første broker til hele kjeden</span></div></div>';
+    h+='<section class="blk"><p>'+CORP.intro+'</p><p class="lab">Rollene</p><ul>'+CORP.cast.map(function(c){return '<li><b>'+c[0]+'</b>, '+c[1]+'</li>'}).join('')+'</ul></section>';
+    ACTS.forEach(function(a){
+      var items=EX.filter(function(e){return e.l===a.id});
+      h+='<section class="blk"><h3><span class="no">AKT '+a.n+'</span>'+a.name.replace(/^Akt \d: /,'')+'</h3><p>'+a.sum+'</p><ol class="tl">';
+      items.forEach(function(e){
+        var t=THREAD[e.n-1], d=isDone(e.n);
+        h+='<li class="'+(d?'done':'')+'"><a href="#ex'+e.n+'" data-go="'+e.n+'"><span class="tk">'+(d?'✓':e.n)+'</span><span><b>'+t[0]+'</b>: '+t[1]+'</span></a></li>';
+      });
+      h+='</ol></section>';
+    });
+    reader.innerHTML=h;
+  }
+
+
+  /* Topologi med animasjon. Hver scene viser samme anlegg i en ny tilstand. */
+  var KIND={plc:'PLC',rtu:'RTU',hmi:'HMI',scada:'SCADA',sens:'SENSOR',brk:'BROKER',app:'APP',erp:'ERP',cld:'SKY',fw:'NETT',hist:'HISTORIAN',mes:'MES',rob:'ROBOT',cam:'KAMERA',pc:'PC',edge:'EDGE',gw:'GATEWAY',wms:'WMS',db:'DATA',ext:'EKSTERN'};
+  var TOPO={}, stopTopo=null;
+  function T(n,z,nodes,links,scenes,cap){
+    TOPO[n]={z:z,cap:cap||'',sc:scenes,
+      nodes:nodes.map(function(q){var p=q.split('|');return {id:p[0],l:p[1],k:p[2],c:+p[3],r:+p[4]}}),
+      links:links.map(function(q){var m=q.split('|'),ab=m[0].split('>');return {a:ab[0],b:ab[1],l:m[1]||''}})};
+  }
+  T(2,['OT','Edge','IT'],['p1|PLC pasteur|plc|0|0','p2|PLC kjøl|plc|0|1','p3|Tank-RTU|rtu|0|2','b|Broker|brk|1|1','d|Dashboard|app|2|0','h|Historian|hist|2|1','e|ERP|erp|2|2'],
+    ['p1>b|temp2_ny_FINAL','p2>b|Temp/kjøl_NEW','p3>b|tank3/t','b>d|abonnerer','b>h|abonnerer','b>e|abonnerer'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2],bad:['d','h','e'],d:'Hvert anlegg finner på egne topic-navn. Hver konsument må kjenne alle navnene, og ingen vet hva «NEW» betyr.'},
+     {t:'Med navnerom',flow:[0,1,2,3,4,5],lab:{0:'meieri/pasteur/temp',1:'meieri/kjol/temp',2:'meieri/tank3/temp',3:'meieri/+/temp'},d:'Samme struktur for alle. Konsumentene abonnerer med wildcard og slipper å kjenne enkeltnavnene.'}]);
+  T(3,['Settefisk (OT)','Mobilnett','Sentral'],['o|O₂-sensor|sens|0|0','g|Gateway|gw|0|1','n|Mobilnett|fw|1|1','b|Broker|brk|2|1','a|Alarm|app|2|0','h|Historian|hist|2|2'],
+    ['o>g|måling','g>n|QoS 0','n>b|nett blinker','b>a|alarm','b>h|logg'],
+    [{t:'Utfordring',warn:1,flow:[0,1],badl:[2],d:'Med QoS 0 forsvinner meldingen når mobilnettet faller ut. Alarmen ser et hull i kurven.'},
+     {t:'Løsning',flow:[0,1,2,3,4],lab:{1:'QoS 1 + buffer'},d:'QoS 1 for alarmer og QoS 0 for trendverdier. Gatewayen buffrer lokalt og sender på nytt når nettet er tilbake.'}]);
+  T(4,['Brygghuset','Sentral','Kantina'],['t|Tank-PLC|plc|0|1','b|Broker|brk|1|1','d|Dashboard|app|2|1'],['t>b|temp hvert 5. min','b>d|abonnement'],
+    [{t:'Etter restart',warn:1,flow:[],bad:['d'],d:'Dashboardet starter og abonnerer, men tanken sender neste verdi først om fem minutter. Skjermen er blank. Brygger Olav tror det er brann.'},
+     {t:'Med retained',flow:[1],lab:{0:'retained',1:'siste verdi ved SUBSCRIBE'},d:'Brokeren husker siste verdi per topic og leverer den med en gang abonnenten kobler til.'}]);
+  T(5,['Pakkeriet (OT)','Felles modell','Konsument'],['a|Siemens S7|plc|0|0','b|Rockwell|plc|0|1','c|Beckhoff|plc|0|2','d|Mitsubishi|plc|0|3','m|OPC UA-modell|gw|1|1.5','s|MES|mes|2|1','h|Historian|hist|2|2'],
+    ['a>s|driver 1','b>s|driver 2','c>s|driver 3','d>s|driver 4','a>m|OPC UA','b>m|OPC UA','c>m|OPC UA','d>m|OPC UA','m>s|én modell','m>h|én modell'],
+    [{t:'Utfordring',warn:1,on:[0,1,2,3],flow:[0,1,2,3],d:'Fire PLC-merker gir fire drivere og fire datamodeller. Hver konsument må programmeres fire ganger.'},
+     {t:'Med OPC UA-modell',on:[4,5,6,7,8,9],flow:[4,5,6,7,8,9],d:'PLC-ene eksponeres i én felles informasjonsmodell. Konsumentene snakker med modellen og ikke med leverandørene.'}]);
+  T(6,['OT','Windows-PC','SCADA'],['p|PLC|plc|0|1','dc|OPC DA-server|pc|1|1','ua|OPC UA-server|gw|1|0','sc|SCADA|scada|2|1'],
+    ['p>dc|driver','dc>sc|DCOM','p>ua|driver','ua>sc|OPC UA'],
+    [{t:'Før',warn:1,on:[0,1],flow:[0,1],badl:[1],d:'OPC DA bruker DCOM med mange åpne porter og skjøre rettigheter. Ingen tør å røre det.'},
+     {t:'Etter',on:[2,3],flow:[2,3],lab:{3:'OPC UA (kryptert kanal)'},d:'Samme PLC, men SCADA leser over OPC UA med én port og autentisering.'}]);
+  T(7,['OT','Edge','IT'],['p|PLC|plc|0|1','b|Broker|brk|1|1','py|Python-avvik|app|2|0','q|Kvalitets-dashboard|app|2|2'],
+    ['py>p|leser PLC direkte','p>b|publiserer','b>py|abonnerer','b>q|abonnerer'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],badl:[0],d:'Kvalitet vil analysere data og ber om PLC-tilgang. Hver ekstra klient er ekstra last og risiko for styringen.'},
+     {t:'Løsning',on:[1,2,3],flow:[1,2,3],d:'PLC-en publiserer én gang. Python og dashboard abonnerer uten at PLC-en vet om dem.'}]);
+  T(8,['OT','Broker','Node-RED','Kantina'],['p1|PLC pasteur|plc|0|0','p2|PLC kjøl|plc|0|1','b|Broker|brk|1|0.5','nr|Node-RED|app|2|0.5','tv|TV i kantina|app|3|0.5'],
+    ['tv>p1|poller selv','tv>p2|poller selv','p1>b|publiser','p2>b|publiser','b>nr|abonner','nr>tv|dashboard'],
+    [{t:'Før',warn:1,on:[0,1],flow:[0,1],badl:[0,1],d:'Hver skjerm spør PLC-ene direkte. Flere skjermer gir mer last på styringen.'},
+     {t:'Etter',on:[2,3,4,5],flow:[2,3,4,5],d:'PLC-ene publiserer. Node-RED bygger dashboardet, og nye skjermer koster ingenting i PLC-ene.'}]);
+  T(9,['Felt','Sentral','Drift'],['r1|RTU stasjon 1|rtu|0|0','r2|RTU stasjon 2|rtu|0|1','r3|RTU stasjon 3|rtu|0|2','b|Broker|brk|1|1','s|SCADA|scada|2|1'],
+    ['r1>b|data','r2>b|data','r3>b|data','b>s|status'],
+    [{t:'Utfordring',warn:1,flow:[0,2,3],bad:['r2'],d:'Stasjon 2 har sluttet å sende. Er den stille fordi alt er rolig, eller død?'},
+     {t:'Last Will',flow:[0,2,3],bad:['r2'],lab:{3:'stasjon 2: offline (Last Will)'},d:'Brokeren publiserer Last Will når forbindelsen faller bort uten DISCONNECT. SCADA vet at stasjonen er borte.'}]);
+  T(10,['Båt','Satellitt','Land'],['g|Gateway|gw|0|1','sat|Satellitt|fw|1|1','b|Broker|brk|2|0','al|Alarm|app|2|2'],
+    ['g>sat|temp','sat>b|sendes','b>al|sjekk grense'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2],lab:{1:'3 timer gammel verdi'},d:'Satellitten har vært borte, og køen leverer gamle målinger etter gjenoppkobling. Alarmen utløses av en verdi som ikke gjelder lenger.'},
+     {t:'Med expiry',flow:[0,1],lab:{1:'Message Expiry 10 min'},d:'Meldinger får utløpstid. Gamle verdier kastes før levering, og alarmen får bare friske data.'}]);
+  T(11,['Sensor','Smalbånd','Sentral'],['s|Sensor|sens|0|1','m|Modem|gw|1|1','b|Broker|brk|2|1'],['s>m|måling','m>b|PUBLISH'],
+    [{t:'Før',warn:1,flow:[0,1],lab:{1:'langt topic + payload'},d:'Det lange topic-navnet sendes i hver melding og dominerer størrelsen.'},
+     {t:'Med Topic Alias',flow:[0,1],lab:{1:'alias 1 + payload'},d:'Topic sendes én gang. Deretter brukes et kort tall, og dataen blir mindre.'}]);
+  T(12,['Linje','Broker','Konsumenter'],['sc|Skanner|sens|0|1','b|Broker|brk|1|1','c1|Prosess A|app|2|0','c2|Prosess B|app|2|1','c3|Prosess C|app|2|2'],
+    ['sc>b|hendelser','b>c1|alle får alt','b>c2|alle får alt','b>c3|alle får alt'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2,3],d:'Tre konsumenter abonnerer på samme topic. Alle får alle meldinger og behandler dem tre ganger.'},
+     {t:'Shared subscription',flow:[0,1],lab:{1:'$share/gruppe1/…',2:'',3:''},on:[0,1],d:'Brokeren fordeler meldingene mellom konsumentene i gruppen, og hver melding behandles én gang.'}]);
+  T(13,['Lager','Broker','Flåte'],['w|WMS|wms|0|1','b|Broker|brk|1|1','r1|AMR 1|rob|2|0','r2|AMR 2|rob|2|2'],
+    ['w>b|oppdrag','b>r1|oppdrag','b>r2|oppdrag','r1>b|jeg tar den','b>w|kvittering'],
+    [{t:'Utfordring',warn:1,on:[0,1,2],flow:[0,1,2],bad:['r1','r2'],d:'Begge roboter får oppdraget og kjører mot samme pall.'},
+     {t:'Request-Response',flow:[0,1,3,4],lab:{0:'Response Topic + Correlation Data'},d:'Oppdraget bærer en svar-topic. Den første som svarer får det, og WMS får kvittering.'}]);
+  T(14,['Operatør','OPC UA','Maskin'],['h|HMI|hmi|0|1','ua|OPC UA-server|gw|1|1','m|Pakkemaskin|plc|2|1'],
+    ['h>m|skriver Recipe=7','h>ua|ByttOppskrift(7)','ua>m|validert skriving','ua>h|event + resultat'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],badl:[0],d:'Hvem som helst med skrivetilgang kan skrive en oppskrift midt i en kjøring.'},
+     {t:'Metode',on:[1,2,3],flow:[1,2,3],d:'Oppskriftsbytte er en metode som sjekker rolle og tilstand før den kjører. Resultatet kommer som event.'}]);
+  T(15,['Typemodell','Instanser'],['t|PumpeType|gw|0|1','i1|Pumpe liten|plc|1|0','i2|Pumpe middels|plc|1|1','i3|Pumpe stor|plc|1|2'],
+    ['t>i1|instans av','t>i2|instans av','t>i3|instans av'],
+    [{t:'Utfordring',warn:1,on:[],bad:['i1','i2','i3'],d:'Tre pumper med tre hjemmelagde strukturer. Hver klient programmeres tre ganger.'},
+     {t:'Med typemodell',flow:[0,1,2],d:'Én type definerer variabler og metoder. Alle pumper arver den, og klienten skrives én gang.'}]);
+  T(16,['OT','OPC UA','Data'],['p|PLC|plc|0|1','ua|OPC UA-server|gw|1|1','py|Python|app|2|0','nb|Notebook|app|2|2'],
+    ['py>p|direkte PLC-tilgang','p>ua|driver','ua>py|abonnement','ua>nb|abonnement'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],badl:[0],d:'Data science vil ha data, men direkte tilgang til PLC-en er en risiko for styringen.'},
+     {t:'Løsning',on:[1,2,3],flow:[1,2,3],d:'Data leses fra OPC UA-serveren, med lesetilgang og uten å røre styringen.'}]);
+  T(17,['Fryselager','Bro','Moderne'],['p|PLC fra 1999|plc|0|1','nr|Node-RED|gw|1|1','b|Broker|brk|2|0','sc|SCADA|scada|2|2'],
+    ['p>nr|OPC UA','nr>b|MQTT','b>sc|abonner'],
+    [{t:'Før',warn:1,on:[],bad:['p'],d:'Gammel PLC uten vei ut. Ingen tør å bytte den midt i sesongen.'},
+     {t:'Etter',flow:[0,1,2],d:'En lavkost-bro leser fra PLC-en og publiserer til brokeren. Ingenting rives, og det er gjort på to dager.'}]);
+  T(18,['Felt','Edge','IT'],['s7|S7-PLC|plc|0|0','mb|Modbus-måler|sens|0|2','he|HiveMQ Edge|gw|1|1','b|Broker|brk|2|1'],
+    ['s7>he|S7','mb>he|Modbus','he>b|MQTT'],
+    [{t:'Utfordring',warn:1,on:[],bad:['s7','mb'],d:'To protokoller og ingen felles vei til IT. Nye PLC-er er ikke budsjettert.'},
+     {t:'Løsning',flow:[0,1,2],d:'HiveMQ Edge oversetter ved kanten. Eksisterende utstyr lever videre.'}]);
+  T(19,['Lager','Integrasjon','ERP'],['sc|Skanner|sens|0|0','hy|Hylle: 117|db|0|2','api|REST-API|gw|1|1','er|ERP: 120|erp|2|1'],
+    ['hy>er|manuell telling','sc>api|bevegelse','api>er|POST'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],bad:['er'],d:'ERP sier 120 paller og hylla sier 117. Differansen oppdages først ved telling.'},
+     {t:'Løsning',on:[1,2],flow:[1,2],d:'Hver bevegelse registreres i ERP når den skjer, og tallene avviker ikke lenger.'}]);
+  T(20,['Linje','Integrasjon','ERP'],['pl|Plastlinje|plc|0|1','pa|Papirlapp|ext|1|0','ad|Adapter|gw|1|2','er|ERP|erp|2|1'],
+    ['pl>pa|skriver tall','pa>er|tastes fredag 15:00','pl>ad|antall','ad>er|produksjonsmelding'],
+    [{t:'Utfordring',warn:1,on:[0,1],flow:[0,1],badl:[1],d:'Produksjonsmengden skrives på papir og tastes inn sent. ERP er alltid en uke etter.'},
+     {t:'Løsning',on:[2,3],flow:[2,3],d:'Linja melder produksjon til ERP når batchen er ferdig.'}]);
+  T(23,['OT/Edge','Nett','IT'],['c|Klient|app|0|1','sn|Avlytter|ext|1|0','b|Broker|brk|2|1'],
+    ['c>b|port 1883','sn>b|leser alt'],
+    [{t:'Utfordring',warn:1,flow:[0,1],badl:[1],d:'Alt går i klartekst. Alle på nettet kan lese topic og verdi.'},
+     {t:'Med TLS',flow:[0],lab:{0:'TLS port 8883',1:'ser bare krypterte bytes'},d:'Trafikken krypteres. Avlytteren ser trafikk, men ikke innholdet.'}]);
+  T(24,['Leverandør','Broker','Edge'],['v|Leverandør|ext|0|1','b|Broker|brk|1|1','t|Tre topics|app|2|0','f|Fryser|plc|2|2'],
+    ['v>b|anonym','b>t|les','b>f|skriv'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2],bad:['f'],d:'Anonym tilgang. Leverandøren kan i prinsippet skru av fryseren.'},
+     {t:'Med ACL',flow:[0,1],badl:[2],lab:{0:'bruker + passord',1:'les: tillatt',2:'skriv: nektet (ACL)'},d:'Leverandøren leser tre topics og får nei til alt annet.'}]);
+  T(25,['Fabrikker','Edge-brokere','Sentral'],['f1|Fabrikk 1|plc|0|0','f2|Fabrikk 2|plc|0|1','f3|Fabrikk 3|plc|0|2','e1|Edge-broker 1|brk|1|0','e2|Edge-broker 2|brk|1|1','e3|Edge-broker 3|brk|1|2','c|Sentral broker|brk|2|1'],
+    ['f1>e1|lokalt','f2>e2|lokalt','f3>e3|lokalt','e1>c|bridge','e2>c|bridge','e3>c|bridge'],
+    [{t:'Utfordring',warn:1,on:[0,1,2],flow:[0,1,2],bad:['c'],d:'Hver fabrikk har sin egen broker. Det finnes ikke noe felles bilde.'},
+     {t:'Med bridge',flow:[0,1,2,3,4,5],lab:{3:'bridge: kun agderfisk/#',4:'bridge: kun agderfisk/#',5:'bridge: kun agderfisk/#'},d:'Edge-brokerne videresender bare utvalgte topics til sentralen. Lokal drift fortsetter selv om WAN faller.'}]);
+  T(27,['Klient','Server'],['c|Klient|app|0|1','s|OPC UA-server|gw|1|1','st|Sertifikatliste|db|1|0'],['c>s|Security None','st>s|trusted'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],badl:[0],d:'Security None var standard fordi det virket. Alle kan koble til.'},
+     {t:'Løsning',flow:[0,1],lab:{0:'Basic256Sha256 + sertifikat'},d:'Klient og server stoler på hverandres sertifikater. Policyen følger mål-SL for sonen.'}]);
+  T(28,['Klienter','Discovery','Servere'],['c|Klient|app|0|1','g|GDS|gw|1|1','s1|Server A|gw|2|0','s2|Server B|gw|2|1','s3|Server C|gw|2|2'],
+    ['c>s1|IP fra Excel','c>s2|IP fra Excel','c>s3|IP fra Excel','c>g|FindServers','g>s1|registrert','g>s2|registrert','g>s3|registrert'],
+    [{t:'Utfordring',warn:1,on:[0,1,2],flow:[0,1,2],d:'Femti servere og en Excel-fil med IP-adresser. Ingen vet hva som er koblet til hva.'},
+     {t:'Med GDS',on:[3,4,5,6],flow:[3,4,5,6],d:'Servere registrerer seg i discovery. Klienter spør om hva som finnes.'}]);
+  T(29,['OT','Server','Kontrollrom'],['p|PLC|plc|0|1','ua|OPC UA A&C|gw|1|1','op|Operatør|hmi|2|0','h|Historian|hist|2|2'],
+    ['p>ua|alle alarmer','ua>op|200 per time','ua>h|alle hendelser'],
+    [{t:'Utfordring',warn:1,on:[0,1],flow:[0,1],bad:['op'],d:'Operatøren får 200 alarmer i timen og leser ingen. Viktige alarmer drukner.'},
+     {t:'Løsning',flow:[0,1,2],lab:{1:'prioriterte alarmer'},d:'Kun handlingsbare alarmer går til operatør. Alt logges i historian for analyse.'}]);
+  T(30,['IT','Gateway','OT'],['w|WMS|wms|0|1','g|Gateway|gw|1|1','p|PLC|plc|2|1'],
+    ['w>p|skriver direkte','w>g|oppdrag','g>p|metode (validert)','p>g|status'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],badl:[0],d:'IT skriver rett i PLC-en. OT mister kontrollen over hva som kjøres.'},
+     {t:'Løsning',on:[1,2,3],flow:[1,2,3],d:'Oppdrag går via en gateway som validerer. OT beholder kontrollen og IT får status tilbake.'}]);
+  T(31,['OT','Edge','IT'],['p|PLC|plc|0|1','he|HiveMQ Edge|gw|1|1','b|Broker|brk|2|1'],
+    ['p>he|les','he>b|publiser','b>he|kommando','he>p|skriv'],
+    [{t:'Enveis',on:[0,1],flow:[0,1],d:'Dataene går fra PLC til broker. Det er enkelt og trygt.'},
+     {t:'Toveis',flow:[0,1,2,3],d:'Kommandoer fra IT går ned til PLC-en via samme gateway. Det krever tilgangsstyring og validering.'}]);
+  T(32,['OT','Edge','IT'],['p|PLC|plc|0|1','nr|Node-RED|app|1|1','b|Broker|brk|2|1'],
+    ['p>nr|les','nr>b|publiser','b>nr|kommando','nr>p|skriv'],
+    [{t:'Enveis',on:[0,1],flow:[0,1],d:'Lavkode leser og publiserer uten egen kode.'},
+     {t:'Toveis',flow:[0,1,2,3],d:'Samme flyt i begge retninger. Spørsmålet er hva som brekker først: feilhåndtering, versjonering og sikkerhet.'}]);
+  T(33,['Anlegg','Broker','Primary host'],['ed|Edge node|gw|0|0','dv|Device|plc|0|2','b|Broker|brk|1|1','ph|SCADA|scada|2|1'],
+    ['ed>b|NBIRTH','dv>b|DDATA','b>ph|data','ph>b|STATE'],
+    [{t:'Utfordring',warn:1,on:[1,2],flow:[1,2],d:'Vi vet bare at enheten har sagt noe. Vi vet ikke om den lever.'},
+     {t:'Sparkplug B',flow:[0,1,2,3],lab:{0:'NBIRTH / NDEATH',1:'DDATA'},d:'Fødsels- og dødsmeldinger gir en felles tilstandsmodell. Primary host annonserer sin egen status.'}]);
+  T(34,['Publisher','Broker','Subscribers'],['p|PLC (PubSub)|plc|0|1','b|Broker|brk|1|1','s1|Konsument 1|app|2|0','s2|Konsument 2|app|2|2'],
+    ['s1>p|egen sesjon','s2>p|egen sesjon','p>b|UADP/JSON','b>s1|abonnement','b>s2|abonnement'],
+    [{t:'Klient-server',warn:1,on:[0,1],flow:[0,1],d:'Hver konsument holder en sesjon mot PLC-en. Antall klienter begrenser hvor mange som kan lese.'},
+     {t:'PubSub',on:[2,3,4],flow:[2,3,4],d:'PLC-en publiserer én gang. Antall konsumenter er ikke lenger PLC-ens problem.'}]);
+  T(36,['Mottak','Produksjon','Pakking','Kunde'],['ra|Råvare R-42|db|0|1','pr|Produksjon|plc|1|1','pk|Pakking|plc|2|1','er|ERP|erp|3|0','k|Kunde|ext|3|2'],
+    ['ra>pr|parti-ID','pr>pk|parti-ID','pk>k|levert','pr>er|sporing','pk>er|sporing'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2],badl:[3,4],d:'Parti-ID følger ikke produktet gjennom linja. Tilbakekalling tar tre dager i stedet for femten minutter.'},
+     {t:'Løsning',flow:[0,1,2,3,4],d:'Partiet registreres i hvert steg og følger hele kjeden. ERP svarer hvilke kunder som fikk råvaren.'}]);
+  T(37,['OT','Beregning','IT'],['p|Linje-PLC|plc|0|1','e|OEE-tjeneste|app|1|1','d|Dashboard|app|2|0','m|MES|mes|2|2'],
+    ['p>d|formel A','p>m|formel B','p>e|tilstand og tellere','e>d|OEE','e>m|OEE'],
+    [{t:'Utfordring',warn:1,on:[0,1],flow:[0,1],d:'To systemer regner OEE med hver sin formel. Tre møter gir tre tall.'},
+     {t:'Løsning',on:[2,3,4],flow:[2,3,4],d:'Én tjeneste regner ett tall med én definisjon. Alle leser samme verdi.'}]);
+  T(38,['Lager','Broker','Flåte'],['w|WMS|wms|0|1','x|Ukjent klient|ext|0|2','b|Broker|brk|1|1','r|AMR|rob|2|1'],
+    ['w>b|oppdrag','x>b|stopp!','b>r|kommando'],
+    [{t:'Utfordring',warn:1,flow:[0,1,2],bad:['r'],d:'Alle med tilgang til brokeren kan publisere kommandoer til roboten.'},
+     {t:'Med ACL',flow:[0,2],badl:[1],lab:{1:'nektet (ACL)'},d:'Kun WMS har skrivetilgang til robotens kommando-topic.'}]);
+  T(40,['Robot','Adapter','ERP'],['r|Plukkrobot|rob|0|1','a|Adapter|gw|1|1','e|ERP lager|erp|2|1'],['r>a|plukket 5 stk','a>e|lagerbevegelse'],
+    [{t:'Utfordring',warn:1,on:[],bad:['e'],d:'Roboten flytter varen, men ERP-lageret vet ikke om det før noen registrerer manuelt.'},
+     {t:'Løsning',flow:[0,1],d:'Roboten melder plukking. Adapteren bokfører lagerbevegelsen i ERP.'}]);
+  T(41,['Fabrikk','Edge','Sentral / sky'],['p1|PLC|plc|0|0','p2|PLC|plc|0|2','e|Edge-broker|brk|1|1','c|Sentral HA-broker|brk|2|1','cl|Analyse (sky)|cld|2|0','er|ERP|erp|2|2'],
+    ['p1>e|lokalt','p2>e|lokalt','e>c|bridge','c>cl|data','c>er|data'],
+    [{t:'Normal drift',flow:[0,1,2,3,4],d:'Edge samler lokalt. Sentral og sky får det de trenger via bridge.'},
+     {t:'WAN faller',warn:1,flow:[0,1],badl:[2],d:'Lokal drift fortsetter, og edge buffrer meldingene. Når nettet er tilbake, sendes de videre.'}]);
+  T(42,['Linje','Edge','Beslutning'],['cam|Kamera|cam|0|1','cl|Sky|cld|1|0','ed|Edge-inferens|app|1|2','r|Avviser|plc|2|1'],
+    ['cam>cl|bilder','cl>r|svar','cam>ed|bilder','ed>r|avvis'],
+    [{t:'Utfordring',warn:1,on:[0,1],flow:[0,1],lab:{1:'svar for sent (eksempel: 400 ms)'},d:'Beslutningen kommer for sent når bildene må til skyen og tilbake. Tallene er eksempler.'},
+     {t:'Edge',on:[2,3],flow:[2,3],lab:{3:'avvis (eksempel: 40 ms)'},d:'Inferens ved maskinen gir korte svartider og tåler nettbrudd.'}]);
+  T(45,['Sky','Edge','Maskin'],['t|Trening|cld|0|1','ed|Edge-node|edge|1|1','r|Robot|rob|2|1'],
+    ['t>ed|modell v3 (signert)','ed>r|styrer','ed>t|telemetri'],
+    [{t:'Oppdatering',flow:[0],d:'Ny modell rulles ut fra skyen. Den skal signeres og testes før den aktiveres.'},
+     {t:'Drift',flow:[1,2],d:'Inferens kjører ved maskinen med lav latens. Telemetri går tilbake for overvåking og ny trening.'}]);
+  T(46,['Robot','OPC UA','MQTT / UNS','IT'],['r|SO-101|rob|0|1','ua|OPC UA|gw|1|1','b|Broker (UNS)|brk|2|1','e|ERP|erp|3|0','k|KPI-dashboard|app|3|2'],
+    ['r>ua|tilstand','ua>b|publiser','b>e|produksjon','b>k|KPI'],
+    [{t:'Hele kjeden',flow:[0,1,2,3],d:'Roboten leverer data via OPC UA og MQTT. ERP får produksjon og dashboardet får KPI.'}]);
+  T(47,['OT','Edge','DMZ / ekstern','IT'],['p|PLC|plc|0|0','vk|Vekt|sens|0|2','g|Gateway|gw|1|1','b|Broker|brk|1|2','v|Leverandør|ext|2|0','j|Jump host|fw|2|2','d|Dashboard|app|3|0','er|ERP|erp|3|1'],
+    ['p>g|A: lesing','vk>g|A: lesing','g>b|lokalt','b>er|C: TLS','b>d|C: TLS','v>j|B','j>b|B: DMZ','v>p|VPN rett inn'],
+    [{t:'Utfordring',warn:1,on:[0,1,2,7],flow:[7],badl:[7],d:'Leverandøren kommer rett inn i OT-sonen via VPN. Ingen sonegrenser, ingen kontroll.'},
+     {t:'Soner og conduits',on:[0,1,2,3,4,5,6],flow:[0,1,2,3,4,5,6],d:'OT og edge er separate soner. Leverandøren går via DMZ. Hver conduit (A, B, C) har en definert regel.'}],
+    'Skisse for øvelsen. Faktiske soner og mål-SL må komme fra en risikovurdering.');
+  T(49,['OT','Navnerom','Historikk'],['p|PLC|plc|0|1','b|Broker|brk|1|1','h|Tidsseriedatabase|hist|2|0','g|Grafana|app|2|2'],
+    ['p>b|publiserer','b>h|abonner og skriv','h>g|spørring'],
+    [{t:'Utfordring',warn:1,on:[0],flow:[0],bad:['b'],d:'Brokeren husker bare siste verdi. Den er ikke en historian, og kurvene fra i fjor finnes ikke.'},
+     {t:'Løsning',flow:[0,1,2],d:'En historian abonnerer og lagrer med tidsstempel. Grafana leser derfra. Alternativer: AVEVA PI System eller AVEVA Historian.'}]);
+  T(50,['Fysisk','Navnerom','Tvilling'],['r|SO-101|rob|0|1','b|Broker|brk|1|1','tw|Isaac Sim|cld|2|0','aas|AAS|db|2|2'],
+    ['r>b|joint states','b>tw|speiler','tw>b|testkommando','aas>b|statiske data'],
+    [{t:'Speiling',on:[0,1],flow:[0,1],d:'Tvillingen speiler robotens tilstand fra navnerommet.'},
+     {t:'Test og AAS',flow:[2,3],d:'Endringer testes i simulering før de kjøres på roboten. AAS holder statiske data som typeskilt og dokumentasjon.'}]);
+  T(51,['Edge-noder','Broker','Drift'],['e1|Edge 1|edge|0|0','e2|Edge 2|edge|0|1','e3|Edge 3|edge|0|2','b|Broker|brk|1|1','m|Overvåking|app|2|0','tk|Tekniker|ext|2|2'],
+    ['e1>b|heartbeat','e2>b|heartbeat','e3>b|heartbeat','b>m|status','m>tk|varsel'],
+    [{t:'Utfordring',warn:1,on:[0,1,2],flow:[0,1],bad:['e3'],d:'Edge 3 har sluttet å snakke, og ingen merker det før noen klager.'},
+     {t:'Med overvåking',flow:[0,1,3,4],bad:['e3'],d:'Manglende heartbeat gir varsel til teknikeren med en gang.'}]);
+
+  function topoShell(e){
+    if(!TOPO[e.n])return '';
+    return '<section class="blk topo" id="topo"><h3><span class="no">TOPOLOGI</span>Slik ser det ut i anlegget</h3><div class="tctl" id="tctl"></div><figure><div id="tsvg"></div><figcaption id="tcap" aria-live="polite"></figcaption></figure></section>';
+  }
+  function initTopo(n){
+    var D=TOPO[n]; if(!D)return null;
+    var host=document.getElementById('tsvg'),ctl=document.getElementById('tctl'),cap=document.getElementById('tcap');
+    if(!host||!ctl||!cap)return null;
+    var NS='http://www.w3.org/2000/svg',W=760,cols=D.z.length,cw=W/cols,maxR=0;
+    D.nodes.forEach(function(x){if(x.r>maxR)maxR=x.r});
+    var H=Math.round(70+maxR*80+60);
+    function el(t,a,p){var x=document.createElementNS(NS,t);for(var k in a)x.setAttribute(k,a[k]);if(p)p.appendChild(x);return x}
+    var svg=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Topologi for øvelse '+n+': '+D.sc.map(function(s){return s.t+'. '+s.d}).join(' ')});
+    svg.style.cssText='width:100%;height:auto;display:block;color:var(--fg)';
+    var defs=el('defs',{},svg);
+    [['n','var(--muted)'],['a','var(--accent)'],['w','var(--amber)']].forEach(function(m){
+      var mk=el('marker',{id:'tm-'+m[0],markerUnits:'userSpaceOnUse',markerWidth:10,markerHeight:10,refX:9,refY:5,orient:'auto'},defs);
+      var ph=el('path',{d:'M0,0 L10,5 L0,10 z'},mk); ph.style.fill=m[1];
+    });
+    D.z.forEach(function(z,i){
+      el('rect',{x:i*cw+4,y:6,width:cw-8,height:H-12,rx:6,fill:'var(--surface)',stroke:'var(--line)'},svg);
+      var zt=el('text',{x:i*cw+16,y:26},svg); zt.textContent=z.toUpperCase();
+      zt.style.cssText='font:500 11px var(--font-mono);fill:var(--muted);letter-spacing:.06em';
+    });
+    var NW=Math.min(cw-56,132),NH=36,pos={};
+    D.nodes.forEach(function(x){x.x=x.c*cw+cw/2;x.y=66+x.r*80;pos[x.id]=x});
+    var linkG=el('g',{},svg), nodeG=el('g',{},svg), lblG=el('g',{},svg), pktG=el('g',{},svg);
+    function clip(a,b){
+      var dx=b.x-a.x,dy=b.y-a.y,ax=Math.abs(dx)||1e-6,ay=Math.abs(dy)||1e-6;
+      return Math.min((NW/2+4)/ax,(NH/2+4)/ay);
+    }
+    var L=D.links.map(function(q){
+      var a=pos[q.a],b=pos[q.b],dx=b.x-a.x,dy=b.y-a.y;
+      var ta=clip(a,b),tb=clip(b,a);
+      var x1=a.x+dx*ta,y1=a.y+dy*ta,x2=b.x-dx*tb,y2=b.y-dy*tb;
+      var line=el('line',{x1:x1,y1:y1,x2:x2,y2:y2,'stroke-width':2},linkG);
+      var txt=el('text',{x:(x1+x2)/2,y:(y1+y2)/2-6,'text-anchor':'middle'},lblG);
+      txt.style.cssText='font:11px var(--font-mono);fill:var(--fg);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round';
+      return {q:q,line:line,txt:txt,x1:x1,y1:y1,x2:x2,y2:y2,len:Math.hypot(x2-x1,y2-y1)};
+    });
+    var NN={};
+    D.nodes.forEach(function(x){
+      var g=el('g',{},nodeG);
+      var r=el('rect',{x:x.x-NW/2,y:x.y-NH/2,width:NW,height:NH,rx:4,fill:'var(--bg)','stroke-width':1.5},g);
+      var tg=el('text',{x:x.x-NW/2,y:x.y-NH/2-5},g); tg.textContent=KIND[x.k]||x.k;
+      tg.style.cssText='font:500 11px var(--font-mono);fill:var(--muted);letter-spacing:.05em';
+      var tl=el('text',{x:x.x,y:x.y+4,'text-anchor':'middle'},g); tl.textContent=x.l;
+      tl.style.cssText='font:600 12px var(--font-mono);fill:var(--fg)';
+      var xm=el('text',{x:x.x+NW/2-12,y:x.y-NH/2-5,'text-anchor':'middle'},g); xm.textContent='✕';
+      xm.style.cssText='font:700 13px var(--font-mono);fill:var(--amber)';
+      NN[x.id]={r:r,xm:xm};
+    });
+    var pk=[],cur=0,paused=false,raf=0,t0=performance.now();
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function apply(i){
+      cur=i; var s=D.sc[i];
+      var on=s.on||L.map(function(_,j){return j});
+      L.forEach(function(k,j){
+        var vis=on.indexOf(j)>-1, bad=(s.badl||[]).indexOf(j)>-1, fl=(s.flow||[]).indexOf(j)>-1;
+        k.line.style.display=k.txt.style.display=vis?'':'none';
+        var col=bad?'w':(fl?(s.warn?'w':'a'):'n');
+        k.line.style.stroke=col==='w'?'var(--amber)':col==='a'?'var(--accent)':'var(--muted)';
+        k.line.setAttribute('stroke-dasharray',bad?'6 4':'');
+        k.line.setAttribute('marker-end','url(#tm-'+col+')');
+        var lab=(s.lab&&s.lab[j]!==undefined)?s.lab[j]:k.q.l;
+        k.txt.textContent=lab+(bad&&lab?' ✕':'');
+      });
+      D.nodes.forEach(function(x){
+        var bad=(s.bad||[]).indexOf(x.id)>-1;
+        NN[x.id].r.style.stroke=bad?'var(--amber)':'var(--muted)';
+        NN[x.id].r.setAttribute('stroke-dasharray',bad?'5 3':'');
+        NN[x.id].xm.style.display=bad?'':'none';
+      });
+      while(pktG.firstChild)pktG.removeChild(pktG.firstChild);
+      pk=[];
+      (s.flow||[]).forEach(function(j){
+        if(on.indexOf(j)<0)return;
+        for(var q=0;q<2;q++){
+          var c=el('circle',{r:4.5},pktG); c.style.fill=s.warn?'var(--amber)':'var(--accent)';
+          pk.push({c:c,k:L[j],ph:q/2});
+        }
+      });
+      cap.textContent=s.d+(D.cap?' '+D.cap:'');
+      Array.prototype.forEach.call(ctl.querySelectorAll('button[data-s]'),function(b){b.setAttribute('aria-pressed',+b.getAttribute('data-s')===i?'true':'false')});
+      place(performance.now());
+    }
+    function place(now){
+      pk.forEach(function(p){
+        var f=reduce?0.5:(((now-t0)/(Math.max(p.k.len,60)/90*1000)+p.ph)%1);
+        p.c.setAttribute('cx',p.k.x1+(p.k.x2-p.k.x1)*f);
+        p.c.setAttribute('cy',p.k.y1+(p.k.y2-p.k.y1)*f);
+      });
+    }
+    function tick(now){ if(!paused)place(now); raf=requestAnimationFrame(tick) }
+    D.sc.forEach(function(s,i){
+      var b=document.createElement('button'); b.type='button'; b.className='tb'; b.setAttribute('data-s',i); b.textContent=s.t;
+      b.addEventListener('click',function(){apply(i)}); ctl.appendChild(b);
+    });
+    if(!reduce){
+      var pb=document.createElement('button'); pb.type='button'; pb.className='tb ghost'; pb.textContent='Pause';
+      pb.addEventListener('click',function(){paused=!paused;pb.textContent=paused?'Spill av':'Pause'}); ctl.appendChild(pb);
+    }
+    host.appendChild(svg);
+    apply(0);
+    if(!reduce)raf=requestAnimationFrame(tick);
+    return function(){cancelAnimationFrame(raf)};
+  }
+
+
+  /* Forutsetninger, recap og kjernepunkter per øvelse (indeks = øvelsesnummer minus 1) */
+  var PRE=[
+    ['WSL2 med Ubuntu (kommandoen <code>wsl -l</code> viser distroen din)','Installer i Ubuntu: <code>sudo apt update &amp;&amp; sudo apt install -y mosquitto mosquitto-clients python3-venv tcpdump</code>. <code>apt update</code> henter pakkelisten, <code>install -y</code> installerer uten å spørre, og <code>&amp;&amp;</code> kjører neste bare hvis forrige lyktes','MQTT Explorer og Wireshark installert i Windows','Ingen tidligere øvelser kreves'],
+    ['Øvelse 1 er bekreftet: brokeren kjører og du har sett CONNECT og PUBLISH i Wireshark','<code>mosquitto.conf</code> fra øvelse 1 finnes i <code>~/lab/ex01</code>','MQTT Explorer kan koble til brokeren'],
+    ['Øvelse 1 og 2 er fullført','Python-miljøet med paho-mqtt fra øvelse 1','Du kan stoppe og starte brokeren, slik at du kan simulere nettbrudd'],
+    ['Øvelse 1 og 2 er fullført','Mosquitto kjører, og du kan restarte klienter'],
+    ['Prosys OPC UA Simulation Server installert (Windows)','En OPC UA-klient installert, for eksempel UaExpert','Ingen MQTT-krav, men øvelse 1 anbefales for å se likhetene mellom modellene'],
+    ['Øvelse 5 er fullført','Python-miljø med asyncua (<code>pip install asyncua</code>)','Prosys-simulatoren kjører'],
+    ['Øvelse 1 og 2 er fullført','Python-miljø med paho-mqtt','Grunnleggende JSON i Python (<code>json</code>-modulen)'],
+    ['Øvelse 1, 2 og 7 er fullført','Node.js (LTS) og Node-RED installert','Dashboard-noder for Node-RED (for eksempel FlowFuse Dashboard)'],
+    ['Øvelse 1, 3 og 4 er fullført','Du kan stoppe en klient brått (for eksempel <code>kill</code>) for å utløse Last Will'],
+    ['Øvelse 3, 4 og 9 er fullført','Mosquitto 2.x med MQTT 5-støtte'],
+    ['Øvelse 1 og 2 er fullført','Wireshark klar for å måle meldingsstørrelser'],
+    ['Øvelse 1–3 er fullført','Mosquitto 2.x (støtter shared subscriptions)','To eller tre Python-klienter eller <code>mosquitto_sub</code> i separate terminaler'],
+    ['Øvelse 1, 2 og 12 er fullført','paho-mqtt som støtter MQTT 5-properties (Response Topic og Correlation Data)'],
+    ['Øvelse 5 og 6 er fullført','En OPC UA-server med metoder (asyncua-server eller Prosys)','asyncua installert'],
+    ['Øvelse 5 og 14 er fullført','asyncua installert','En klient som kan vise typer (UaExpert)'],
+    ['Øvelse 6 og 15 er fullført','asyncua i Python-miljøet','NodeId-ene du fant i øvelse 5'],
+    ['Øvelse 6, 8 og 16 er fullført','Node-RED med OPC UA-noder (for eksempel node-red-contrib-opcua)','Mosquitto-broker kjører'],
+    ['Øvelse 17 er fullført','Docker (Docker Desktop eller Docker i WSL2)','HiveMQ Edge som container','En simulert Modbus- eller S7-enhet å lese fra'],
+    ['Øvelse 7 er fullført','Python med Flask eller FastAPI (installeres i øvelsen)','Du kan bruke <code>curl</code> mot et REST-API'],
+    ['Øvelse 19 er fullført: ERP-simulatoren kjører','Øvelse 17 eller 18: data fra en linje publiseres på MQTT'],
+    ['SO-101 (leader og follower) levert og montert','LeRobot installert i et Python-miljø (sjekk dokumentasjonen for Python-versjon)','USB-tilgang fra WSL2 til servoene (for eksempel usbipd-win)'],
+    ['Øvelse 21 er fullført','PS5-kontroller koblet til datamaskinen','Kamera er valgfritt'],
+    ['Øvelse 1–4 er fullført','<code>openssl</code> i Ubuntu (følger vanligvis med)','Wireshark for å se TLS-handshaken'],
+    ['Øvelse 23 er fullført: TLS virker','<code>mosquitto_passwd</code> (følger med mosquitto)','Flere testbrukere å prøve med'],
+    ['Øvelse 23 og 24 er fullført','To Mosquitto-instanser med hver sin konfigfil og port (for eksempel 1883 og 1884)'],
+    ['Øvelse 1–12 er fullført','En 3.1.1-klient (for eksempel <code>mosquitto_sub -V mqttv311</code>)'],
+    ['Øvelse 5, 6 og 23 er fullført','<code>openssl</code> og asyncua','Sertifikat-mappe for klient og server'],
+    ['Øvelse 5 og 27 er fullført','Flere OPC UA-servere som kan startes på ulike porter','En discovery-server eller GDS å teste mot'],
+    ['Øvelse 14 og 16 er fullført','En OPC UA-server med historikk-støtte (Prosys eller asyncua)'],
+    ['Øvelse 14 og 17 er fullført','MQTT-broker og OPC UA-server kjører'],
+    ['Øvelse 18 og 30 er fullført','HiveMQ Edge kjører'],
+    ['Øvelse 17 og 30 er fullført','Node-RED med OPC UA-noder'],
+    ['Øvelse 2, 4 og 9 er fullført','Verktøy som kan lese Sparkplug-payload (for eksempel Eclipse Tahu eller et Sparkplug-bevisst verktøy)'],
+    ['Øvelse 12 og 33 er fullført','Et bibliotek eller en simulator som støtter OPC UA PubSub over MQTT (sjekk støtten i verktøyet du velger)'],
+    ['Øvelse 5 og 15 er fullført','NodeSet-filer for aktuelle companion specs (hentes fra OPC Foundation)'],
+    ['Øvelse 19 og 20 er fullført','ERP-simulatoren med partier og avvik'],
+    ['Øvelse 20 og 36 er fullført','Node-RED-dashboard eller Grafana'],
+    ['Øvelse 13, 21 og 24 er fullført','Brokeren med ACL fra øvelse 24'],
+    ['Øvelse 14, 15 og 21 er fullført','asyncua installert'],
+    ['Øvelse 19, 20 og 38 er fullført','ERP-simulatoren kjører'],
+    ['Øvelse 25 og 33 er fullført','Docker eller to brokere'],
+    ['Øvelse 21 er fullført','Kamera (USB) eller bildefiler','OpenCV (<code>pip install opencv-python</code>)'],
+    ['Øvelse 22 er fullført','LeRobot installert','Kamera'],
+    ['Øvelse 43 er fullført','Tilgang til cloud GPU','Datasettet fra øvelse 43'],
+    ['Øvelse 44 er fullført','Den trente modellen','En edge-maskin (PC eller Jetson) eller Docker'],
+    ['Øvelse 21, 31, 36 og 37 anbefales','Alle tjenestene fra tidligere øvelser kan startes'],
+    ['Øvelse 23–25 og 41 anbefales','Grunnkunnskap om 62443-3-2 (soner og conduits)','Sone- og conduit-skissen fra øvelse 1'],
+    ['Øvelse 47 er fullført','Tilgang til standardtekstene du skal kartlegge mot (62443-3-3, 4-1 og 4-2)','Oppdatert status for norsk regelverk fra NSM eller regjeringen'],
+    ['Øvelse 7 og 25 er fullført','Docker for InfluxDB eller TimescaleDB og Grafana'],
+    ['Øvelse 15, 21 og 39 er fullført','Tilgang til Isaac Sim (cloud GPU)','AAS-verktøy (for eksempel AASX Package Explorer eller Eclipse BaSyx)'],
+    ['Øvelse 41 er fullført','Docker eller k3s','Enkel heartbeat-overvåking eller Prometheus'],
+    ['Øvelse 2 og 36 er fullført','Navnerommet ditt fra øvelse 2'],
+    ['Øvelse 38 og 39 er fullført','Overordnet kjennskap til ISO 13849 og ISO 10218']
+  ];
+  var REFS=[[],[1],[1,2],[1,2,3],[1],[5],[1,2],[1,2,7],[1,3,4],[3,4,9],[1,2],[1,3],[1,2,12],[5,6],[5,14],[6,15],[6,8,16],[17,2],[7],[17,19],[],[21],[1,9],[23],[23,24],[1,11],[5,23],[27],[14,16],[14,17],[18,30],[17,30],[2,9,4],[12,33],[5,15],[19,20],[20,36],[13,24,21],[14,15,21],[19,20,38],[25,33],[21],[22],[43],[44],[21,31,36,37],[23,24,25],[47],[7,25],[15,39],[41],[2,36],[38,39]];
+  var KEY=[
+    ['Klienter snakker aldri direkte. Brokeren ruter mellom utgiver og abonnent (løs kobling).','Handshaken er CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Du ser den i Wireshark på port 1883.','QoS 0 lagres ikke. Abonnenten må være startet før publiseringen.'],
+    ['Topic-navn er et API. En fast struktur (anlegg, linje, maskin, signal) gjør wildcards nyttige.','<code>+</code> matcher ett nivå og <code>#</code> matcher alle nivåer under.','Konvensjonen må avtales tidlig. Omdøping senere rammer alle konsumenter.'],
+    ['QoS 0, 1 og 2 gir ulike leveringsgarantier, og valget gjøres per signaltype.','QoS 1 kan gi duplikater. QoS 2 koster mer og brukes sjelden.','QoS gjelder per hopp, og effektiv QoS er den laveste av utgiver og abonnent.'],
+    ['Retained gir en ny abonnent siste kjente verdi med en gang.','En retained melding slettes ved å publisere tom payload med retain.','Bruk retained til status og tilstand og ikke til enkelthendelser.'],
+    ['OPC UA er en modell med noder, referanser og typer og ikke bare tagger.','Hver node har NodeId, nodeklasse og attributter.','En felles modell skjuler forskjeller mellom leverandører.'],
+    ['I klient-server leser, skriver og abonnerer klienten på variabler.','Subscriptions og monitored items sender endringer i stedet for polling.','OPC UA erstatter OPC DA og DCOM med én port og en sikker kanal.'],
+    ['Python som abonnent kan parse JSON og regne avvik uten å røre PLC-en.','<code>on_message</code> kalles per melding, og <code>loop_forever</code> eller <code>loop_start</code> holder klienten i live.','Håndter dårlig data: manglende felt og feil enheter.'],
+    ['Node-RED kobler MQTT til dashboard med få noder.','Dashboardet er en konsument og ikke en del av styringen.','Lavkode er raskt, men trenger versjonering og eierskap.'],
+    ['Last Will publiseres av brokeren når klienten forsvinner uten DISCONNECT.','Kombiner den med retained status for online og offline.','Keep-alive bestemmer hvor raskt feilen oppdages.'],
+    ['Message Expiry kaster gamle meldinger. Session Expiry styrer hvor lenge brokeren husker en økt.','Gamle verdier skal ikke utløse alarmer.','Clean Start og session expiry avgjør hva som køes mens klienten er borte.'],
+    ['Topic Alias erstatter et langt topic med et kort tall per forbindelse.','User Properties gir metadata uten å endre payload.','Mål gevinsten i Wireshark.'],
+    ['Shared subscriptions fordeler meldinger mellom konsumenter i en gruppe.','Syntaksen er <code>$share/gruppe/topic</code>.','Bruk det for skalering, ikke når alle skal ha alt.'],
+    ['Response Topic og Correlation Data gir request-response i MQTT 5.','Korrelasjon kobler svaret til forespørselen.','Timeout og feil må håndteres i klienten.'],
+    ['Metoder er handlinger med argumenter og resultat, med rolle- og tilstandssjekk.','Events varsler om noe som har skjedd.','Å skrive en variabel og å kalle en metode er ikke det samme.'],
+    ['Typer og DataTypes gir gjenbrukbare modeller, og referanser knytter noder sammen.','Én type for pumper gir én klient for alle pumper.','Navn og struktur må planlegges.'],
+    ['En Python-klient kan lese og abonnere uten PLC-tilgang.','Les verdi med tidsstempel og statuskode.','Bruk subscription og ikke polling.'],
+    ['Node-RED kan bygge bro fra OPC UA til MQTT på kort tid.','Brownfield: ingenting rives, og broen kan byttes senere.','Test hva som skjer når OPC UA-serveren faller.'],
+    ['HiveMQ Edge oversetter protokoller ved kanten.','Konfigurasjon i stedet for kode, men produktet må driftes.','Sammenlign med Node-RED-broen: funksjoner og eierskap.'],
+    ['ERP-API er REST med JSON, og tallene avviker fra virkeligheten uten integrasjon.','Idempotens: samme melding to ganger skal ikke gi dobbel bokføring.','Simulatoren lar deg øve uten ekte ERP.'],
+    ['Arbeidsordre og produksjonsregistrering kobles til linjens tellere.','Bekreftelser bør være automatiske og sporbare.','Forsinkelsen i ERP forsvinner når linja melder direkte.'],
+    ['Servoene styres via posisjon, og kalibrering er kritisk.','Leader og follower gir teleoperasjon senere.','En fysisk robot krever sikkerhetsavstand.'],
+    ['Teleoperasjon gir demonstrasjoner som robotlæring bruker.','Kvaliteten på demonstrasjonene avgjør modellen.','Latens og kontrolleroppsett påvirker resultatet.'],
+    ['TLS krypterer og autentiserer serveren, og sertifikatet må ha riktig CN eller SAN og gyldig levetid.','Port 8883 er standard for MQTT over TLS.','Wireshark viser handshaken, men ikke innholdet.'],
+    ['Autentisering sier hvem du er, og ACL sier hva du får gjøre.','Minste privilegium: leverandøren leser tre topics.','Test både tillatt og nektet tilgang.'],
+    ['Bridge kobler brokere og filtrerer hvilke topics som går videre.','Lokal drift fortsetter når WAN faller.','Retning og prefiks avgjør hvor meldingene havner.'],
+    ['3.1.1 og 5 kan leve side om side på samme broker.','Gamle klienter får ikke MQTT 5-funksjoner.','Migrer gradvis og mål først.'],
+    ['Security policy og mode må matche mål-SL.','Sertifikater gir gjensidig tillit mellom klient og server.','Security None skal ikke være standard i produksjon.'],
+    ['Discovery finner servere, og GDS gir sentral registrering og sertifikathåndtering.','Uten oversikt er sikkerheten ukjent.','Registreringen må ha en eier.'],
+    ['Alarmer og tilstander er hendelser med alvorlighetsgrad og ikke vanlige variabler.','Historikk lagres i en historian og ikke i brokeren.','For mange alarmer er en designfeil.'],
+    ['IT sender oppdrag, men OT validerer og beholder kontrollen.','Bruk gateway og metode i stedet for direkte skriving.','Status går tilbake til IT.'],
+    ['Toveis kommunikasjon gir kommandoer ned og data opp.','Skriveveien krever autorisasjon og validering.','Konfigurasjon framfor kode, men testing er fortsatt nødvendig.'],
+    ['Lavkode gir toveis kommunikasjon raskt.','Feilhåndtering og versjonering er svakest.','Vurder om flowen bør flyttes til et produkt.'],
+    ['Sparkplug B gir fast topicstruktur og tilstand (BIRTH, DATA og DEATH).','En primary host kan se om enheter lever.','Payload er protobuf og trenger verktøy for å leses.'],
+    ['PubSub sender data uten at klienter holder sesjoner mot PLC-en.','Datasettmeldinger kan bruke UADP eller JSON.','Sammenlign med klient-server for last og skalering.'],
+    ['Companion specs gir ferdige modeller, for eksempel for pakkemaskiner og sprøytestøping.','Gjenbruk reduserer integrasjonskostnaden.','Sjekk at leverandøren faktisk støtter spesifikasjonen.'],
+    ['Sporbarhet krever parti-ID gjennom hele kjeden.','Avvik og stans registreres med årsak og tid.','Målet er svar på minutter og ikke dager.'],
+    ['OEE er tilgjengelighet ganger ytelse ganger kvalitet, med én definisjon.','Beregn det ett sted og la alle lese det.','Kilden må være tilstand og tellere og ikke manuelle tall.'],
+    ['Roboten styres via et kommando-topic og rapporterer status.','ACL begrenser hvem som kan styre.','Nødstopp hører ikke hjemme i nettverket.'],
+    ['OPC UA-modell for robot: variabler for status og metoder for kommandoer.','Informasjonsmodellen gjør roboten forståelig for klienter.','Sammenlign med MQTT-varianten.'],
+    ['Robothendelser oversettes til lagerbevegelser i ERP.','Feil og retry må håndteres.','ERP-lageret er sannheten for lagerstatus.'],
+    ['Edge, sentral og sky har ulike roller og eiere.','En HA-broker gir tilgjengelighet.','UNS gir felles struktur på tvers av anlegg.'],
+    ['Kameraer gir store datamengder, og de bør behandles ved kanten.','Beslutningstiden avgjør arkitekturen.','Send resultater og metadata og ikke bilder til sentralen.'],
+    ['Datasettet bestemmer modellen.','Gode demonstrasjoner er jevne, varierte og merkede.','Versjoner datasettet.'],
+    ['Trening kjøres på GPU i skyen, og modellen hentes ned.','Hold treningsdata og modeller versjonert.','Evaluer før utrulling.'],
+    ['Inferens ved maskinen gir lav latens og uavhengighet fra nettet.','Modelloppdateringer må styres og signeres.','Overvåk drift og feil.'],
+    ['Hele kjeden fra robot til KPI virker bare når alle grensesnitt er testet.','Hver komponent har eier og overvåking.','Noter hva som ville brutt først.'],
+    ['Soner grupperer eiendeler med lik sikkerhetsbehov, og conduits er kontrollerte forbindelser.','Mål-SL kommer fra risikovurderingen.','Leverandørtilgang går via DMZ.'],
+    ['Krav må kobles til tiltak og bevis.','Leverandørkrav (4-1 og 4-2) hører hjemme i kontrakten.','Regelverkets status må sjekkes mot kilden.'],
+    ['En broker er ikke en historian.','Et tidsserielager gir historikk, aggregater og dashboards.','Retention og oppløsning bestemmer kostnaden.'],
+    ['AAS beskriver et aktivum med submodeller, og en digital tvilling speiler tilstand.','Statiske og live data har ulike kilder.','Standardene er i endring, så sjekk status.'],
+    ['Edge-noder trenger overvåking, oppdatering og eier.','Heartbeat gir deteksjon av stillhet.','Standardiser driften før du skalerer.'],
+    ['ISA-95 gir hierarkiet, ISA-88 gir batch-begrepene og PackML gir tilstandene.','Felles ordforråd mellom OT og IT.','Bruk modellene som støtte og ikke slavisk.'],
+    ['Safety og security er ulike analyser med ulike standarder.','Sikkerhetsfunksjoner skal ikke avhenge av nettverket.','Grensesnittet mellom dem må være eksplisitt.']
+  ];
+  function preSec(e){
+    var P=PRE[e.n-1]||[]; if(!P.length)return '';
+    return '<section class="blk" id="pre"><h3><span class="no">FØR DU STARTER</span>Forutsetninger</h3>'
+      +P.map(function(x,i){return '<label class="chk"><input type="checkbox" data-k="ex'+e.n+'.p'+(i+1)+'"><span>'+x+'</span></label>'}).join('')+'</section>';
+  }
+  function recapSec(e){
+    var R=REFS[e.n-1]||[], body;
+    if(R.length){
+      body='<ul>'+R.map(function(m){return '<li><a href="#ex'+m+'" data-go="'+m+'">Øvelse '+m+', '+EX[m-1].t+'</a>: '+KEY[m-1][0]+'</li>'}).join('')+'</ul>';
+    }else{
+      body='<p>Nytt spor eller første øvelse. Ingen direkte avhengighet av tidligere øvelser ut over forutsetningene over.</p>';
+    }
+    return '<section class="blk" id="recap"><h3><span class="no">RECAP</span>Det du allerede har lært som du bruker her</h3>'+body+'</section>';
+  }
+  function keySec(e){
+    var K=KEY[e.n-1]||[]; if(!K.length)return '';
+    return '<section class="blk" id="key"><h3><span class="no">OPPSUMMERING</span>Kjernepunkter</h3><ul>'+K.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></section>';
+  }
+  /* Skjul og vis avsnitt. Tilstanden huskes lokalt per avsnitt. */
+  function loadFold(){try{return JSON.parse(localStorage.getItem('otit-fold-v1')||'{}')||{}}catch(x){return {}}}
+  function storeFold(o){try{localStorage.setItem('otit-fold-v1',JSON.stringify(o))}catch(x){}}
+  function collapsify(n){
+    var st=loadFold();
+    var secs=[].slice.call(reader.children).filter(function(x){return x.tagName==='SECTION'&&x.firstElementChild&&x.firstElementChild.tagName==='H3'});
+    if(!secs.length)return;
+    function setOpen(sec,open,save){
+      var h=sec.firstElementChild,key=sec.getAttribute('data-fk');
+      sec.classList.toggle('closed',!open); h.setAttribute('aria-expanded',open?'true':'false');
+      if(save){st[key]=open}
+    }
+    secs.forEach(function(sec){
+      var h=sec.firstElementChild, key=n+':'+(sec.id||h.textContent.slice(0,40));
+      sec.setAttribute('data-fk',key);
+      h.setAttribute('role','button'); h.tabIndex=0; h.classList.add('fh');
+      setOpen(sec,st[key]!==false,false);
+      h.addEventListener('click',function(){setOpen(sec,sec.classList.contains('closed'),true);storeFold(st)});
+      h.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();h.click()}});
+    });
+    var bar=document.createElement('div'); bar.className='foldbar';
+    [['Skjul alle',false],['Vis alle',true]].forEach(function(b){
+      var bt=document.createElement('button'); bt.type='button'; bt.className='tb'; bt.textContent=b[0];
+      bt.addEventListener('click',function(){secs.forEach(function(sec){setOpen(sec,b[1],true)});storeFold(st)});
+      bar.appendChild(bt);
+    });
+    reader.insertBefore(bar,secs[0]);
+  }
+
+  function renderReader(){
+    if(stopAnim){stopAnim();stopAnim=null}
+    if(stopTopo){stopTopo();stopTopo=null}
+    if(sel==='tool'){renderTool();return}
+    if(sel==='thread'){renderThread();return}
+    var e=EX[sel-1], L=LEVELS.filter(function(x){return x.id===e.l})[0];
+    var h='<div class="head"><div class="kick">Øvelse '+e.n+' av '+TOTAL+' · '+L.name+' · '+L.weeks+'</div><h2>'+e.t+'</h2><div class="tags"><span class="tag">'+e.d+'</span>'+tagChips(e)
+      +'<span class="tag st'+(isDone(e.n)?' ok':'')+'" id="stag">'+(isDone(e.n)?'Fullført':(e.ready?'Aktiv':'Planlagt'))+'</span></div></div>';
+    reader.innerHTML=h+threadPanel(e)+preSec(e)+recapSec(e)+topoShell(e);
+    stopTopo=initTopo(e.n);
+    if(e.ready){
+      var t=document.getElementById('tpl-'+e.n);
+      reader.appendChild(t.content.cloneNode(true));
+      var cf=reader.querySelector('.confirm'),kh=document.createElement('div');
+      kh.innerHTML=keySec(e);
+      if(kh.firstChild){if(cf)reader.insertBefore(kh.firstChild,cf);else reader.appendChild(kh.firstChild)}
+      addCopyButtons(reader);
+      syncChecks();
+      if(INIT[e.n])stopAnim=INIT[e.n]();
+    }else{
+      var d=document.createElement('div');
+      d.className='blk locked';
+      d.innerHTML='<h3>Ikke åpnet ennå</h3><div class="sketch"><span class="lab">Case-skisse</span><b>'+e.k+'</b><span>'+e.h+'</span></div><p class="lab">Spør kunden om</p><ul>'+e.q.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'+(e.a[0]?'<p class="lab">TOGAF</p><p>'+e.a[0]+'</p>':'')+(e.a[1]?'<p class="lab">Systemteknikk</p><p>'+e.a[1]+'</p>':'')+(e.r?'<p class="lab">ERP</p><ul><li><b>SAP S/4HANA:</b> '+e.r[0]+'</li><li><b>Infor:</b> '+e.r[1]+'</li><li><b>Dynamics 365:</b> '+e.r[2]+'</li></ul>':'')+(e.u?'<p class="lab">UNS</p><p>'+e.u+'</p>':'')+(e.s?'<p class="lab">IEC 62443</p><p>'+e.s+'</p>':'')+(e.v?'<p class="lab">Digital tvilling</p><p>'+e.v+'</p>':'')+(e.hz?'<p class="lab">Historian</p><p>'+e.hz+'</p>':'')+'<p>'+(e.l==='t'?'Tilleggsmodul. Be Claude om den når du vil ta den.':'Øvelsen låses opp når du har bekreftet øvelse '+(e.n-1)+'. Kryss den av, og be Claude om neste øvelse.')+' Den kommer med full case og animasjon, konsept, arkitektur, kommandoer, kode, verifisering, feilsøking, Wireshark og ekstra utfordring.</p>';
+      reader.appendChild(d);
+      var kd=document.createElement('div'); kd.innerHTML=keySec(e); if(kd.firstChild)reader.appendChild(kd.firstChild);
+      syncChecks();
+    }
+    collapsify(e.n);
+  }
+
+  function refresh(){buildIndex();updateProgress();var s=$('stag');if(s){var n=sel;s.textContent=isDone(n)?'Fullført':(EX[n-1].ready?'Aktiv':'Planlagt');s.classList.toggle('ok',isDone(n))}}
+
+  function go(n,fromHash){
+    if(n!=='tool'&&n!=='thread'&&!EX[n-1])return; sel=n; renderReader(); refresh();
+    if(!fromHash){try{history.replaceState(null,'','#'+(n==='tool'?'verktoy':n==='thread'?'rodtrad':'ex'+n))}catch(e){}}
+    if(window.matchMedia('(max-width:860px)').matches){$('index').open=false;window.scrollTo(0,0)}
+  }
+
+  idx.addEventListener('click',function(ev){
+    var a=ev.target.closest('a[data-go]');
+    if(a){ev.preventDefault();var g=a.getAttribute('data-go');go(g==='tool'||g==='thread'?g:+g)}
+  });
+  idx.addEventListener('change',function(ev){
+    var c=ev.target; if(!c.matches('input[data-idx]'))return;
+    state['ex'+c.getAttribute('data-idx')]=c.checked; save(); refresh(); syncChecks();
+  });
+  reader.addEventListener('click',function(ev){var a=ev.target.closest('a[data-go]');if(a){ev.preventDefault();go(+a.getAttribute('data-go'))}});
+  reader.addEventListener('change',function(ev){
+    var c=ev.target; if(!c.matches('input[data-k]'))return;
+    state[c.getAttribute('data-k')]=c.checked; save(); refresh();
+  });
+
+  /* Filter chips above the index */
+  var flt=document.createElement('div'); flt.className='flt';
+  [['','Alle'],['S','IEC 62443'],['A','Physical AI'],['D','Digitalisering'],['B','Brownfield'],['T','TOGAF'],['E','Systemteknikk'],['R','ERP'],['U','UNS'],['V','Digital tvilling'],['H','Historian']].forEach(function(f){
+    var b=document.createElement('button'); b.type='button'; b.className='chip';
+    b.setAttribute('data-f',f[0]); b.setAttribute('aria-pressed',f[0]===''?'true':'false'); b.textContent=f[1]; flt.appendChild(b);
+  });
+  idx.parentNode.insertBefore(flt,idx);
+  flt.addEventListener('click',function(ev){
+    var b=ev.target.closest('[data-f]'); if(!b)return;
+    filt=b.getAttribute('data-f');
+    flt.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b?'true':'false')});
+    buildIndex();
+  });
+
+  /* Case 1 animation: point-to-point vs broker */
+  var INIT={1:initCase1}, stopAnim=null;
+  function initCase1(){
+    var box=document.getElementById('c1'); if(!box)return null;
+    var svg=box.querySelector('svg'), NS='http://www.w3.org/2000/svg';
+    var SRC=['PLC Pakking','PLC Fryser','Temp-gateway','Vekt (RS-232)'];
+    var CONS=['SCADA','MES','Dashboard','Knuts Excel','KI-kamera','ERP'];
+    var SY=[60,130,200,270];
+    var CAPS={
+      p2p:['Fire lesere per PLC. Knut: «Det går fint så lenge ingen åpner Excel.»',
+           'KI-kamera vil også ha tallene. Nå er det 20 koblinger, og Terje har begynt å tegne dem på tavla.',
+           'ERP kobler på: 24 koblinger. PLC-en bruker mer tid på å svare enn å styre. Pakkelinjen tok en pause uten å spørre.'],
+      broker:['Hver PLC snakker med én mottaker. Brokeren deler ut resten. Knut ser mistenkelig rolig ut.',
+              'KI-kamera abonnerer på temperaturen. Ingen rørte PLC-en. Knut oppdaget det først på fredag.',
+              'ERP kobler på med én ny kobling og null ekstra last. Randi smilte. Det skjer sjelden.']
+    };
+    var mode='p2p', n=4, dots=[], raf=0, tt=0, last=0;
+    var paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(paused)tt=0.5;
+    function cy(j){return 40+j*50}
+    function el(name,attrs,parent){var e=document.createElementNS(NS,name);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+    function node(g,x,y,w,h,label,cls){var gg=el('g',{'class':'nd '+cls},g);el('rect',{x:x,y:y,width:w,height:h,rx:4},gg);el('text',{x:x+w/2,y:y+h/2},gg).textContent=label}
+    function out(k){return box.querySelector('[data-o="'+k+'"]')}
+    function draw(){dots.forEach(function(d){var p=(tt*0.35+d.ph)%1;d.c.setAttribute('cx',d.l[0]+(d.l[2]-d.l[0])*p);d.c.setAttribute('cy',d.l[1]+(d.l[3]-d.l[1])*p)})}
+    function loop(now){if(!last)last=now;if(!paused)tt+=(now-last)/1000;last=now;draw();if(!paused)raf=requestAnimationFrame(loop)}
+    function start(){cancelAnimationFrame(raf);last=0;raf=requestAnimationFrame(loop)}
+    function build(){
+      svg.textContent='';dots=[];
+      var gl=el('g',{},svg),gd=el('g',{},svg),gn=el('g',{},svg),links=[],i,j;
+      el('text',{x:66,y:14,'class':'col'},svg).textContent='KILDER (OT)';
+      el('text',{x:414,y:14,'class':'col'},svg).textContent='KONSUMENTER (IT)';
+      if(mode==='p2p'){for(i=0;i<4;i++)for(j=0;j<n;j++)links.push([122,SY[i],358,cy(j)])}
+      else{for(i=0;i<4;i++)links.push([122,SY[i],205,165]);for(j=0;j<n;j++)links.push([275,165,358,cy(j)])}
+      links.forEach(function(l,k){
+        el('line',{x1:l[0],y1:l[1],x2:l[2],y2:l[3],'class':'ln'},gl);
+        dots.push({l:l,ph:(k*0.173)%1,c:el('circle',{r:3.2,'class':'dt '+mode},gd)});
+      });
+      SRC.forEach(function(s,i){node(gn,10,SY[i]-15,112,30,s,(mode==='p2p'&&n>=5)?'hot':'')});
+      for(j=0;j<n;j++)node(gn,358,cy(j)-15,112,30,CONS[j],j>=4?'new':'');
+      if(mode==='broker'){
+        var g=el('g',{'class':'nd brk'},gn);
+        el('rect',{x:205,y:135,width:70,height:60,rx:4},g);
+        el('text',{x:240,y:157},g).textContent='Broker';
+        var t2=el('text',{x:240,y:177},g);t2.textContent='MQTT :1883';t2.setAttribute('style','font-size:10px;font-weight:400');
+      }
+      draw();
+    }
+    function update(){
+      var links=mode==='p2p'?4*n:4+n, load=mode==='p2p'?n:1;
+      out('links').textContent=links; out('load').textContent=load;
+      var mb=out('mbar'); mb.firstElementChild.style.width=(load/6*100)+'%'; mb.classList.toggle('warn',load>=5);
+      out('cap').textContent=CAPS[mode][n-4];
+      box.querySelectorAll('[data-act="p2p"],[data-act="broker"]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-act')===mode?'true':'false')});
+      var add=box.querySelector('[data-act="add"]'); add.disabled=n>=6; add.textContent=n>=6?'Alle er koblet på':'+ '+CONS[n];
+      var p=box.querySelector('[data-act="pause"]'); p.setAttribute('aria-pressed',paused?'true':'false'); p.textContent=paused?'Spill av':'Pause';
+    }
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-act]'); if(!b||b.disabled)return;
+      var a=b.getAttribute('data-act');
+      if(a==='p2p'||a==='broker'){mode=a;build()}
+      else if(a==='add'){n=Math.min(6,n+1);build()}
+      else if(a==='reset'){mode='p2p';n=4;build()}
+      else if(a==='pause'){paused=!paused;if(paused){cancelAnimationFrame(raf);draw()}else{start()}}
+      update();
+    });
+    build(); update(); if(!paused)start();
+    return function(){cancelAnimationFrame(raf);paused=true};
+  }
+
+  /* Verktøykasse: maler og kostnadskalkulator */
+  function renderTool(){
+    reader.innerHTML='<div class="head"><div class="kick">Verktøykasse</div><h2>Workshop, ADR, anbefaling og kalkulator</h2><div class="tags"><span class="tag">Maler for kundemøter</span></div></div>';
+    reader.appendChild(document.getElementById('tpl-tool').content.cloneNode(true));
+    addCopyButtons(reader);
+    initCalc();
+  }
+  function initCalc(){
+    var ids=['k','n','h1','h2','hs','r','l','y','m1','m2'];
+    var nf=new Intl.NumberFormat('nb-NO',{maximumFractionDigits:0});
+    function v(id){var x=parseFloat(document.getElementById('t-'+id).value);return isFinite(x)&&x>0?x:0}
+    function kr(x){return nf.format(Math.round(x))+' kr'}
+    function put(id,t){document.getElementById('t-'+id).textContent=t}
+    function calc(){
+      var k=v('k'),n=v('n'),h1=v('h1'),h2=v('h2'),hs=v('hs'),r=v('r'),l=v('l'),y=v('y'),m1=v('m1')/100,m2=v('m2')/100;
+      var pi=k*n*h1*r, pt=pi+pi*m1*y;
+      var hi=(hs+(k+n)*h2)*r, ht=hi+(hi*m2+l)*y;
+      put('o-p2p',kr(pt)); put('o-hub',kr(ht));
+      put('o-p2pd','Bygging '+kr(pi)+', vedlikehold '+kr(pi*m1)+' per år');
+      put('o-hubd','Bygging '+kr(hi)+', vedlikehold og drift '+kr(hi*m2+l)+' per år');
+      var d=pt-ht;
+      put('o-diff',(d>=0?'Hub er '+kr(d)+' billigere':'Hub er '+kr(-d)+' dyrere')+' over '+y+' år. En ny konsument koster '+kr(k*h1*r)+' punkt-til-punkt og '+kr(h2*r)+' via hub.');
+    }
+    ids.forEach(function(id){document.getElementById('t-'+id).addEventListener('input',calc)});
+    calc();
+  }
+
+  /* Backup: copy/download a progress code, paste to restore */
+  function progressCode(){
+    var keys=Object.keys(state).filter(function(k){return state[k]}).sort(function(a,b){return a.localeCompare(b,undefined,{numeric:true})});
+    return 'otit1:'+keys.join(',');
+  }
+  var bkMsg=$('bk-msg'), bkIn=$('bk-in');
+  function say(t){bkMsg.textContent=t;var r=$('rsmsg');if(r)r.textContent=t}
+  $('rs-copy').addEventListener('click',function(){$('bk-copy').click()});
+  $('rs-go').addEventListener('click',function(){bkIn.value=$('rs-in').value;$('bk-imp').click()});
+  $('bk-copy').addEventListener('click',function(){
+    var code=progressCode();
+    function manual(){bkIn.value=code;bkIn.focus();bkIn.select();say('Koden står i feltet under. Kopier den manuelt (Ctrl+C).')}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(function(){say('Koden er kopiert.')},manual)}else{manual()}
+  });
+  $('bk-dl').addEventListener('click',function(){
+    var code=progressCode();
+    (window.claude&&window.claude.use?window.claude.use('downloads'):Promise.resolve(null)).then(function(d){
+      if(!d){bkIn.value=code;say('Nedlasting er ikke tilgjengelig her. Koden står i feltet under.');return}
+      return d.save({filename:'otit-fremdrift.txt',data:code+'\n'}).then(function(){say('Filen er lagret.')},function(e){
+        if(e&&e.code==='declined'){say('Avbrutt.')}else{bkIn.value=code;say('Kunne ikke laste ned. Koden står i feltet under.')}
+      });
+    });
+  });
+  $('bk-imp').addEventListener('click',function(){
+    var raw=bkIn.value.trim();
+    if(raw.indexOf('otit1:')!==0){say('Koden må starte med otit1:');return}
+    var keys=raw.slice(6).split(',').map(function(s){return s.trim()}).filter(Boolean);
+    var ok=keys.every(function(k){return /^ex\d{1,2}(\.[a-z0-9]{1,8})?$/.test(k)});
+    if(!ok){say('Koden inneholder ugyldige verdier.');return}
+    var next={}; keys.forEach(function(k){next[k]=true});
+    state=next; save(); syncChecks(); refresh(); say('Importerte '+keys.length+' avkrysninger.');
+  });
+
+  $('index').open=window.matchMedia('(min-width:861px)').matches;
+  var m=/^#ex(\d+)$/.exec(location.hash); if(m&&EX[+m[1]-1])sel=+m[1];
+  if(location.hash==='#verktoy')sel='tool';
+  if(location.hash==='#rodtrad')sel='thread';
+  renderReader(); refresh();
+  function setStore(t){var el=$('store');if(el)el.textContent=t}
+  setStore('Lagring: kun i denne nettleseren. Bruk eksportkoden nederst i menyen for sikkerhetskopi.');
+
+  /* Shared progress store: lights up when the db capability is available. */
+  (window.claude&&window.claude.use?window.claude.use('db'):Promise.resolve(null)).then(function(db){
+    if(!db)return;
+    dbDoc=db.doc('progress/main');
+    setStore('Lagring: på kontoen din (følger deg mellom nettlesere)');
+    dbDoc.onSnapshot(function(snap){
+      if(snap.metadata&&snap.metadata.hasPendingWrites)return;
+      if(snap.exists){
+        var c=snap.data().checks;
+        if(c&&JSON.stringify(c)!==JSON.stringify(state)){state=JSON.parse(JSON.stringify(c));persistLocal();syncChecks();refresh()}
+      }else if(Object.keys(state).length){
+        save();
+      }
+    },function(){});
+  }).catch(function(){});
+})();
+</script>
+
+</html>
