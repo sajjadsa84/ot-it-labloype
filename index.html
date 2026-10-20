@@ -209,7 +209,7 @@ tr.rec td{background:var(--accent-soft)}
 .code{border-radius:16px}
 @media (min-width:861px){
   .shell.slim{grid-template-columns:76px minmax(0,1fr)}
-  .shell.slim .fltbox,.shell.slim .index>summary,.shell.slim .lv h3,.shell.slim .row a,.shell.slim .lv:nth-child(-n+2){display:none}
+  .shell.slim .fltbox,.shell.slim .index>summary,.shell.slim .lv h3,.shell.slim .row a,.shell.slim .lv:nth-child(2),.shell.slim .lv:nth-child(3){display:none}
   .shell.slim .row{grid-template-columns:22px 1fr;padding:0 6px;cursor:pointer}
   .shell.slim .row .n{text-align:center}
   .shell.slim #sidebtn span{display:none}
@@ -245,6 +245,109 @@ details.fltbox{margin:0 14px 10px}
 details.fltbox>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font:600 14px var(--font-body);color:var(--muted)}
 details.fltbox .flt{padding:0 0 8px}
 .thread{padding:16px 20px}
+
+/* ===== Ny lab-visning: ett løp, ærlig status ===== */
+.kick+h2{margin-top:2px}
+.status{display:inline-flex;gap:6px;align-items:center;font:600 12px var(--font-body);padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);width:max-content}
+.status.klar{color:var(--accent);border-color:var(--accent)}
+.row.planned a::after{content:" · planlagt";font-size:12px;color:var(--muted)}
+.four{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.four>div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.four b{font:700 12px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.four span{font-size:15px;line-height:1.5}
+.story{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.story p{margin:0}
+.quote{border-left:3px solid var(--accent);padding-left:12px;color:var(--muted);font-style:italic}
+.sec-h{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.sec-h h3{font-size:22px}
+.lsteps{display:flex;flex-direction:column;gap:12px}
+.lstep{background:var(--surface);border:1px solid var(--line);border-radius:20px}
+.lstep.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.lhead{all:unset;box-sizing:border-box;width:100%;min-height:60px;padding:10px 20px;display:flex;gap:14px;align-items:center;cursor:pointer;border-radius:20px}
+.lhead:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lnum{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--line);font:600 14px var(--font-mono);color:var(--fg)}
+.lstep.done .lnum{background:#2f7d5b;color:#fff}
+.lstep.cur .lnum{background:var(--accent);color:var(--surface)}
+.ltitle{flex:1;font:600 17px/1.3 var(--font-body)}
+.lbody{display:none;padding:4px 20px 22px;flex-direction:column;gap:16px}
+.lstep.open .lbody{display:flex}
+.lbody p{margin:0}
+.tbadge{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--font-body);padding:4px 10px;border-radius:8px;border:1.5px solid currentColor;white-space:nowrap}
+.tbadge.ps{color:#1d5fa8}
+.tbadge.ub{color:#9a4a1f}
+.tbadge.gui{color:#4d6b3a}
+:root[data-theme="dark"] .tbadge.ps{color:#7db4f0}
+:root[data-theme="dark"] .tbadge.ub{color:#f0a070}
+:root[data-theme="dark"] .tbadge.gui{color:#a8cf8f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tbadge.ps{color:#7db4f0}:root:not([data-theme="light"]) .tbadge.ub{color:#f0a070}:root:not([data-theme="light"]) .tbadge.gui{color:#a8cf8f}}
+.cmd1{display:flex;flex-direction:column;gap:8px}
+.cmeta{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:14px;color:var(--muted)}
+.cmeta .dirn{font:13px var(--font-mono)}
+.cbox{position:relative;background:var(--code-bg);border-radius:14px;display:flex;align-items:stretch}
+.cbox pre{margin:0;padding:14px 16px;overflow-x:auto;flex:1;min-width:0}
+.cbox code{font:400 14px/1.6 var(--font-mono);color:var(--code-fg);white-space:pre}
+.cbox code::before{content:attr(data-prompt) " ";color:#a99d8b;user-select:none;-webkit-user-select:none}
+.cbox code.nop::before{content:none}
+.cpy{flex:none;align-self:flex-start;margin:8px;min-height:44px;min-width:88px;padding:0 14px;border-radius:10px;border:1px solid var(--code-line);background:transparent;color:var(--code-fg);font:500 13px var(--font-body);cursor:pointer}
+.cpy:focus-visible{outline:2px solid var(--accent)}
+.crun{font-size:14px;color:var(--muted);display:flex;gap:8px}
+.crun::before{content:"→";color:var(--accent);font-weight:700}
+.exw{background:var(--accent-soft);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.exw b{font:700 12px var(--font-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.exw pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:10px 14px;overflow-x:auto;font:13px/1.55 var(--font-mono)}
+.why{background:transparent;border-left:3px solid var(--line);padding:2px 0 2px 14px;font-size:15px;color:var(--fg)}
+.why b{color:var(--muted);font-weight:600}
+.fixd{border:1px solid var(--amber);background:var(--amber-soft);border-radius:14px;padding:0 16px}
+.fixd summary{min-height:48px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.fixd dl{margin:0 0 14px;display:grid;gap:10px}
+.fixd dt{font-weight:600}
+.fixd dd{margin:0;color:var(--fg)}
+.adm{font-size:14px;border:1px dashed var(--line);border-radius:12px;padding:8px 12px}
+.lnav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:14px}
+.lnav .chk{font:600 15px var(--font-body)}
+.simbox{background:var(--surface);border:2px dashed var(--line);border-radius:20px;padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.simtag{display:inline-flex;gap:8px;align-items:center;width:max-content;font:700 12px var(--font-body);letter-spacing:.06em;text-transform:uppercase;padding:4px 12px;border-radius:999px;background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button,.pbtn{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:500 15px var(--font-body);cursor:pointer}
+.opts button[aria-pressed="true"],.pbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.pbtn.go{background:var(--accent);color:var(--surface);border-color:var(--accent);font-weight:600}
+.fb{padding:12px 16px;border-radius:14px;background:var(--accent-soft);margin:0}
+.fb[hidden]{display:none}
+.sim svg{width:100%;height:auto;max-width:560px}
+.sim .nd rect{fill:var(--surface);stroke:var(--fg);stroke-width:1.5}
+.sim .nd text{fill:var(--fg);font:600 13px var(--font-body);text-anchor:middle;dominant-baseline:middle}
+.sim .nd.off rect{stroke-dasharray:4 3;opacity:.6}
+.sim .ln{stroke:var(--muted);stroke-width:1.5}
+.sim .dt{fill:var(--accent)}
+.tlist{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.tlist li{font:14px var(--font-mono);padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);overflow-wrap:anywhere}
+.tlist li.hit{border-color:var(--accent);background:var(--accent-soft);font-weight:500}
+.tlist li.miss{opacity:.55}
+.deep{display:flex;flex-direction:column;gap:10px}
+.deep details{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:0 20px}
+.deep summary{min-height:52px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.deep details>div{padding:0 0 18px;display:flex;flex-direction:column;gap:12px}
+.deep details p,.deep details ul{margin:0}
+.next{background:var(--accent-soft);border:1px solid var(--line);border-radius:20px;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.next p{margin:0}
+.planbanner{background:var(--amber-soft);border:1px solid var(--amber);border-radius:16px;padding:14px 18px}
+.homehero{display:flex;flex-direction:column;gap:10px}
+.homehero h2{font-size:34px}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.hcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.hcard h3{font-size:18px}
+.hcard p{margin:0;color:var(--fg)}
+.hcard .pbtn{width:max-content}
+.plant{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.room{border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.room h4{margin:0;font:700 14px var(--font-body)}
+.room .inst{justify-content:flex-start;text-align:left}
+.instinfo{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0}
+.instinfo dt{color:var(--muted);font-size:14px}
+.instinfo dd{margin:0;font:14px var(--font-mono);overflow-wrap:anywhere}
+.guide li{margin-bottom:6px}
+.cbox code{background:none;padding:0;border:0;border-radius:0}
+@media (max-width:560px){.cbox{flex-direction:column}.cbox pre{padding:12px 14px 4px}.cbox code{white-space:pre-wrap;overflow-wrap:anywhere}.cpy{align-self:flex-end;margin:0 8px 8px}.lhead{padding:10px 14px}.lbody{padding:4px 14px 18px}.ltitle{font-size:16px}.cpy{min-width:76px}}
 </style>
 
 <div class="wrap">
@@ -255,7 +358,7 @@ details.fltbox .flt{padding:0 0 8px}
       <div class="tools"><button class="tb" id="theme" type="button" aria-label="Bytt mellom lyst og mørkt tema"><span id="themeico" aria-hidden="true">◐</span><span id="themetxt">Tema</span></button></div>
     </div>
     <div class="prog" aria-live="polite">
-      <div class="prog-row"><span>Fullførte øvelser</span><strong id="pcount">0 / 0</strong></div>
+      <div class="prog-row"><span>Klare labber bekreftet i egen lab</span><strong id="pcount">0 / 0</strong></div>
       <div class="bar"><i id="pbar"></i></div>
       <div class="lvls" id="plv"></div>
       <div class="save" id="store" aria-live="polite">Lagring: sjekker …</div>
@@ -995,8 +1098,8 @@ Eier og revisjonsdato:</code></pre></div></section>
     {id:'t',name:'Tillegg',weeks:'valgfri'}
   ];
   var RAW=[
-    ['b','Broker og klienter','Mosquitto, pub/sub, Python, Wireshark',1],
-    ['b','Topics, wildcards og topic-design (UNS)','+ og #, navnerom, UNS-struktur',1],
+    ['b','Send og motta én verdi (broker)','Mosquitto, mottaker og sender',1],
+    ['b','Gi signalene gode navn (topics og jokertegn)','+ og #, navnerom, skallskript',1],
     ['b','QoS 0, 1 og 2','Leveringsgarantier og handshake'],
     ['b','Retained messages','Siste kjente verdi'],
     ['b','OPC UA: Address Space og noder','Prosys-server og OPC UA Browser'],
@@ -1322,7 +1425,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   var EX=RAW.map(function(r,i){var c=CASE[i]||['','',''],a=ARCH[i]||['',''];return {n:i+1,l:r[0],t:r[1],d:r[2],ready:!!r[3],k:c[0],h:c[1],g:c[2]+(a[0]?'T':'')+(a[1]?'E':'')+(ERPL[i+1]?'R':'')+(UNSL[i+1]?'U':'')+(VL[i+1]?'V':'')+(HL[i+1]?'H':''),q:CUST[i]||[],a:a,r:ERPL[i+1]||null,u:UNSL[i+1]||'',s:SECL[i+1]||'',v:VL[i+1]||'',hz:HL[i+1]||''}});
   var TOTAL=EX.length;
 
-  var state={}, dbDoc=null, sel=1, saveChain=Promise.resolve();
+  var state={}, dbDoc=null, sel='home', saveChain=Promise.resolve();
   var LS='otit-labloype-v1';
   try{state=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){state={}}
 
@@ -1342,7 +1445,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   }
 
   function buildIndex(){
-    var h='<div class="lv"><h3>Rød tråd<span>Nordlys Mat</span></h3><ul><li class="row ready'+(sel==='thread'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#rodtrad" data-go="thread"><span class="lamp"></span>Historien gjennom alle øvelsene</a></li></ul></div><div class="lv"><h3>Verktøykasse<span>maler</span></h3><ul><li class="row ready'+(sel==='tool'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#verktoy" data-go="tool"><span class="lamp"></span>Workshop, ADR, anbefaling og kalkulator</a></li></ul></div>';
+    var h='<div class="lv"><h3>Start her<span>klar</span></h3><ul><li class="row ready'+(sel==='home'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#hjem" data-go="home"><span class="lamp"></span>Oversikt og anlegget</a></li><li class="row ready'+(state.ex0?' done':'')+(sel==='setup'?' sel':'')+'" style="display:grid"><span></span><span class="n">00</span><a href="#oppsett" data-go="setup"><span class="lamp"></span>Sett opp lab-PC-en</a></li></ul></div><div class="lv"><h3>Rød tråd<span>Nordlys Mat</span></h3><ul><li class="row ready'+(sel==='thread'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#rodtrad" data-go="thread"><span class="lamp"></span>Historien gjennom alle øvelsene</a></li></ul></div><div class="lv"><h3>Verktøykasse<span>maler</span></h3><ul><li class="row ready'+(sel==='tool'?' sel':'')+'" style="display:grid"><span></span><span class="n"></span><a href="#verktoy" data-go="tool"><span class="lamp"></span>Workshop, ADR, anbefaling og kalkulator</a></li></ul></div>';
     LEVELS.forEach(function(L){
       var items=EX.filter(function(e){return e.l===L.id&&(!filt||e.g.indexOf(filt)>-1)});
       if(!items.length)return;
@@ -1360,9 +1463,9 @@ Eier og revisjonsdato:</code></pre></div></section>
   }
 
   function updateProgress(){
-    var done=EX.filter(function(e){return isDone(e.n)}).length;
-    $('pcount').textContent=done+' / '+TOTAL;
-    $('pbar').style.width=(done/TOTAL*100)+'%';
+    var rd=EX.filter(function(e){return e.ready}), done=rd.filter(function(e){return isDone(e.n)}).length+(state.ex0?1:0), tot=rd.length+1;
+    $('pcount').textContent=done+' / '+tot;
+    $('pbar').style.width=(done/tot*100)+'%';
     $('plv').innerHTML=LEVELS.map(function(L){
       var it=EX.filter(function(e){return e.l===L.id});
       var d=it.filter(function(e){return isDone(e.n)}).length;
@@ -1391,7 +1494,7 @@ Eier og revisjonsdato:</code></pre></div></section>
 
   /* Rød tråd: ett konsern gjennom alle øvelsene. [anlegg, hva du legger til, hvorfor den følger forrige] */
   var ACTS=[
-    {id:'b',n:1,name:'Akt 1: Støy i ett anlegg',sum:'Fra punkt-til-punkt til en broker og et navnerom, og så en TV i kantina.'},
+    {id:'b',n:1,name:'Akt 1: Støy i ett anlegg',sum:'Pakkeriet: én temperatur via en broker, så et navnerom og en kontrollskjerm.'},
     {id:'i',n:2,name:'Akt 2: Flere kilder, ERP og roboten',sum:'Flere anlegg og protokoller kobles på, ERP-simulatoren kommer, og SO-101 flytter inn i robotlabben.'},
     {id:'a',n:3,name:'Akt 3: Sikkert, toveis og ekte data',sum:'Revisoren kommer. Sikkerhet, toveis kommunikasjon, Sparkplug, ERP-sporbarhet og robotstyring.'},
     {id:'e',n:4,name:'Akt 4: Konsernet',sum:'Arkitektur for alle anlegg, kamera, trening av modeller og hele kjeden samlet.'},
@@ -1399,18 +1502,18 @@ Eier og revisjonsdato:</code></pre></div></section>
   ];
   var CORP={
     name:'Nordlys Mat AS',
-    intro:'Nordlys Mat er et familieeid matkonsern i Agder med seks anlegg: fiskeforedling, meieri, settefisk, pakkeri, sentrallager og et lite brygghus. Det kjøres på blandede PLC-er, ERP er Infor M3 (SAP eller Dynamics 365 brukes som sammenligning), og nylig kjøpte de en robotlab. Alt i øvelsene er fiktivt. Hver øvelse viser en typisk situasjon fra en bransje, og i løypa er den lagt til et av Nordlys sine anlegg.',
+    intro:'Løypa starter i pakkeriet (kjølerom KJ1, pakkemaskin PM1 og en kontrollskjerm) og blir der i de første øvelsene. Nordlys Mat er et familieeid matkonsern i Agder med seks anlegg: fiskeforedling, meieri, settefisk, pakkeri, sentrallager og et lite brygghus. Det kjøres på blandede PLC-er, ERP er Infor M3 (SAP eller Dynamics 365 brukes som sammenligning), og nylig kjøpte de en robotlab. Alt i øvelsene er fiktivt. Hver øvelse viser en typisk situasjon fra en bransje, og i løypa er den lagt til et av Nordlys sine anlegg.',
     cast:[['Gunnhild','driftssjef på fiskeforedlingen som vil ha ett tall'],['Terje','IT-sjef i konsernet, og serverrommet er kosteskapet'],['Knut','automasjonstekniker med 31 år i huset'],['Randi','økonomisjef som vil vite når det slutter å koste'],['Bjørg og Håkon','produksjonssjef og automasjonstekniker på meieriet'],['Silje','revisor som vil se tegninger'],['Du','arkitekten som skal få det til å henge sammen']]
   };
   var THREAD=[
-    ['Fiskeforedlingen','Mosquitto-broker, PLC-simulator og de første klientene','Startpunktet: alle spør PLC-en direkte, og brokeren tar over rollen som mellomledd.'],
-    ['Meieriet','Navnerom (UNS) som du bruker videre i alle øvelser','Brokeren fra øvelse 1 fylles opp, og meieriet krever en navnekonvensjon.'],
+    ['Pakkeriet','Broker, mottaker og sender med kjølerommets temperatur','Startpunktet: skjermen får temperaturen via en broker i stedet for å spørre PLS-en.'],
+    ['Pakkeriet','Navnerom for kjølerom og pakkemaskin, brukt videre i alle øvelser','Fem signaler med fem navnesystemer, og skjermen skal hente alt fra pakkemaskinen.'],
     ['Settefisk-anlegget','QoS-valg per signaltype i navnerommet','Settefisk-anlegget sender over mobilnett, så leveringsgarantier må velges med vilje.'],
     ['Brygghuset','Retained status-topics','Dashboardet skal ha en verdi fra første sekund, også etter restart.'],
     ['Pakkeriet','OPC UA-modell for pakkeriet (Prosys)','Pakkeriet har fire PLC-merker, og en felles modell trengs før noe kan flyttes.'],
     ['Prosessvann på Fiskeforedlingen','OPC UA-klient mot variablene','Vannbehandlingen går fortsatt på gammel OPC DA, og vi leser først, sikkert.'],
     ['Kvalitetsavdelingen','Python-klient som lytter på navnerommet','Kvalitet vil ha avvik uten tilgang til PLC-en, og leser fra brokeren du har bygget.'],
-    ['Meieriet','Node-RED-dashboard (TV i kantina)','Det første synlige resultatet på toppen av navnerommet.'],
+    ['Pakkeriet','Node-RED-dashboard på kontrollskjermen','Det første grafiske resultatet på toppen av navnerommet.'],
     ['Pumpestasjonene','Last Will for RTU-status','Fjernstasjoner dør uten å si fra, og status må være eksplisitt.'],
     ['Kjølebåten','Utløpstid for økter og meldinger','Kjølebåten mister og får dekning, og gamle verdier skal ikke utløse alarmer.'],
     ['Fjernanlegg på smalbånd','Topic Alias og User Properties','Hver byte koster, så meldingene må slankes uten å miste metadata.'],
@@ -1972,6 +2075,300 @@ Eier og revisjonsdato:</code></pre></div></section>
   }
 
 
+
+  /* ===== Ny lab-visning (oppsett, øvelse 1 og 2) ===== */
+  function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  var TAB={Broker:'Broker',Mottaker:'Mottaker',Sender:'Sender',Ubuntu:'Ubuntu'};
+  var PL={
+    ps:'PS C:\\Users\\deg>',
+    Ubuntu:'deg@lab:~$',
+    Nordlys:'deg@lab:~/lab/nordlys$'
+  };
+  var SIG=[
+    {id:'kj',room:'Kjølerom 1',name:'Temperatur',tag:'KJ1-TT01',opc:'ns=2;s=Pakkeri.Kjolerom1.Temperatur',topic:'nordlys/pakkeri/kjolerom1/temperatur',val:'4.5 °C',old:'KJ1_T_ACT'},
+    {id:'st',room:'Pakkemaskin 1',name:'Driftstilstand',tag:'PM1-ST',opc:'ns=2;s=Pakkeri.Pakkemaskin1.Tilstand',topic:'nordlys/pakkeri/pakkemaskin1/tilstand',val:'RUN',old:'PM1.STATE'},
+    {id:'ok',room:'Pakkemaskin 1',name:'Godkjente pakker',tag:'PM1-CNT01',opc:'ns=2;s=Pakkeri.Pakkemaskin1.GodkjentePakker',topic:'nordlys/pakkeri/pakkemaskin1/godkjente-pakker',val:'1280',old:'PM1/OK_CNT'},
+    {id:'ao',room:'Pakkemaskin 1',name:'Arbeidsordre',tag:'PM1-AO',opc:'ns=2;s=Pakkeri.Pakkemaskin1.Arbeidsordre',topic:'nordlys/pakkeri/pakkemaskin1/arbeidsordre',val:'100234',old:'AO'},
+    {id:'pa',room:'Pakkemaskin 1',name:'Parti-ID',tag:'PM1-PARTI',opc:'ns=2;s=Pakkeri.Pakkemaskin1.PartiId',topic:'nordlys/pakkeri/pakkemaskin1/parti-id',val:'P-2024-118',old:'Parti'}
+  ];
+  function mqttMatch(f,t){
+    var fs=f.split('/'),ts=t.split('/');
+    if(t.charAt(0)==='$'&&(fs[0]==='#'||fs[0]==='+'))return false;
+    for(var i=0;i<fs.length;i++){
+      if(fs[i]==='#')return true;
+      if(i>=ts.length)return false;
+      if(fs[i]!=='+'&&fs[i]!==ts[i])return false;
+    }
+    return fs.length===ts.length;
+  }
+
+  var LABS={};
+  LABS[0]={
+    no:'0',title:'Sett opp lab-PC-en',
+    boxes:[['Dette har du fra før','En Windows-PC med WSL 2 og Ubuntu (eller vilje til å installere det).'],['Dette skal vi løse','Du vet ikke alltid hvilken terminal du står i, hvor filene havner eller hva som skjer når du trykker Ctrl+C.'],['Dette legger vi til','Windows Terminal med tre navngitte Ubuntu-faner, prosjektmappen ~/lab/nordlys og Mosquitto.'],['Slik kontrollerer vi','Du kjenner igjen PowerShell og Ubuntu på ledeteksten, og mosquitto -h viser versjonsnummer.']],
+    story:'<p><b>Knut</b> har 31 års erfaring med PLS-er og null års erfaring med Linux-terminal. <b>Terje</b> sier at «det bare er tekst». Begge har rett. Denne øvelsen tar bort mystikken, slik at resten av løypa handler om anlegget og ikke om terminalen.</p><p class="quote">Knut: «Hvis jeg skriver kommandoen i feil vindu, går det da bra?» Svar: Nei, men du får en tydelig feilmelding. Slik kjenner du igjen riktig vindu.</p>',
+    guide:'<p class="lab">Slik leser du kommandoene på denne siden</p><ul class="guide"><li><b>Terminalkommando:</b> skrives ved ledeteksten i en terminal, og kjøres med Enter. Merket over boksen sier hvilken terminal og mappe.</li><li><b>Filinnhold:</b> tekst som lagres i en fil (for eksempel <code>mosquitto.conf</code>). Det skrives ikke som kommando. Du åpner filen i en editor, limer inn innholdet og lagrer.</li><li><b>Ledeteksten</b> (for eksempel <code>deg@lab:~/lab/nordlys$</code>) er terminalens «jeg venter på deg». Den er ikke en del av kommandoen. Kopieringsknappen tar den ikke med.</li><li><b>Ctrl+C</b> stopper et program som kjører. Det er ikke «kopier» i en terminal uten markert tekst.</li></ul>',
+    steps:[
+      {t:'Åpne Windows Terminal og kjenn igjen PowerShell',term:'gui',what:'<p>Trykk Windows-tasten, skriv <b>Terminal</b> og åpne <b>Windows Terminal</b>. Den første fanen er vanligvis <b>PowerShell</b>.</p><p>PowerShell kjenner du igjen på ledeteksten, som begynner med <code>PS</code> og slutter med <code>&gt;</code>.</p>',expect:{out:'PS C:\\Users\\deg>',why:'Ledeteksten begynner med PS. Brukernavnet ditt står i stedet for «deg».'},why:'PowerShell er Windows sitt eget kommandovindu. Vi bruker det bare til å styre WSL. Resten av labben foregår i Ubuntu.',fix:[['Jeg ser bare en svart boks med C:\\> uten PS','Det er den gamle ledeteksten (cmd). Lukk den, og åpne «Terminal» eller «Windows Terminal» fra Start-menyen.'],['Jeg finner ikke Windows Terminal','Installer «Windows Terminal» fra Microsoft Store (gratis). Hvis du ikke får installere programmer på arbeids-PC-en, bruk PowerShell fra Start-menyen i denne øvelsen.']]},
+      {t:'Sjekk at Ubuntu kjører under WSL 2',term:'ps',dir:'(hvilken som helst)',what:'<p>Vi spør Windows om hvilke Linux-miljøer som er installert, og hvilken WSL-versjon de bruker.</p>',cmds:[{c:'wsl -l -v',run:'back',ex:[['wsl','Programmet som styrer Windows Subsystem for Linux.'],['-l','Lag en liste over installerte Linux-miljøer.'],['-v','Vis også status og WSL-versjon.']]}],expect:{out:'  NAME      STATE           VERSION\n* Ubuntu    Running         2',why:'Du skal se Ubuntu, og tallet under VERSION skal være 2. Stjernen markerer standardmiljøet. STATE kan stå som Stopped. Det går bra.'},why:'WSL 2 kjører en ekte Linux-kjerne. Det gjør at nettverk og filer oppfører seg som på en vanlig Linux-maskin, og det er det Mosquitto forventer.',admin:'Administrator trengs bare hvis Ubuntu mangler og må installeres (se «Jeg får et annet resultat»).',fix:[['Meldingen sier at det ikke finnes noen distribusjoner','Åpne PowerShell som administrator (høyreklikk Start, velg Terminal (administrator)) og kjør <code>wsl --install -d Ubuntu</code>. Start PC-en på nytt når den ber om det, og velg brukernavn og passord i Ubuntu.'],['VERSION viser 1','Kjør <code>wsl --set-version Ubuntu 2</code>. Det trenger ikke administrator. Det kan ta noen minutter.'],['wsl er ikke gjenkjent','WSL er ikke installert eller er skrudd av. Kjør <code>wsl --install</code> som administrator, eller spør IT.']]},
+      {t:'Åpne en Ubuntu-fane og kjenn den igjen',term:'gui',what:'<p>I Windows Terminal: klikk på <b>pil ned</b> (v) ved siden av <b>+</b>, og velg <b>Ubuntu</b>. En ny fane åpnes.</p><p>Ubuntu kjenner du igjen på ledeteksten: den har et <code>@</code> og slutter med <code>$</code>, og den begynner ikke med <code>PS</code>.</p>',cmds:[{c:'whoami',tab:'Ubuntu',run:'back',pr:'Ubuntu',ex:[['whoami','«Hvem er jeg?» Skriver ut brukernavnet ditt i Ubuntu.']]},{c:'pwd',tab:'Ubuntu',run:'back',pr:'Ubuntu',ex:[['pwd','«Print working directory»: viser hvilken mappe du står i akkurat nå.']]}],expect:{out:'deg\n/home/deg',why:'Første linje er brukernavnet ditt. Andre linje er hjemmemappen din. Tegnet ~ i ledeteksten betyr akkurat den mappen.'},why:'Du har nå to helt ulike miljøer: PowerShell (Windows) og Ubuntu (Linux). Samme kommando virker ofte ikke i begge. Se på ledeteksten før du skriver.',fix:[['Jeg ser ikke Ubuntu i listen','Gå tilbake til forrige steg og sjekk at Ubuntu er installert. Du kan også skrive <code>wsl</code> i PowerShell. Da bytter denne fanen til Ubuntu.'],['Ubuntu ber om passord jeg ikke husker','Passordet er det du valgte første gang Ubuntu startet. Fant du det ikke, spør IT.']]},
+      {t:'Lag prosjektmappen',term:'ub',tab:'Ubuntu',dirn:'Nordlys',what:'<p>Alle filer i løypa havner i én mappe: <code>~/lab/nordlys</code>. Vi lager den og går inn i den.</p>',cmds:[{c:'mkdir -p ~/lab/nordlys',tab:'Ubuntu',run:'back',pr:'Ubuntu',ex:[['mkdir','«Make directory»: lager en mappe.'],['-p','Lager også mappen over (~/lab), og er ikke sur hvis den finnes fra før.'],['~/lab/nordlys','~ er hjemmemappen din. Stien betyr: lab, og så nordlys inni den.']]},{c:'cd ~/lab/nordlys',tab:'Ubuntu',run:'back',pr:'Ubuntu',ex:[['cd','«Change directory»: gå til en annen mappe.']]},{c:'pwd',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['pwd','Bekrefter hvor du står.']]},{c:'ls',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['ls','Viser filene i mappen. Den er tom nå, så du får ingen utskrift.']]}],expect:{out:'/home/deg/lab/nordlys',why:'pwd viser hele stien. ls skriver ingenting fordi mappen er tom. Ledeteksten viser nå også mappen: deg@lab:~/lab/nordlys$.'},why:'Når filene ligger på samme sted hver gang, trenger du ikke gjette stier senere. Du kan åpne mappen i Windows Utforsker med <code>explorer.exe .</code> (husk punktumet), hvis du vil se filene der.',fix:[['No such file or directory','Mappen finnes ikke ennå, eller du skrev feil. Kjør mkdir-kommandoen på nytt, og deretter cd.'],['Jeg står ikke i riktig mappe senere','Kjør <code>cd ~/lab/nordlys</code> i fanen. Det virker uansett hvor du står.']]},
+      {t:'Lag din første fil med nano',term:'ub',tab:'Ubuntu',dirn:'Nordlys',what:'<p>Mye av løypa handler om filer du lager selv. Her øver du på det med en fil du kaster etterpå.</p><ol><li>Kjør <code>nano hei.txt</code>. Terminalen blir til en enkel editor.</li><li>Skriv: <code>Hei Nordlys</code></li><li>Trykk <b>Ctrl+O</b> og så <b>Enter</b> (lagrer med samme navn).</li><li>Trykk <b>Ctrl+X</b> (lukker nano). Ledeteksten kommer tilbake.</li></ol>',cmds:[{c:'nano hei.txt',tab:'Ubuntu',run:'keep',pr:'Nordlys',ex:[['nano','En enkel teksteditor som kjører inni terminalen.'],['hei.txt','Filnavnet. Finnes den ikke, lages den når du lagrer.']]},{c:'cat hei.txt',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['cat','Skriver innholdet i en fil ut i terminalen. Slik sjekker du at fila er riktig.']]},{c:'rm hei.txt',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['rm','«Remove»: sletter filen for godt. Linux har ingen papirkurv i terminalen. Bruk den med omhu.']]}],expect:{out:'Hei Nordlys',why:'cat skriver ut teksten du la inn. rm skriver ingenting når det går bra.'},why:'Dette er forskjellen på kommando og filinnhold: <code>nano hei.txt</code> er en kommando. <code>Hei Nordlys</code> er innholdet du skriver inni nano. Senere i løypa limer du inn skript og konfigurasjon på samme måte. I Windows Terminal limer du inn med høyreklikk eller Ctrl+Shift+V.',fix:[['Jeg kommer ikke ut av nano','Trykk Ctrl+X. Spør den om å lagre, trykk N for nei og Enter.'],['cat sier No such file','Du lagret ikke. Åpne nano på nytt, skriv teksten, Ctrl+O, Enter, Ctrl+X.'],['Ctrl+V limer ikke inn','Bruk høyreklikk, eller Ctrl+Shift+V i Windows Terminal.']]},
+      {t:'Installer Mosquitto',term:'ub',tab:'Ubuntu',dirn:'Nordlys',what:'<p>Mosquitto er MQTT-brokeren vi bruker. Pakken <code>mosquitto-clients</code> gir deg kommandoene <code>mosquitto_pub</code> (sender) og <code>mosquitto_sub</code> (mottaker).</p>',cmds:[{c:'sudo apt update',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['sudo','Kjør som superbruker i Ubuntu. Ikke det samme som Windows-administrator. Du blir bedt om Ubuntu-passordet, og tegnene vises ikke mens du skriver.'],['apt','Ubuntu sin pakkebehandler (som en app-butikk i terminalen).'],['update','Henter oppdatert pakkeliste. Installerer ingenting ennå.']]},{c:'sudo apt install -y mosquitto mosquitto-clients',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['install','Installer disse pakkene.'],['-y','Svar «ja» automatisk på spørsmålet om du vil fortsette.'],['mosquitto mosquitto-clients','Brokeren og klientverktøyene.']]},{c:'mosquitto -h',tab:'Ubuntu',run:'back',pr:'Nordlys',ex:[['-h','«Help»: skriver hjelpetekst. Første linje viser versjonen, og det er nok til å bekrefte at installasjonen virket.']]}],expect:{out:'mosquitto version 2.0.18\n\nmosquitto is an MQTT v5.0/v3.1.1/v3.1 broker.',why:'Versjonsnummeret kan avvike (2.x er fint). Installasjonen tar noen minutter, og du får masse tekst underveis.'},why:'Brokeren er «postkontoret»: den tar imot meldinger og leverer dem til de som har bedt om dem. Selve installasjonen krever sudo fordi den legger programmer i systemmapper.',admin:'sudo trengs her, og bare her og når du stopper en bakgrunnstjeneste i øvelse 1. Ingen Windows-administrator er nødvendig.',fix:[['Unable to locate package mosquitto','Kjør <code>sudo apt update</code> på nytt. Sjekk at Ubuntu har internett (<code>ping -c 2 google.com</code>).'],['Could not get lock','En annen installasjon pågår. Vent et minutt og prøv igjen.'],['Feil passord','Passordet er Ubuntu-passordet ditt, ikke Windows-passordet.']]},
+      {t:'Lag tre faner: Broker, Mottaker og Sender',term:'gui',what:'<p>I løypa kjører flere programmer samtidig. Hver trenger sin egen fane. Vi gir dem faste navn.</p><ol><li>Åpne tre Ubuntu-faner (pil ned ved +, velg Ubuntu, tre ganger).</li><li>Dobbeltklikk på tittelen på fanen, eller høyreklikk og velg «Gi nytt navn til fane». Navngi dem <b>Broker</b>, <b>Mottaker</b> og <b>Sender</b>.</li><li>Kjør kommandoen under i hver av dem.</li></ol><div class="tbl"><table><thead><tr><th>Fane</th><th>Hva som kjører</th><th>Ledeteksten</th></tr></thead><tbody><tr><td><b>Broker</b></td><td>Mosquitto. Skal alltid kjøre mens du jobber.</td><td>Kommer ikke tilbake før du trykker Ctrl+C.</td></tr><tr><td><b>Mottaker</b></td><td>Lytter på meldinger.</td><td>Kommer ikke tilbake før du trykker Ctrl+C.</td></tr><tr><td><b>Sender</b></td><td>Sender én melding om gangen.</td><td>Kommer tilbake med en gang.</td></tr></tbody></table></div>',cmds:[{c:'cd ~/lab/nordlys',tab:'Broker, Mottaker og Sender',run:'back',pr:'Ubuntu',ex:[['cd ~/lab/nordlys','Går til prosjektmappen. Kjør den i alle tre fanene.']]}],expect:{out:'(ingen utskrift, men ledeteksten viser nå ~/lab/nordlys)',why:'Alle tre fanene har tittel og står i prosjektmappen.'},why:'Faste fanenavn gjør at du alltid vet hvor en kommando skal kjøres. Hvert steg i øvelsene sier «Broker», «Mottaker» eller «Sender».',fix:[['Fanen mister navnet når jeg lukker den','Det er normalt. Du navngir fanene på nytt hver dag. Det tar ti sekunder.'],['Fanen står i feil mappe','Kjør <code>cd ~/lab/nordlys</code> der.']]},
+      {t:'Slik avslutter du, og slik starter du igjen i morgen',term:'gui',what:'<p class="lab">Avslutte for i dag</p><ol><li>Trykk <b>Ctrl+C</b> i Mottaker, og så i Broker. Det stopper programmene. (Står noe markert, kopierer Ctrl+C i stedet. Klikk først på en tom flate i vinduet.)</li><li>Skriv <code>exit</code> i fanene, eller lukk dem.</li></ol><p class="lab">Starte igjen</p><ol><li>Åpne Windows Terminal og tre Ubuntu-faner, og gi dem navn (steg 7).</li><li>Kjør <code>cd ~/lab/nordlys</code> i hver av dem.</li><li>Start alltid <b>Broker</b> først, deretter <b>Mottaker</b>, til slutt <b>Sender</b>.</li></ol>',cmds:[{c:'exit',tab:'hvilken som helst Ubuntu-fane',run:'back',pr:'Ubuntu',ex:[['exit','Lukker Ubuntu-økten. Filene dine ligger igjen i ~/lab/nordlys.']]}],expect:{out:'(fanen lukkes)',why:'Filene i ~/lab/nordlys er der neste dag. Ingenting går tapt når du lukker faner.'},why:'Programmer som kjører i terminalen stopper når du lukker fanen eller trykker Ctrl+C. Filene blir liggende.',fix:[['Ctrl+C gjør ingenting','Du står kanskje ved ledeteksten og ikke i et program som kjører. Da er alt i orden.'],['Jeg får «Address already in use» neste dag','Brokeren fra i går kjører fortsatt i bakgrunnen. Se feilsøkingen i øvelse 1, steg 2.']]}
+    ],
+    deep:[['Valgfritt: MQTT Explorer (grafisk visning)','<p>MQTT Explorer er et Windows-program som viser topics som et tre. Det brukes fra øvelse 1, steg 5, og er helt valgfritt. Hvis du ikke får installere det, bruker du <code>mosquitto_sub</code> i stedet.</p><p>Last ned fra den offisielle siden (mqtt-explorer.com), eller spør IT om det er godkjent på arbeids-PC-en.</p>']],
+    confirm:'Oppsettet er bekreftet i min egen lab',
+    nextText:'<p><b>Du kan nå:</b> åpne PowerShell og Ubuntu, lage og lagre filer, og starte Mosquitto.</p><p><b>Fortsett med:</b> Øvelse 1, send og motta én verdi fra kjølerommet.</p>',nextEx:1
+  };
+  LABS[1]={
+    no:'1',title:'Send og motta én verdi fra kjølerommet',
+    boxes:[['Dette fungerer fra før','Lab-PC-en er satt opp (øvelse 0). Kjølerommets PLS viser temperaturen lokalt på panelet.'],['Dette skal vi løse','Kontrollskjermen i pakkeriet skal vise kjølerommets temperatur uten å spørre PLS-en direkte.'],['Dette legger vi til','En MQTT-broker, en mottaker som lytter og en sender som publiserer temperaturen 4.5.'],['Slik kontrollerer vi','Verdien du sender dukker opp i Mottaker-fanen (og i MQTT Explorer hvis du har det).']],
+    story:'<p>Pakkeriet til Nordlys Mat har et kjølerom (<b>KJ1</b>), en pakkemaskin (<b>PM1</b>) og en kontrollskjerm i gangen. I dag spør skjermen, et Excel-ark og et dashboard i kantina hver sin gang PLS-en i kjølerommet om temperaturen.</p><p class="quote">Knut: «PLS-en har begynt å svare med et sukk.» Gunnhild: «Jeg vil bare ha ett tall på skjermen, og jeg vil at det er det samme tallet som Excel viser.»</p><p>Løsningen er en <b>broker</b>: ett sted alle data sendes til og hentes fra. Senderen (her: deg, i rollen som PLS-gateway) sender temperaturen én gang. Alle som er interessert, får den fra brokeren. Senderen trenger ikke vite hvem de er.</p><p><b>Ord du trenger:</b> <i>MQTT</i> er protokollen. En <i>broker</i> er serveren i midten. Å <i>publisere</i> er å sende. Å <i>abonnere</i> er å be om meldinger. Et <i>topic</i> er adressen på meldingen, for eksempel <code>nordlys/pakkeri/kjolerom1/temperatur</code>. Hvordan du lager gode adresser, er tema i øvelse 2.</p>',
+    steps:[
+      {t:'Lag konfigurasjonsfilen for brokeren',term:'ub',tab:'Broker',dirn:'Nordlys',what:'<p>Mosquitto leser innstillingene sine fra en tekstfil. Vi lager filen <code>mosquitto.conf</code> i prosjektmappen.</p><ol><li>Kjør <code>nano mosquitto.conf</code>.</li><li>Lim inn filinnholdet under (høyreklikk eller Ctrl+Shift+V).</li><li>Lagre med <b>Ctrl+O</b>, <b>Enter</b>, og lukk med <b>Ctrl+X</b>.</li><li>Kontroller med <code>cat mosquitto.conf</code>.</li></ol>',file:{name:'mosquitto.conf',path:'~/lab/nordlys/mosquitto.conf',content:'listener 1883\nallow_anonymous true',ex:[['listener 1883','Brokeren tar imot tilkoblinger på port 1883, som er standardporten for MQTT uten kryptering.'],['allow_anonymous true','Alle får koble til uten brukernavn. Det er greit på en isolert lab-PC, aldri i produksjon. Vi låser det ned i sikkerhetsøvelsene.']]},cmds:[{c:'nano mosquitto.conf',tab:'Broker',run:'keep',pr:'Nordlys',ex:[['nano mosquitto.conf','Åpner (eller lager) filen i editoren. Terminalen er «opptatt» til du lukker nano med Ctrl+X.']]},{c:'cat mosquitto.conf',tab:'Broker',run:'back',pr:'Nordlys',ex:[['cat','Skriver ut filen, så du ser at den ble lagret riktig.']]}],expect:{out:'listener 1883\nallow_anonymous true',why:'cat viser de to linjene du limte inn.'},why:'Mosquitto 2 tillater bare tilkoblinger fra samme maskin hvis du ikke har en konfigurasjonsfil. Med filen bestemmer du selv, og du ser nøyaktig hva brokeren gjør.',fix:[['cat viser ingenting eller noe annet','Åpne filen på nytt med nano, rett teksten, lagre med Ctrl+O, Enter, Ctrl+X.'],['No such file or directory','Du står ikke i prosjektmappen. Kjør <code>cd ~/lab/nordlys</code> og prøv igjen.']]},
+      {t:'Start brokeren',term:'ub',tab:'Broker',dirn:'Nordlys',what:'<p>Ubuntu kan ha startet Mosquitto i bakgrunnen da du installerte den. Den stopper vi først, så vi kan kjøre brokeren synlig i Broker-fanen og se alt den gjør.</p>',cmds:[{c:'sudo service mosquitto stop',tab:'Broker',run:'back',pr:'Nordlys',ex:[['sudo','Krever Ubuntu-passordet. Nødvendig fordi bakgrunnstjenester eies av systemet.'],['service mosquitto stop','Stopper bakgrunnstjenesten. Står det at tjenesten ikke finnes eller ikke kjører, er det helt greit.']]},{c:'mosquitto -c mosquitto.conf -v',tab:'Broker',run:'keep',pr:'Nordlys',ex:[['mosquitto','Starter brokeren.'],['-c mosquitto.conf','Bruk konfigurasjonsfilen vi nettopp laget.'],['-v','«Verbose»: skriv en logglinje for alt som skjer, for eksempel nye tilkoblinger og meldinger.']]}],expect:{out:'1761000000: mosquitto version 2.0.18 starting\n1761000000: Config loaded from mosquitto.conf.\n1761000000: Opening ipv4 listen socket on port 1883.\n1761000000: Opening ipv6 listen socket on port 1883.\n1761000000: mosquitto version 2.0.18 running',why:'Tallet først er et tidsstempel, og versjonen kan avvike. Det viktige er «Opening … port 1883» og «running». Ledeteksten kommer ikke tilbake. La fanen stå slik.'},why:'Med brokeren i forgrunnen ser du hver tilkobling og hver melding. Det er den raskeste feilsøkingen du har.',fix:[['Error: Address already in use','Noe annet bruker port 1883, som regel bakgrunnstjenesten. Kjør <code>sudo service mosquitto stop</code> én gang til, eller <code>sudo pkill mosquitto</code>, og start på nytt.'],['Error: Unable to open config file mosquitto.conf','Du står i feil mappe. Kjør <code>cd ~/lab/nordlys</code> og start på nytt.'],['Ledeteksten kom tilbake med en gang','Brokeren stoppet. Les siste linje i utskriften, den forteller hvorfor.']]},
+      {t:'Start mottakeren (kontrollskjermen)',term:'ub',tab:'Mottaker',dirn:'Nordlys',what:'<p>Mottakeren spiller kontrollskjermen. Den ber brokeren om alle meldinger med kjølerommets temperatur-adresse. Start den <b>før</b> du sender, ellers går meldingen forbi.</p>',cmds:[{c:'mosquitto_sub -h localhost -t "nordlys/pakkeri/kjolerom1/temperatur" -v',tab:'Mottaker',run:'keep',pr:'Nordlys',ex:[['mosquitto_sub','Klient som abonnerer (lytter).'],['-h localhost','Brokeren kjører på denne maskinen.'],['-t "…"','Topic (adressen) du vil ha meldinger fra. Anførselstegn rundt er en god vane.'],['-v','Skriv topic foran hver verdi, så du ser hvor den kom fra.']]}],expect:{out:'(ingenting ennå i Mottaker)\n\nI Broker-fanen dukker det opp linjer som:\nNew client connected from 127.0.0.1 … as auto-…\nReceived SUBSCRIBE from auto-…\n    nordlys/pakkeri/kjolerom1/temperatur (QoS 0)',why:'Mottakeren venter. Brokeren har registrert abonnementet. Klient-ID-en (auto-…) er tilfeldig.'},why:'Brokeren lagrer ikke vanlige meldinger for noen som ikke lytter. Derfor er rekkefølgen Broker → Mottaker → Sender. (I øvelse 4 lærer du å få siste kjente verdi likevel.)',fix:[['Error: Connection refused','Brokeren kjører ikke. Se på Broker-fanen, og start den igjen (steg 2).'],['Ledeteksten kom tilbake','Kommandoen ble avbrutt. Sjekk at du kopierte hele linjen.']]},
+      {t:'Send temperaturen',term:'ub',tab:'Sender',dirn:'Nordlys',what:'<p>Nå sender du temperaturen 4.5, som om du var gatewayen ved kjølerommets PLS.</p>',cmds:[{c:'mosquitto_pub -h localhost -t "nordlys/pakkeri/kjolerom1/temperatur" -m 4.5',tab:'Sender',run:'back',pr:'Nordlys',ex:[['mosquitto_pub','Klient som publiserer (sender) én melding og avslutter.'],['-t "…"','Samme topic som mottakeren lytter på. Store og små bokstaver må være like.'],['-m 4.5','Selve meldingen (payload). Bruk punktum som desimaltegn.']]}],expect:{out:'I Mottaker:\nnordlys/pakkeri/kjolerom1/temperatur 4.5',why:'Sender skriver ingenting, og ledeteksten kommer tilbake med en gang. Mottaker viser topic og verdien. Broker logger en ny klient, en PUBLISH og en frakobling.'},why:'Dette er hele prinsippet: senderen kjenner bare brokeren og adressen. Den vet ikke at mottakeren finnes. En til mottaker (Excel, dashboard) koster ingen ekstra last på PLS-en.',fix:[['Ingenting dukker opp i Mottaker','Sjekk at topic er helt likt i begge kommandoene, med samme store og små bokstaver. Sjekk at Mottaker fortsatt kjører.'],['Verdien kom, men uten topic foran','Du glemte <code>-v</code> i Mottaker. Trykk Ctrl+C der og start på nytt med -v.']]},
+      {t:'Se verdien på en skjerm (MQTT Explorer)',term:'gui',what:'<p>Valgfritt hvis du ikke har MQTT Explorer. Da er Mottaker-fanen skjermen din.</p><ol><li>Åpne MQTT Explorer i Windows.</li><li>Lag en ny tilkobling: Protocol <code>mqtt://</code>, Host <code>localhost</code>, Port <code>1883</code>. Trykk <b>Connect</b>.</li><li>Send en ny verdi fra Sender-fanen (kommandoen under).</li></ol>',cmds:[{c:'mosquitto_pub -h localhost -t "nordlys/pakkeri/kjolerom1/temperatur" -m 4.8',tab:'Sender',run:'back',pr:'Nordlys',ex:[['-m 4.8','En ny verdi, slik at du ser at skjermen oppdateres.']]}],expect:{out:'nordlys\n└ pakkeri\n  └ kjolerom1\n    └ temperatur = 4.8',why:'MQTT Explorer viser topic som et tre. 4.5 vises ikke, fordi den ble sendt før MQTT Explorer koblet til. Mottaker-fanen viser nå både 4.5 og 4.8.'},why:'Kontrollskjermen og Mottaker får samme verdi fra brokeren, uten at senderen gjorde noe ekstra.',fix:[['MQTT Explorer får ikke koble til localhost','Kjør <code>hostname -I</code> i en Ubuntu-fane, og bruk den første IP-adressen som Host.'],['Treet er tomt','Send verdien på nytt etter at du har koblet til.']]},
+      {t:'Avslutt labben',term:'gui',what:'<ol><li>Klikk i Mottaker-fanen og trykk <b>Ctrl+C</b>. Ledeteksten kommer tilbake.</li><li>Gjør det samme i Broker-fanen. Siste logglinje er omtrent «mosquitto version … terminating».</li><li>Lar du fanene stå, starter du neste gang med <code>mosquitto -c mosquitto.conf -v</code> i Broker.</li></ol>',expect:{out:'^C\ndeg@lab:~/lab/nordlys$',why:'^C betyr at du trykket Ctrl+C. Ledeteksten er tilbake.'},why:'Ctrl+C sender et avbruddssignal til programmet som kjører. Filene i prosjektmappen påvirkes ikke.',fix:[['Ctrl+C kopierte i stedet for å stoppe','Noe tekst var markert. Klikk på en tom flate i fanen og prøv igjen.']]}
+    ],
+    sim:'send',
+    deep:[
+      ['Se pakkene uten Wireshark (mosquitto_sub -d)','<p>Med <code>-d</code> skriver klienten ut hver MQTT-pakke den sender og mottar. Prøv i Mottaker-fanen i stedet for kommandoen i steg 3:</p>'+cmdHtml({c:'mosquitto_sub -d -h localhost -t "nordlys/pakkeri/kjolerom1/temperatur"',tab:'Mottaker',run:'keep',pr:'Nordlys',ex:[['-d','Debug: skriv ut pakker som «Client … sending CONNECT», «received CONNACK», «sending SUBSCRIBE», «received SUBACK» og «received PUBLISH».']]})+'<p>Ordlyden varierer litt mellom versjoner.</p>'],
+      ['Wireshark (valgfritt, hvis du får bruke det)','<p>Fang på adapteren «Adapter for loopback traffic capture» eller WSL-adapteren, og bruk visningsfilteret <code>mqtt</code>. Du ser CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH, med topic og payload i klartekst. Det er også grunnen til at port 1883 aldri skal brukes over usikre nett.</p>'],
+      ['Til kundemøtet: spørsmål, TOGAF og IEC 62443','<ul><li><b>Spør kunden:</b> Hvem leser data direkte fra PLS-ene i dag? Hvor ofte? Hva skjer med PLS-en når en ny leser kobles på?</li><li><b>TOGAF:</b> En broker er en felles plattformtjeneste (Technology Architecture). Gevinsten kommer når nye konsumenter ikke krever nye integrasjoner.</li><li><b>Systemteknikk:</b> Grensesnittet mellom PLS-gateway og broker beskrives i en ICD (topic, format, frekvens, eier).</li><li><b>IEC 62443:</b> Brokeren er et nytt kommunikasjonspunkt (en «conduit»). Uten innlogging og kryptering er den kun for lab.</li></ul>']
+    ],
+    confirm:'Øvelse 1 er bekreftet i min egen lab: Mottaker viste verdien jeg sendte',
+    nextText:'<p><b>Du kan nå:</b> starte en broker, abonnere og publisere en verdi, og stoppe programmer med Ctrl+C.</p><p><b>Neste behov:</b> Pakkeriet har fem signaler, og PLS-ene kaller dem fem forskjellige ting. Kontrollskjermen skal hente alle fra pakkemaskinen uten å kjenne hvert navn.</p>',nextEx:2
+  };
+
+  LABS[2]={
+    no:'2',title:'Gi signalene gode navn (topics og jokertegn)',
+    boxes:[['Dette fungerer fra før','Broker, Mottaker og Sender fra øvelse 1. Temperaturen vises på skjermen.'],['Dette skal vi løse','Pakkeriet sender fem signaler med navn fra fem PLS-programmerere. Skjermen kan ikke be om «alt fra pakkemaskinen».'],['Dette legger vi til','Et fast navnerom: nordlys/pakkeri/<enhet>/<signal>, og abonnement med jokertegnene + og #.'],['Slik kontrollerer vi','Tre filtre gir henholdsvis 4, 1 og 5 meldinger når skriptet kjøres.']],
+    story:'<p>Pakkeriet har nå fem signaler: kjølerommets temperatur, pakkemaskinens driftstilstand, antall godkjente pakker, arbeidsordre og parti-ID. Navnene kommer rett fra PLS-ene: <code>KJ1_T_ACT</code>, <code>PM1.STATE</code>, <code>PM1/OK_CNT</code>, <code>AO</code> og <code>Parti</code>.</p><p class="quote">Terje: «Hva er AO?» Knut: «Arbeidsordre. Åpenbart.» Revisoren Silje noterte noe.</p><p>Et <b>topic</b> er en adresse med nivåer delt av <code>/</code>. Mottakeren kan bruke <b>jokertegn</b> i abonnementet: <code>+</code> betyr «ett hvilket som helst nivå», og <code>#</code> betyr «alt herfra og ned». Det virker bare når navnene følger samme oppbygning.</p><p class="lab">Navnerommet i løypa</p><pre class="exw" style="margin:0;font:14px/1.6 var(--font-mono);white-space:pre-wrap">nordlys / pakkeri / pakkemaskin1 / tilstand\nselskap / anlegg  / enhet        / signal</pre><ul><li>Fra generelt til spesifikt, og samme antall nivåer overalt.</li><li>Små bokstaver, ingen mellomrom, ingen æøå. Bindestrek mellom ord.</li><li>Ingen skråstrek først eller sist. Verdier hører hjemme i meldingen, ikke i navnet.</li></ul>',
+    steps:[
+      {t:'Sjekk at Broker kjører',term:'ub',tab:'Broker',dirn:'Nordlys',what:'<p>Kjører brokeren fortsatt fra øvelse 1, hopper du over dette steget. Ellers starter du den på samme måte som sist.</p>',cmds:[{c:'mosquitto -c mosquitto.conf -v',tab:'Broker',run:'keep',pr:'Nordlys',ex:[['mosquitto -c mosquitto.conf -v','Start brokeren med konfigurasjonen fra øvelse 1, med logg.']]}],expect:{out:'… Opening ipv4 listen socket on port 1883.\n… mosquitto version 2.0.18 running',why:'Samme som i øvelse 1. Ledeteksten kommer ikke tilbake.'},why:'Alle steg i denne øvelsen sender gjennom samme broker.',fix:[['Address already in use','Brokeren kjører allerede, enten i en annen fane eller i bakgrunnen. Da kan du gå videre.'],['Unable to open config file','Kjør <code>cd ~/lab/nordlys</code> først.']]},
+      {t:'Lytt på alt, og send de gamle navnene',term:'ub',tab:'Mottaker',dirn:'Nordlys',what:'<p>Mottakeren lytter på <code>#</code>, altså alle topics. Deretter sender du de fem signalene med PLS-navnene, én kommando om gangen i Sender-fanen.</p>',cmds:[{c:'mosquitto_sub -h localhost -t "#" -v',tab:'Mottaker',run:'keep',pr:'Nordlys',ex:[['-t "#"','Jokertegnet # alene betyr alle topics. Bra til feilsøking, men ikke i produksjon.']]},{c:'mosquitto_pub -h localhost -t "KJ1_T_ACT" -m 4.5',tab:'Sender',run:'back',pr:'Nordlys'},{c:'mosquitto_pub -h localhost -t "PM1.STATE" -m RUN',tab:'Sender',run:'back',pr:'Nordlys'},{c:'mosquitto_pub -h localhost -t "PM1/OK_CNT" -m 1280',tab:'Sender',run:'back',pr:'Nordlys'},{c:'mosquitto_pub -h localhost -t "AO" -m 100234',tab:'Sender',run:'back',pr:'Nordlys'},{c:'mosquitto_pub -h localhost -t "Parti" -m P-2024-118',tab:'Sender',run:'back',pr:'Nordlys',ex:[['-m P-2024-118','Meldingen kan være tekst, ikke bare tall.']]}],expect:{out:'KJ1_T_ACT 4.5\nPM1.STATE RUN\nPM1/OK_CNT 1280\nAO 100234\nParti P-2024-118',why:'Alle fem kommer frem, fordi # tar alt. Men prøv å tenke ut ett filter som gir «alt fra pakkemaskinen». Det finnes ikke: PM1.STATE er ett nivå, PM1/OK_CNT er to, og AO og Parti har ingenting med PM1 å gjøre i navnet.'},why:'Brokeren bryr seg ikke om navnene. Problemet oppstår hos mottakerne, som må kjenne hvert enkelt navn.',fix:[['Mottaker viser i tillegg linjer fra øvelse 1','Ingen fare. Brokeren leverer alt som sendes mens Mottaker lytter.']]},
+      {t:'Lag et skript som sender med navnerom',term:'ub',tab:'Sender',dirn:'Nordlys',what:'<p>I stedet for å skrive fem kommandoer hver gang, legger vi dem i en fil. Et <b>skallskript</b> er en tekstfil med terminalkommandoer som kjøres ovenfra og ned når du starter filen.</p><ol><li>Kjør <code>nano publish_pakkeri.sh</code>.</li><li>Lim inn filinnholdet under.</li><li>Lagre med <b>Ctrl+O</b>, <b>Enter</b>, lukk med <b>Ctrl+X</b>.</li><li>Gjør filen kjørbar med <code>chmod +x</code>.</li></ol>',file:{name:'publish_pakkeri.sh',path:'~/lab/nordlys/publish_pakkeri.sh',content:'#!/usr/bin/env bash\n# Sender de fem pakkeri-signalene med navnerom\nH="-h localhost"\nmosquitto_pub $H -t nordlys/pakkeri/kjolerom1/temperatur -m 4.5\nmosquitto_pub $H -t nordlys/pakkeri/pakkemaskin1/tilstand -m RUN\nmosquitto_pub $H -t nordlys/pakkeri/pakkemaskin1/godkjente-pakker -m 1280\nmosquitto_pub $H -t nordlys/pakkeri/pakkemaskin1/arbeidsordre -m 100234\nmosquitto_pub $H -t nordlys/pakkeri/pakkemaskin1/parti-id -m P-2024-118',ex:[['#!/usr/bin/env bash','Første linje sier at filen skal kjøres av programmet bash (Ubuntu sitt kommandoskall).'],['# Sender …','Linjer som starter med # er kommentarer. De kjøres ikke.'],['H="-h localhost"','Lagrer felles valg i variabelen H, så du slipper å gjenta dem.'],['$H','Byttes ut med innholdet i H når linjen kjøres.']]},cmds:[{c:'nano publish_pakkeri.sh',tab:'Sender',run:'keep',pr:'Nordlys',ex:[['nano publish_pakkeri.sh','Lager og åpner skriptfilen i prosjektmappen.']]},{c:'chmod +x publish_pakkeri.sh',tab:'Sender',run:'back',pr:'Nordlys',ex:[['chmod +x','Gir filen lov til å kjøres som et program. Uten dette får du «Permission denied».']]},{c:'ls -l publish_pakkeri.sh',tab:'Sender',run:'back',pr:'Nordlys',ex:[['ls -l','Viser filen med rettigheter. En x i starten betyr kjørbar.']]}],expect:{out:'-rwxr-xr-x 1 deg deg 486 okt 20 10:30 publish_pakkeri.sh',why:'Det viktige er x-ene i -rwxr-xr-x. Størrelse og dato vil avvike.'},why:'Når samme fem meldinger sendes likt hver gang, kan du teste filtre rolig og sammenligne resultatene.',fix:[['Permission denied når skriptet kjøres','Kjør <code>chmod +x publish_pakkeri.sh</code>.'],['Filen er tom','Du lagret ikke i nano. Åpne den igjen, lim inn, Ctrl+O, Enter, Ctrl+X.']]},
+      {t:'Kjør skriptet',term:'ub',tab:'Sender',dirn:'Nordlys',what:'<p>Mottaker lytter fortsatt på <code>#</code>. Kjør skriptet i Sender.</p>',cmds:[{c:'./publish_pakkeri.sh',tab:'Sender',run:'back',pr:'Nordlys',ex:[['./','Betyr «i mappen jeg står i». Linux leter ikke i gjeldende mappe uten dette.']]}],expect:{out:'I Mottaker:\nnordlys/pakkeri/kjolerom1/temperatur 4.5\nnordlys/pakkeri/pakkemaskin1/tilstand RUN\nnordlys/pakkeri/pakkemaskin1/godkjente-pakker 1280\nnordlys/pakkeri/pakkemaskin1/arbeidsordre 100234\nnordlys/pakkeri/pakkemaskin1/parti-id P-2024-118',why:'Fem linjer med samme oppbygning. Skriptet er ferdig på et sekund, og ledeteksten kommer tilbake i Sender.'},why:'Nå kan du lese hvor et signal hører hjemme rett fra navnet, og maskiner kan filtrere på nivåene.',fix:[['No such file or directory','Du står i feil mappe, eller filen heter noe annet. Kjør <code>ls</code> og se.'],['bash: $\'\\r\': command not found','Filen er lagret med Windows-linjeskift. Kjør <code>sed -i \'s/\\r$//\' publish_pakkeri.sh</code> og prøv igjen.']]},
+      {t:'Abonner med jokertegn',term:'ub',tab:'Mottaker',dirn:'Nordlys',what:'<p>Vi tester tre filtre. For hvert filter: trykk <b>Ctrl+C</b> i Mottaker, start filteret, og kjør skriptet i Sender. Tell linjene.</p>',cmds:[{c:'mosquitto_sub -h localhost -t "nordlys/pakkeri/pakkemaskin1/+" -v',tab:'Mottaker',run:'keep',pr:'Nordlys',after:'Kjør <code>./publish_pakkeri.sh</code> i Sender. Forventet: <b>4 linjer</b> (alt fra pakkemaskinen). Trykk så Ctrl+C i Mottaker.',ex:[['+','Ett nivå, hva som helst. Her: alle signaler under pakkemaskin1.']]},{c:'mosquitto_sub -h localhost -t "nordlys/pakkeri/+/temperatur" -v',tab:'Mottaker',run:'keep',pr:'Nordlys',after:'Kjør skriptet igjen. Forventet: <b>1 linje</b> (kjølerommets temperatur). Kommer det et kjølerom 2, treffer filteret det også. Ctrl+C i Mottaker.',ex:[['+/temperatur','Alle enheter som har et signal som heter temperatur.']]},{c:'mosquitto_sub -h localhost -t "nordlys/pakkeri/#" -v',tab:'Mottaker',run:'keep',pr:'Nordlys',after:'Kjør skriptet igjen. Forventet: <b>5 linjer</b>. La filteret stå til neste steg.',ex:[['#','Alt herfra og ned, uansett antall nivåer. Må stå sist i filteret.']]}],expect:{out:'Filter 1: 4 linjer\nFilter 2: 1 linje\nFilter 3: 5 linjer',why:'Hvis tallene stemmer, virker både navnerommet og jokertegnene.'},why:'Kontrollskjermen trenger nå ett filter per behov, ikke ett per signal. En leverandør som skal se pakkemaskinen, kan få tilgang til nordlys/pakkeri/pakkemaskin1/# og ingenting annet (øvelse 24).',fix:[['Ingen linjer','Startet du Mottaker før du kjørte skriptet? Meldinger lagres ikke for sene lyttere.'],['Feil antall','Tell nivåene i filteret. + matcher nøyaktig ett nivå. Sjekk også skrivefeil i skriptet.']]},
+      {t:'Prøv to regler som ofte går galt',term:'ub',tab:'Sender',dirn:'Nordlys',what:'<p>Mottaker lytter fortsatt på <code>nordlys/pakkeri/#</code>. Kjør disse i Sender, én om gangen.</p>',cmds:[{c:'mosquitto_pub -h localhost -t "nordlys/pakkeri/+/temperatur" -m 1',tab:'Sender',run:'back',pr:'Nordlys',after:'Forventet: en feilmelding om ugyldig topic. Jokertegn kan bare brukes når du abonnerer, aldri når du sender.'},{c:'mosquitto_pub -h localhost -t "Nordlys/Pakkeri/kjolerom1/temperatur" -m 9.9',tab:'Sender',run:'back',pr:'Nordlys',after:'Forventet: ingenting i Mottaker. Store og små bokstaver gir et annet topic. Mottaker hører bare på «nordlys» med liten n.'}],expect:{out:'Error: Invalid publish topic \'nordlys/pakkeri/+/temperatur\', does it contain \'+\' or \'#\'?\n\n(og ingenting nytt i Mottaker for Nordlys/Pakkeri)',why:'Ordlyden i feilmeldingen kan variere mellom versjoner, men den sier at topicet er ugyldig.'},why:'Begge feilene skjer i virkeligheten når navn tastes manuelt. Det er et argument for at navn genereres fra en liste, ikke skrives for hånd.',fix:[['Meldingen med store bokstaver dukket opp','Da lytter Mottaker på # og ikke nordlys/pakkeri/#. Det er riktig oppførsel for # alene.']]},
+      {t:'Avslutt',term:'gui',what:'<p>Trykk <b>Ctrl+C</b> i Mottaker, og så i Broker hvis du er ferdig for i dag. Skriptet <code>publish_pakkeri.sh</code> og <code>mosquitto.conf</code> brukes videre i neste øvelse.</p>',expect:{out:'ls\nmosquitto.conf  publish_pakkeri.sh',why:'Kjører du ls i prosjektmappen, ser du begge filene.'},why:'Neste øvelse bygger på samme filer og samme fem signaler.',fix:[]}
+    ],
+    sim:'filter',
+    deep:[
+      ['Valgfritt: test filtrene med Python','<p>Dette er for deg som vil prøve Python allerede nå. Det er ikke nødvendig for å gå videre. Python kommer for fullt i øvelse 7.</p><p><b>Et virtuelt miljø</b> er en egen mappe med Python-pakker for ett prosjekt, slik at de ikke blandes med systemet. Du lager det én gang og «aktiverer» det hver gang du åpner en ny fane.</p>'
+        +cmdHtml({c:'sudo apt install -y python3-venv',tab:'Sender',run:'back',pr:'Nordlys',ex:[['python3-venv','Verktøyet som lager virtuelle miljøer. Trengs bare én gang.']]})
+        +cmdHtml({c:'python3 -m venv .venv',tab:'Sender',run:'back',pr:'Nordlys',ex:[['python3 -m venv .venv','Lager miljøet i en skjult mappe .venv i prosjektmappen.']]})
+        +cmdHtml({c:'source .venv/bin/activate',tab:'Sender',run:'back',pr:'Nordlys',ex:[['source …/activate','Slår på miljøet i denne fanen. Ledeteksten begynner nå med (.venv).']]})
+        +cmdHtml({c:'pip install paho-mqtt',tab:'Sender',run:'back',pr:'Nordlys',ex:[['pip install','Installerer MQTT-biblioteket for Python inn i miljøet.']]})
+        +'<p>Lag filen <code>filtertest.py</code> med <code>nano filtertest.py</code>, lim inn, lagre og lukk:</p>'
+        +fileHtml({name:'filtertest.py',path:'~/lab/nordlys/filtertest.py',content:'from paho.mqtt.client import topic_matches_sub\n\nTOPICS = [\n    "nordlys/pakkeri/kjolerom1/temperatur",\n    "nordlys/pakkeri/pakkemaskin1/tilstand",\n    "nordlys/pakkeri/pakkemaskin1/godkjente-pakker",\n    "nordlys/pakkeri/pakkemaskin1/arbeidsordre",\n    "nordlys/pakkeri/pakkemaskin1/parti-id",\n    "Nordlys/Pakkeri/kjolerom1/temperatur",    # feil: store bokstaver\n    "nordlys/pakkeri/kjolerom1/temperatur/",   # feil: skråstrek sist\n]\nFILTRE = [\n    "nordlys/pakkeri/pakkemaskin1/+",\n    "nordlys/pakkeri/+/temperatur",\n    "nordlys/pakkeri/#",\n    "#",\n]\n\nfor f in FILTRE:\n    treff = [t for t in TOPICS if topic_matches_sub(f, t)]\n    print(f, "->", len(treff), "treff")'})
+        +cmdHtml({c:'python filtertest.py',tab:'Sender',run:'back',pr:'Nordlys',ex:[['python filtertest.py','Kjører Python-filen. Dette er en terminalkommando. Innholdet i filen er Python-kode, og skrives aldri direkte i terminalen.']]})
+        +'<div class="exw"><b>Du skal se</b><pre>nordlys/pakkeri/pakkemaskin1/+ -> 4 treff\nnordlys/pakkeri/+/temperatur -> 1 treff\nnordlys/pakkeri/# -> 6 treff\n# -> 7 treff</pre><p>Hvorfor 6 og ikke 5? Topicet med skråstrek sist har et ekstra, tomt nivå. # tar det med. Derfor er «ingen skråstrek sist» en regel.</p></div><p>Skriv <code>deactivate</code> for å slå av miljøet.</p>'],
+      ['Til kundemøtet: spørsmål, TOGAF og systemteknikk','<ul><li><b>Spør kunden:</b> Finnes det en navnekonvensjon i dag? Hvem lager nye signalnavn? Finnes det et anleggsregister (funksjonssteder i SAP PM, tag-lister) som navnene kan hentes fra? Hvem skal lese hva?</li><li><b>TOGAF:</b> Navnekonvensjonen hører til dataarkitekturen (fase C) og registreres som standard. Styring i fase G: nye topics gjennomgås før de tas i bruk.</li><li><b>Systemteknikk:</b> «Alle topics følger konvensjonen» er et testbart krav. En linter kan verifisere det automatisk.</li><li><b>UNS og ISA-95:</b> nivåene selskap, anlegg, område, enhet tilsvarer enterprise, site, area og line/cell.</li><li><b>IEC 62443:</b> Tilgangskontroll (FR 2) bygger på prefiksene. Uten struktur kan du ikke gi en leverandør tilgang til bare pakkemaskinen.</li></ul>'],
+      ['Se pakkene uten Wireshark','<p>Bruk <code>mosquitto_sub -d -h localhost -t "nordlys/pakkeri/+/temperatur"</code>. I SUBSCRIBE-linjen ser du filteret med jokertegnet. Brokeren gjør selve matchingen.</p>']
+    ],
+    confirm:'Øvelse 2 er bekreftet i min egen lab: filtrene ga 4, 1 og 5 linjer',
+    nextText:'<p><b>Du kan nå:</b> lage et navnerom, abonnere med + og #, og lage og kjøre et skallskript.</p><p><b>Neste behov:</b> Temperaturen vises på skjermen. Men hvis forbindelsen forsvinner, står den fortsatt på 4.5. Hvordan vet operatøren at verdien er gammel? Det tar vi i de neste øvelsene (QoS, siste kjente verdi og Last Will). De er planlagt, men ikke ferdige ennå.</p>',nextEx:null
+  };
+
+  function termBadge(term,tab){
+    if(term==='ps')return '<span class="tbadge ps">PowerShell</span>';
+    if(term==='gui')return '<span class="tbadge gui">Skjerm og mus</span>';
+    return '<span class="tbadge ub">Ubuntu'+(tab?' · '+esc(tab):'')+'</span>';
+  }
+  function exList(ex){
+    if(!ex||!ex.length)return '';
+    return '<p class="cmdh">Hva delene betyr</p><dl class="cmd">'+ex.map(function(x){return '<dt>'+esc(x[0])+'</dt><dd>'+x[1]+'</dd>'}).join('')+'</dl>';
+  }
+  function cmdHtml(c){
+    var ps=c.pr==='ps', prompt=ps?PL.ps:(PL[c.pr]||PL.Nordlys);
+    var dir=ps?'':'<span class="dirn">Mappe: '+(c.pr==='Ubuntu'?'~ (hjemmemappen)':'~/lab/nordlys')+'</span>';
+    var run=c.run==='keep'?'Programmet fortsetter å kjøre, og ledeteksten kommer ikke tilbake. La fanen stå. Ctrl+C stopper det når du er ferdig.':'Ledeteksten kommer tilbake når kommandoen er ferdig.';
+    if(/^nano /.test(c.c))run='nano tar over fanen til du lagrer (Ctrl+O, Enter) og lukker (Ctrl+X). Da kommer ledeteksten tilbake.';
+    return '<div class="cmd1"><div class="cmeta">'+termBadge(ps?'ps':'ub',c.tab)+dir+'</div>'
+      +'<div class="cbox"><pre><code data-prompt="'+esc(prompt)+'">'+esc(c.c)+'</code></pre><button type="button" class="cpy" aria-label="Kopier kommandoen">Kopier</button></div>'
+      +'<p class="crun">'+run+'</p>'+(c.after?'<p>'+c.after+'</p>':'')+exList(c.ex)+'</div>';
+  }
+  function fileHtml(f){
+    return '<div class="cmd1"><div class="cmeta"><span class="tbadge gui">Filinnhold</span><span class="dirn">Lagres som '+esc(f.path)+'</span></div>'
+      +'<div class="cbox"><pre><code class="nop">'+esc(f.content)+'</code></pre><button type="button" class="cpy" aria-label="Kopier filinnholdet">Kopier</button></div>'
+      +'<p class="crun">Dette er innholdet i filen, ikke en kommando. Lim det inn i nano.</p>'+exList(f.ex)+'</div>';
+  }
+  function stepHtml(n,s,i){
+    var k='ex'+n+'.s'+(i+1), h='';
+    h+='<div class="cmeta">'+termBadge(s.term,s.tab)+(s.term==='ub'?'<span class="dirn">Mappe: ~/lab/nordlys</span>':'')+'</div>';
+    h+='<div>'+s.what+'</div>';
+    if(s.file)h+=fileHtml(s.file);
+    (s.cmds||[]).forEach(function(c){h+=cmdHtml(c)});
+    if(s.expect)h+='<div class="exw"><b>Forventet resultat</b><pre>'+esc(s.expect.out)+'</pre><p>'+s.expect.why+'</p></div>';
+    if(s.why)h+='<p class="why"><b>Hvorfor:</b> '+s.why+'</p>';
+    if(s.admin)h+='<p class="adm"><b>Rettigheter:</b> '+s.admin+'</p>';
+    if(s.fix&&s.fix.length)h+='<details class="fixd"><summary>Jeg får et annet resultat</summary><dl>'+s.fix.map(function(f){return '<dt>'+f[0]+'</dt><dd>'+f[1]+'</dd>'}).join('')+'</dl></details>';
+    h+='<div class="lnav"><label class="chk"><input type="checkbox" data-k="'+k+'"><span>Jeg fikk dette resultatet i min lab</span></label><span style="display:flex;gap:8px;flex-wrap:wrap">'
+      +(i>0?'<button type="button" class="pbtn" data-lprev>Forrige steg</button>':'')
+      +'<button type="button" class="pbtn go" data-lnext>'+(i<LABS[n].steps.length-1?'Neste steg':'Til bekreftelsen')+'</button></span></div>';
+    return '<section class="lstep" data-i="'+i+'"><button type="button" class="lhead" aria-expanded="false"><span class="lnum">'+(i+1)+'</span><span class="ltitle">'+esc(s.t)+'</span>'+termBadge(s.term,s.tab)+'</button><div class="lbody">'+h+'</div></section>';
+  }
+
+  var labCur={}, labAll={};
+  function renderLab(n){
+    var L=LABS[n], isSetup=n===0;
+    var h='<div class="head"><div class="kick">'+(isSetup?'Start her':'Øvelse '+n+' · Beginner')+'</div><h2>'+esc(L.title)+'</h2><span class="status klar">Klar labb</span></div>';
+    h+='<div class="four">'+L.boxes.map(function(b){return '<div><b>'+b[0]+'</b><span>'+esc(b[1])+'</span></div>'}).join('')+'</div>';
+    h+='<div class="story">'+L.story+'</div>';
+    if(L.guide)h+='<div class="story">'+L.guide+'</div>';
+    h+='<div class="sec-h"><h3>Gjennomføring</h3><button type="button" class="pbtn" data-lall aria-pressed="false">Åpne alle steg</button></div>';
+    h+='<div class="lsteps">'+L.steps.map(function(s,i){return stepHtml(n,s,i)}).join('')+'</div>';
+    if(L.sim)h+='<div class="simbox sim" id="sim"></div>';
+    h+='<div class="sec-h"><h3>Fordypning (valgfritt)</h3></div><div class="deep">'+L.deep.map(function(d){return '<details><summary>'+d[0]+'</summary><div>'+d[1]+'</div></details>'}).join('')+'</div>';
+    h+='<div class="confirm" id="confirm"><label class="chk"><input type="checkbox" data-k="ex'+n+'"><span>'+L.confirm+'</span></label><p>Kryss av først når du har gjort stegene på din egen PC. Simuleringen over teller ikke som bekreftelse.</p></div>';
+    h+='<div class="next">'+L.nextText+(L.nextEx?'<button type="button" class="pbtn go" style="width:max-content" data-go="'+L.nextEx+'">Gå til øvelse '+L.nextEx+'</button>':'')+'</div>';
+    reader.innerHTML=h;
+    syncChecks();
+    var steps=[].slice.call(reader.querySelectorAll('.lstep')), allBtn=reader.querySelector('[data-lall]');
+    var cur=labCur[n];
+    if(cur===undefined){cur=0;for(var i=0;i<steps.length;i++){if(!state['ex'+n+'.s'+(i+1)]){cur=i;break}}}
+    function draw(scroll){
+      var all=!!labAll[n];
+      steps.forEach(function(st,i){
+        var open=all||i===cur, d=!!state['ex'+n+'.s'+(i+1)];
+        st.classList.toggle('open',open); st.classList.toggle('cur',i===cur&&!all); st.classList.toggle('done',d);
+        st.querySelector('.lhead').setAttribute('aria-expanded',open?'true':'false');
+        st.querySelector('.lnum').textContent=d?'✓':(i+1);
+      });
+      allBtn.textContent=all?'Ett steg om gangen':'Åpne alle steg'; allBtn.setAttribute('aria-pressed',all?'true':'false');
+      if(scroll&&!all)steps[cur].scrollIntoView({block:'start',behavior:'smooth'});
+    }
+    reader.querySelector('.lsteps').addEventListener('click',function(ev){
+      var st=ev.target.closest('.lstep'); if(!st)return; var i=+st.getAttribute('data-i');
+      if(ev.target.closest('.lhead')){if(labAll[n]){labAll[n]=false} cur=(cur===i&&steps[i].classList.contains('open')&&!labAll[n])?cur:i; labCur[n]=cur; draw(false); return}
+      if(ev.target.closest('[data-lprev]')){cur=Math.max(0,i-1);labCur[n]=cur;draw(true);return}
+      if(ev.target.closest('[data-lnext]')){if(i<steps.length-1){cur=i+1;labCur[n]=cur;draw(true)}else{reader.querySelector('#confirm').scrollIntoView({block:'center',behavior:'smooth'})}}
+    });
+    allBtn.addEventListener('click',function(){labAll[n]=!labAll[n];draw(false)});
+    reader.addEventListener('change',function f(ev){if(!allBtn.isConnected){reader.removeEventListener('change',f);return} if(ev.target.matches('input[data-k]'))draw(false)});
+    draw(false);
+    if(L.sim==='send')simSend(reader.querySelector('#sim'),n);
+    if(L.sim==='filter')simFilter(reader.querySelector('#sim'),n);
+  }
+
+  function copyText(txt,btn){
+    function ok(){var o=btn.textContent;btn.textContent='Kopiert';setTimeout(function(){btn.textContent=o},1400)}
+    function fb(){try{var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var r=document.execCommand('copy');document.body.removeChild(ta);if(r)ok();else btn.textContent='Marker og kopier'}catch(e){btn.textContent='Marker og kopier'}}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fb)}else fb();
+  }
+  reader.addEventListener('click',function(ev){
+    var b=ev.target.closest('.cpy'); if(!b)return;
+    var code=b.parentNode.querySelector('code'); copyText(code.textContent,b);
+  });
+
+  function simHead(title){return '<span class="simtag">Simulering · kjører ikke på PC-en din</span><h3>'+title+'</h3>'}
+  function simFoot(n){return '<p class="note">Simuleringen viser prinsippet. Det er først når du har kjørt kommandoene selv at det er bekreftet. </p><label class="chk"><input type="checkbox" data-k="ex'+n+'.sim"><span>Jeg har prøvd det samme i min egen lab</span></label>'}
+
+  function simSend(box,n){
+    box.innerHTML=simHead('Følg én melding fra Sender via Broker til Mottaker')
+      +'<p><b>Forutsi først:</b> Mottaker er ikke startet. Sender sender 4.5. Etterpå starter du Mottaker. Hva viser Mottaker?</p>'
+      +'<div class="opts" data-pq><button type="button" data-o="a" aria-pressed="false">4.5, meldingen ventet hos brokeren</button><button type="button" data-o="b" aria-pressed="false">Ingenting, meldingen ble ikke lagret</button></div>'
+      +'<div data-play hidden style="display:flex;flex-direction:column;gap:12px"><p>Prøv nå begge tilfellene:</p><div class="opts"><button type="button" class="pbtn" data-sub aria-pressed="true">Mottaker lytter: ja</button><button type="button" class="pbtn go" data-send>Send 4.5</button></div>'
+      +'<svg viewBox="0 0 560 130" role="img" aria-label="Sender, broker og mottaker på rad. En prikk viser meldingen."><line class="ln" x1="120" y1="65" x2="220" y2="65"/><line class="ln" x1="340" y1="65" x2="440" y2="65"/>'
+      +'<g class="nd"><rect x="10" y="35" width="110" height="60" rx="10"/><text x="65" y="65">Sender</text></g><g class="nd"><rect x="220" y="35" width="120" height="60" rx="10"/><text x="280" y="65">Broker</text></g><g class="nd" data-mnode><rect x="440" y="35" width="110" height="60" rx="10"/><text x="495" y="65">Mottaker</text></g>'
+      +'<circle class="dt" r="7" cx="65" cy="65" style="opacity:0"/></svg><p class="fb" data-out aria-live="polite">Velg om Mottaker lytter, og trykk Send.</p></div>'
+      +'<p class="fb" data-fb hidden></p>'+simFoot(n);
+    syncChecks();
+    var guess=null, sub=true, dot=box.querySelector('circle'), out=box.querySelector('[data-out]'), play=box.querySelector('[data-play]'), raf=0;
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.querySelector('[data-pq]').addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-o]'); if(!b)return; guess=b.getAttribute('data-o');
+      box.querySelectorAll('[data-o]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+      play.hidden=false; play.style.display='flex';
+    });
+    box.querySelector('[data-sub]').addEventListener('click',function(){sub=!sub;this.textContent='Mottaker lytter: '+(sub?'ja':'nei');this.setAttribute('aria-pressed',sub?'true':'false');box.querySelector('[data-mnode]').classList.toggle('off',!sub)});
+    function animate(x0,x1,ms,done){
+      if(reduce){dot.setAttribute('cx',x1);done();return}
+      var t0=null;cancelAnimationFrame(raf);
+      function f(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/ms);dot.setAttribute('cx',x0+(x1-x0)*p);if(p<1)raf=requestAnimationFrame(f);else done()}
+      raf=requestAnimationFrame(f);
+    }
+    box.querySelector('[data-send]').addEventListener('click',function(){
+      dot.style.opacity='1';dot.setAttribute('cx',65);out.textContent='Sender publiserer til brokeren …';
+      animate(65,280,700,function(){
+        if(sub){out.textContent='Brokeren har en mottaker for dette topicet og sender videre …';
+          animate(280,495,700,function(){out.textContent='Mottaker viser: nordlys/pakkeri/kjolerom1/temperatur 4.5';})}
+        else{dot.style.opacity='0.25';
+          out.textContent='Ingen lytter på topicet. Brokeren kaster meldingen. Starter Mottaker etterpå, viser den ingenting.';
+          var fb=box.querySelector('[data-fb]');fb.hidden=false;
+          fb.textContent=(guess==='b'?'Du forutså riktig. ':'Du gjettet at meldingen ventet. ')+'En vanlig melding lagres ikke hos brokeren når ingen abonnerer. Det kan endres med «retained» (øvelse 4) eller med en vedvarende sesjon (øvelse 10).';}
+      });
+    });
+  }
+
+  function simFilter(box,n){
+    var FL=['nordlys/pakkeri/pakkemaskin1/+','nordlys/pakkeri/+/temperatur','nordlys/pakkeri/#','nordlys/pakkeri/+','#'];
+    box.innerHTML=simHead('Endre et topic-filter og se hvilke signaler det treffer')
+      +'<p>Velg et filter, og <b>forutsi hvor mange av de fem signalene det treffer</b>. Så viser simuleringen svaret.</p>'
+      +'<p class="lab">1. Velg filter</p><div class="opts" data-fl>'+FL.map(function(f,i){return '<button type="button" data-f="'+i+'" aria-pressed="false" style="font-family:var(--font-mono);font-size:14px">'+esc(f)+'</button>'}).join('')+'</div>'
+      +'<p class="lab">2. Hvor mange treff?</p><div class="opts" data-gs>'+[0,1,2,3,4,5].map(function(g){return '<button type="button" data-g="'+g+'" aria-pressed="false">'+g+'</button>'}).join('')+'</div>'
+      +'<p class="lab">3. Navn</p><div class="opts"><button type="button" class="pbtn" data-nm aria-pressed="false">Vis med PLS-navnene i stedet</button></div>'
+      +'<ul class="tlist" data-tl></ul><p class="fb" data-out aria-live="polite">Velg filter og antall.</p>'+simFoot(n);
+    syncChecks();
+    var fi=null, g=null, old=false, tl=box.querySelector('[data-tl]'), out=box.querySelector('[data-out]');
+    var WHY=['+ står for ett nivå, her signalet. Alt under pakkemaskin1 treffer.','+ står for enheten. Bare kjølerommet har et signal som heter temperatur.','# tar alt under nordlys/pakkeri, uansett hvor mange nivåer.','Ingen treff: + er nøyaktig ett nivå, så dette filteret treffer bare topics med tre nivåer. Alle signalene har fire.','# alene tar alt. Nyttig til feilsøking, men gir deg også det du ikke skal ha.'];
+    function draw(){
+      var names=SIG.map(function(s){return old?s.old:s.topic});
+      var hits=names.map(function(t){return fi!==null&&mqttMatch(FL[fi],t)});
+      var reveal=fi!==null&&g!==null;
+      tl.innerHTML=names.map(function(t,i){return '<li class="'+(reveal?(hits[i]?'hit':'miss'):'')+'">'+(reveal?(hits[i]?'✓ ':'· '):'')+esc(t)+'</li>'}).join('');
+      if(!reveal){out.textContent='Velg filter og antall.';return}
+      var c=hits.filter(Boolean).length;
+      out.textContent=(g===c?'Riktig: ':'Svaret er ')+c+' treff. '+(old&&fi!==4?'Med PLS-navnene treffer ingen filtre noe, bortsett fra # alene. Det er hele poenget med et navnerom.':WHY[fi]);
+    }
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-f],[data-g],[data-nm]'); if(!b)return;
+      if(b.hasAttribute('data-f')){fi=+b.getAttribute('data-f');g=null;box.querySelectorAll('[data-f]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});box.querySelectorAll('[data-g]').forEach(function(x){x.setAttribute('aria-pressed','false')})}
+      else if(b.hasAttribute('data-g')){g=+b.getAttribute('data-g');box.querySelectorAll('[data-g]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')})}
+      else{old=!old;b.textContent=old?'Vis med navnerom':'Vis med PLS-navnene i stedet';b.setAttribute('aria-pressed',old?'true':'false')}
+      draw();
+    });
+    draw();
+  }
+
+  function plantHtml(){
+    var rooms=[['Kjølerom 1 (KJ1)',['kj']],['Pakkemaskin 1 (PM1)',['st','ok','ao','pa']],['Kontrollskjerm i gangen',[]]];
+    return '<div class="plant">'+rooms.map(function(r){
+      return '<div class="room"><h4>'+r[0]+'</h4>'+(r[1].length?r[1].map(function(id){var s=SIG.filter(function(x){return x.id===id})[0];return '<button type="button" class="pbtn inst" data-inst="'+id+'" aria-pressed="false">'+s.name+' <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">'+s.tag+'</span></button>'}).join(''):'<p style="margin:0;color:var(--muted)">Leser alle signalene via brokeren. Viser temperatur, tilstand og antall pakker.</p>')+'</div>'}).join('')
+      +'</div><dl class="instinfo" data-ii aria-live="polite"><dt>Velg et instrument</dt><dd>for å se utstyrs-ID, OPC UA-node, MQTT-topic og eksempelverdi.</dd></dl><p class="note">OPC UA-nodene er eksempler på hvordan pakkeriets PLS kan eksponere signalene. OPC UA kommer i øvelse 5 og 6.</p>';
+  }
+  function wirePlant(root){
+    root.addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-inst]'); if(!b)return;
+      var s=SIG.filter(function(x){return x.id===b.getAttribute('data-inst')})[0];
+      root.querySelectorAll('[data-inst]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+      root.querySelector('[data-ii]').innerHTML='<dt>Signal</dt><dd>'+s.room+', '+s.name+'</dd><dt>Utstyrs-ID</dt><dd>'+s.tag+'</dd><dt>Navn i PLS i dag</dt><dd>'+s.old+'</dd><dt>OPC UA-node</dt><dd>'+s.opc+'</dd><dt>MQTT-topic</dt><dd>'+s.topic+'</dd><dt>Eksempelverdi</dt><dd>'+s.val+'</dd>';
+    });
+  }
+
+  function renderHome(){
+    var ready=[0,1,2], done=ready.filter(function(n){return !!state['ex'+n]});
+    var nextN=ready.filter(function(n){return !state['ex'+n]})[0];
+    var nm=function(n){return n===0?'Oppsett av lab-PC-en':LABS[n].title};
+    var h='<div class="homehero"><div class="kick">Nordlys Mat · pakkeriet</div><h2>Bygg datastrømmen i ett pakkeri, steg for steg</h2>'
+      +'<p>Du starter med én temperatur fra kjølerommet og bygger videre: flere signaler, kommunikasjonsbrudd, datakvalitet, OPC UA, historikk og arbeidsordre. Samme anlegg, samme navn og samme prosjektmappe hele veien.</p></div>';
+    h+='<div class="hgrid">'
+      +'<div class="hcard"><h3>Fortsett her</h3><p>'+(nextN!==undefined?nm(nextN):'Alle klare labber er bekreftet. Nye øvelser kommer.')+'</p>'+(nextN!==undefined?'<button type="button" class="pbtn go" data-go="'+(nextN===0?'setup':nextN)+'">Åpne</button>':'')+'</div>'
+      +'<div class="hcard"><h3>Status</h3><p><b>'+done.length+' av 3</b> klare labber er bekreftet i din egen lab. De øvrige '+(TOTAL-2)+' øvelsene er planlagt og har bare en skisse.</p></div>'
+      +'<div class="hcard"><h3>Simulering eller egen lab?</h3><p>Simuleringene er merket og viser prinsippet. Et kryss betyr at du selv har gjort det på din PC. Siden kan ikke se hva som kjører hos deg.</p></div>'
+      +'</div>';
+    h+='<section class="blk"><h3>Klare labber</h3><ol class="tl">'+ready.map(function(n){var d=!!state['ex'+n];return '<li class="'+(d?'done':'')+'"><a href="#'+(n===0?'oppsett':'ex'+n)+'" data-go="'+(n===0?'setup':n)+'"><span class="tk">'+(d?'✓':n)+'</span><span><b>'+nm(n)+'</b>'+(d?' · bekreftet':'')+'</span></a></li>'}).join('')+'</ol></section>';
+    h+='<section class="blk"><h3>Anlegget du bygger for</h3><p>Velg et instrument for å se hvordan samme signal heter i PLS-en, i OPC UA og i MQTT.</p>'+plantHtml()+'</section>';
+    h+='<section class="blk"><h3>Sikker labavgrensning</h3><ul><li>Alt kjører lokalt på lab-PC-en. Brokeren er åpen uten passord (kun lab) og skal ikke eksponeres mot bedriftsnettet eller internett.</li><li>Ingen kobling til ekte PLS-er eller produksjonsnett. Signalene er simulerte.</li><li>Robotøvelsene (SO-101) starter med robotsikkerhet: arbeidsområde, nødstopp ved å kutte strøm, lav hastighet og ingen hender i arbeidsområdet, før første bevegelse. Leader/follower er hovedveien for teleoperasjon. PS5-kontroller er valgfri.</li></ul></section>';
+    reader.innerHTML=h;
+    wirePlant(reader);
+  }
+
   var tabCur={};
   function tabify(e){
     var kids=[].slice.call(reader.children).filter(function(x){return !x.classList.contains('head')&&!x.classList.contains('foldbar')});
@@ -2016,6 +2413,9 @@ Eier og revisjonsdato:</code></pre></div></section>
     if(stopTopo){stopTopo();stopTopo=null}
     if(sel==='tool'){renderTool();return}
     if(sel==='thread'){renderThread();return}
+    if(sel==='home'){renderHome();return}
+    if(sel==='setup'){renderLab(0);return}
+    if(LABS[sel]&&EX[sel-1].ready){renderLab(sel);return}
     var e=EX[sel-1], L=LEVELS.filter(function(x){return x.id===e.l})[0];
     var h='<div class="head"><div class="kick">Øvelse '+e.n+' av '+TOTAL+' · '+L.name+' · '+L.weeks+'</div><h2>'+e.t+'</h2><div class="tags"><span class="tag">'+e.d+'</span>'+tagChips(e)
       +'<span class="tag st'+(isDone(e.n)?' ok':'')+'" id="stag">'+(isDone(e.n)?'Fullført':(e.ready?'Aktiv':'Planlagt'))+'</span></div></div>';
@@ -2041,7 +2441,7 @@ Eier og revisjonsdato:</code></pre></div></section>
     }else{
       var d=document.createElement('div');
       d.className='blk locked';
-      d.innerHTML='<h3>Ikke åpnet ennå</h3><div class="sketch"><span class="lab">Case-skisse</span><b>'+e.k+'</b><span>'+e.h+'</span></div><p class="lab">Spør kunden om</p><ul>'+e.q.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'+(e.a[0]?'<p class="lab">TOGAF</p><p>'+e.a[0]+'</p>':'')+(e.a[1]?'<p class="lab">Systemteknikk</p><p>'+e.a[1]+'</p>':'')+(e.r?'<p class="lab">ERP</p><ul><li><b>SAP S/4HANA:</b> '+e.r[0]+'</li><li><b>Infor:</b> '+e.r[1]+'</li><li><b>Dynamics 365:</b> '+e.r[2]+'</li></ul>':'')+(e.u?'<p class="lab">UNS</p><p>'+e.u+'</p>':'')+(e.s?'<p class="lab">IEC 62443</p><p>'+e.s+'</p>':'')+(e.v?'<p class="lab">Digital tvilling</p><p>'+e.v+'</p>':'')+(e.hz?'<p class="lab">Historian</p><p>'+e.hz+'</p>':'')+'<p>'+(e.l==='t'?'Tilleggsmodul. Be Claude om den når du vil ta den.':'Øvelsen låses opp når du har bekreftet øvelse '+(e.n-1)+'. Kryss den av, og be Claude om neste øvelse.')+' Den kommer med full case og animasjon, konsept, arkitektur, kommandoer, kode, verifisering, feilsøking, Wireshark og ekstra utfordring.</p>';
+      d.innerHTML='<p class="planbanner"><b>Planlagt innhold.</b> Dette er en skisse, ikke en ferdig labb. Det finnes ingen steg å gjennomføre her ennå.</p><h3>Skisse</h3><div class="sketch"><span class="lab">Case-skisse</span><b>'+e.k+'</b><span>'+e.h+'</span></div><p class="lab">Spør kunden om</p><ul>'+e.q.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'+(e.a[0]?'<p class="lab">TOGAF</p><p>'+e.a[0]+'</p>':'')+(e.a[1]?'<p class="lab">Systemteknikk</p><p>'+e.a[1]+'</p>':'')+(e.r?'<p class="lab">ERP</p><ul><li><b>SAP S/4HANA:</b> '+e.r[0]+'</li><li><b>Infor:</b> '+e.r[1]+'</li><li><b>Dynamics 365:</b> '+e.r[2]+'</li></ul>':'')+(e.u?'<p class="lab">UNS</p><p>'+e.u+'</p>':'')+(e.s?'<p class="lab">IEC 62443</p><p>'+e.s+'</p>':'')+(e.v?'<p class="lab">Digital tvilling</p><p>'+e.v+'</p>':'')+(e.hz?'<p class="lab">Historian</p><p>'+e.hz+'</p>':'')+'<p>'+(e.l==='t'?'Tilleggsmodul. Be Claude om den når du vil ta den.':'Øvelsen låses opp når du har bekreftet øvelse '+(e.n-1)+'. Kryss den av, og be Claude om neste øvelse.')+' Den kommer med full case og animasjon, konsept, arkitektur, kommandoer, kode, verifisering, feilsøking, Wireshark og ekstra utfordring.</p>';
       reader.appendChild(d);
       var kd=document.createElement('div'); kd.innerHTML=keySec(e); if(kd.firstChild)reader.appendChild(kd.firstChild);
       syncChecks();
@@ -2053,20 +2453,21 @@ Eier og revisjonsdato:</code></pre></div></section>
   function refresh(){buildIndex();updateProgress();var s=$('stag');if(s){var n=sel;s.textContent=isDone(n)?'Fullført':(EX[n-1].ready?'Aktiv':'Planlagt');s.classList.toggle('ok',isDone(n))}}
 
   function go(n,fromHash){
-    if(n!=='tool'&&n!=='thread'&&!EX[n-1])return; sel=n; renderReader(); refresh();
-    if(!fromHash){try{history.replaceState(null,'','#'+(n==='tool'?'verktoy':n==='thread'?'rodtrad':'ex'+n))}catch(e){}}
+    if(n!=='tool'&&n!=='thread'&&n!=='home'&&n!=='setup'&&!EX[n-1])return; sel=n; renderReader(); refresh();
+    if(!fromHash){try{history.replaceState(null,'','#'+(n==='tool'?'verktoy':n==='thread'?'rodtrad':n==='home'?'hjem':n==='setup'?'oppsett':'ex'+n))}catch(e){}}
+    if(fromHash!==true){try{window.scrollTo(0,0)}catch(e){}}
     if(window.matchMedia('(max-width:860px)').matches){$('index').open=false;window.scrollTo(0,0)}
   }
 
   idx.addEventListener('click',function(ev){
     var a=ev.target.closest('a[data-go]');
-    if(a){ev.preventDefault();var g=a.getAttribute('data-go');go(g==='tool'||g==='thread'?g:+g)}
+    if(a){ev.preventDefault();var g=a.getAttribute('data-go');go(/^(tool|thread|home|setup)$/.test(g)?g:+g)}
   });
   idx.addEventListener('change',function(ev){
     var c=ev.target; if(!c.matches('input[data-idx]'))return;
     state['ex'+c.getAttribute('data-idx')]=c.checked; save(); refresh(); syncChecks();
   });
-  reader.addEventListener('click',function(ev){var a=ev.target.closest('a[data-go]');if(a){ev.preventDefault();go(+a.getAttribute('data-go'))}});
+  reader.addEventListener('click',function(ev){var a=ev.target.closest('[data-go]');if(a){ev.preventDefault();var g=a.getAttribute('data-go');go(/^(tool|thread|home|setup)$/.test(g)?g:+g)}});
   reader.addEventListener('change',function(ev){
     var c=ev.target; if(!c.matches('input[data-k]'))return;
     state[c.getAttribute('data-k')]=c.checked; save(); refresh();
@@ -2341,6 +2742,8 @@ Eier og revisjonsdato:</code></pre></div></section>
   var m=/^#ex(\d+)$/.exec(location.hash); if(m&&EX[+m[1]-1])sel=+m[1];
   if(location.hash==='#verktoy')sel='tool';
   if(location.hash==='#rodtrad')sel='thread';
+  if(location.hash==='#oppsett')sel='setup';
+  if(location.hash==='#hjem')sel='home';
   renderReader(); refresh();
   function setStore(t){var el=$('store');if(el)el.textContent=t}
   setStore('Lagring: kun i denne nettleseren. Bruk eksportkoden nederst i menyen for sikkerhetskopi.');
