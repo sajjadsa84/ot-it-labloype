@@ -209,7 +209,7 @@ tr.rec td{background:var(--accent-soft)}
 .code{border-radius:16px}
 @media (min-width:861px){
   .shell.slim{grid-template-columns:76px minmax(0,1fr)}
-  .shell.slim .flt,.shell.slim .index>summary,.shell.slim .lv h3,.shell.slim .row a,.shell.slim .lv:nth-child(-n+2){display:none}
+  .shell.slim .fltbox,.shell.slim .index>summary,.shell.slim .lv h3,.shell.slim .row a,.shell.slim .lv:nth-child(-n+2){display:none}
   .shell.slim .row{grid-template-columns:22px 1fr;padding:0 6px;cursor:pointer}
   .shell.slim .row .n{text-align:center}
   .shell.slim #sidebtn span{display:none}
@@ -230,6 +230,21 @@ tr.rec td{background:var(--accent-soft)}
 .coach-on .step.cx-off{display:none}
 .coach-on .step:not(.cx-expl) .cmdh,.coach-on .step:not(.cx-expl) dl.cmd{display:none}
 .cx-all{margin-left:auto}
+
+/* Ryddigere: faner i stedet for lang side */
+.foldbar,.head .tags,.bd,.lvls,.restore,#rsmsg{display:none}
+.top .prog{max-width:360px}
+.tabs{display:flex;gap:6px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;position:sticky;top:8px;z-index:5;flex-wrap:wrap}
+.tabs button{flex:1 1 auto;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:transparent;color:var(--muted);font:600 15px var(--font-body);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--surface)}
+.tabpanel{display:none;flex-direction:column;gap:30px}
+.tabpanel.on{display:flex}
+.tabnext{display:flex;justify-content:flex-end}
+.tabnext .btn{background:var(--accent);color:var(--surface);border-color:var(--accent);font-weight:600}
+details.fltbox{margin:0 14px 10px}
+details.fltbox>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font:600 14px var(--font-body);color:var(--muted)}
+details.fltbox .flt{padding:0 0 8px}
+.thread{padding:16px 20px}
 </style>
 
 <div class="wrap">
@@ -1956,6 +1971,46 @@ Eier og revisjonsdato:</code></pre></div></section>
     draw();
   }
 
+
+  var tabCur={};
+  function tabify(e){
+    var kids=[].slice.call(reader.children).filter(function(x){return !x.classList.contains('head')&&!x.classList.contains('foldbar')});
+    function cls(x){
+      if(x.id==='ford')return 'ford';
+      if(x.classList.contains('thread')||x.id==='pre'||x.id==='recap'||x.classList.contains('case'))return 'start';
+      if(x.classList.contains('confirm')||x.id==='key')return 'done';
+      if(x.classList.contains('topo'))return 'learn';
+      var t=x.firstElementChild?x.firstElementChild.textContent:'';
+      if(/Konseptet|Bruk i industrien|Arkitektur|protokollnivå/i.test(t))return 'learn';
+      if(/Steg og kommandoer|Python|Node-RED|Wireshark/i.test(t))return 'lab';
+      if(/Verifisering|Feilsøking|Ekstra utfordring/i.test(t))return 'done';
+      return 'start';
+    }
+    var T=[['start','Start'],['learn','Forstå'],['lab','Labb'],['done','Fullfør'],['ford','Fordypning']],P={};
+    T.forEach(function(t){var d=document.createElement('div');d.className='tabpanel';d.setAttribute('role','tabpanel');P[t[0]]=d});
+    kids.forEach(function(x){P[cls(x)].appendChild(x)});
+    var use=T.filter(function(t){return P[t[0]].children.length});
+    if(use.length<2){use.forEach(function(t){reader.appendChild(P[t[0]]);P[t[0]].classList.add('on')});return}
+    var bar=document.createElement('div');bar.className='tabs';bar.setAttribute('role','tablist');
+    var after=reader.querySelector('.head');
+    reader.insertBefore(bar,after?after.nextSibling:reader.firstChild);
+    use.forEach(function(t){reader.appendChild(P[t[0]])});
+    use.forEach(function(t,i){
+      if(i<use.length-1){var nx=document.createElement('div');nx.className='tabnext';nx.innerHTML='<button type="button" class="btn" data-tab="'+use[i+1][0]+'">Neste: '+use[i+1][1]+' →</button>';P[t[0]].appendChild(nx)}
+    });
+    function show(k,scroll){
+      tabCur[e.n]=k;
+      use.forEach(function(t){P[t[0]].classList.toggle('on',t[0]===k)});
+      bar.innerHTML=use.map(function(t){return '<button type="button" role="tab" data-tab="'+t[0]+'" aria-selected="'+(t[0]===k?'true':'false')+'">'+t[1]+'</button>'}).join('');
+      if(scroll){var h=reader.querySelector('.head');(h||bar).scrollIntoView({block:'start',behavior:'smooth'})}
+    }
+    reader.addEventListener('click',function f(ev){
+      if(!bar.isConnected){reader.removeEventListener('click',f);return}
+      var b=ev.target.closest('[data-tab]');if(b&&reader.contains(b))show(b.getAttribute('data-tab'),true)
+    });
+    show(tabCur[e.n]&&P[tabCur[e.n]]?tabCur[e.n]:'start',false);
+  }
+
   function renderReader(){
     if(stopAnim){stopAnim();stopAnim=null}
     if(stopTopo){stopTopo();stopTopo=null}
@@ -1992,7 +2047,7 @@ Eier og revisjonsdato:</code></pre></div></section>
       syncChecks();
     }
     collapsify(e.n);
-    if(e.ready)coachify(e.n);
+    if(e.ready){coachify(e.n);tabify(e)}
   }
 
   function refresh(){buildIndex();updateProgress();var s=$('stag');if(s){var n=sel;s.textContent=isDone(n)?'Fullført':(EX[n-1].ready?'Aktiv':'Planlagt');s.classList.toggle('ok',isDone(n))}}
@@ -2023,7 +2078,8 @@ Eier og revisjonsdato:</code></pre></div></section>
     var b=document.createElement('button'); b.type='button'; b.className='chip';
     b.setAttribute('data-f',f[0]); b.setAttribute('aria-pressed',f[0]===''?'true':'false'); b.textContent=f[1]; flt.appendChild(b);
   });
-  idx.parentNode.insertBefore(flt,idx);
+  var fb=document.createElement('details'); fb.className='fltbox'; fb.innerHTML='<summary>Filtrer øvelser</summary>'; fb.appendChild(flt);
+  idx.parentNode.insertBefore(fb,idx);
   flt.addEventListener('click',function(ev){
     var b=ev.target.closest('[data-f]'); if(!b)return;
     filt=b.getAttribute('data-f');
