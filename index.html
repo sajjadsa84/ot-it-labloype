@@ -8,25 +8,17 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: sticky exercise index (left) + reading column (right); index collapses above the reader on phones. */
 :root{
-  --bg:#f3f6f7; --surface:#ffffff; --fg:#13212a; --muted:#566772; --line:#d3dce1;
-  --accent:#0d7a69; --accent-soft:#dcf1ec; --amber:#a96a0c; --amber-soft:#fbefd9;
-  --code-bg:#0f1b22; --code-fg:#d5e3e9; --code-line:#223540;
-  --font-display:'IBM Plex Sans Condensed','Arial Narrow',system-ui,sans-serif;
-  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --bg:#fbf7f1; --surface:#ffffff; --fg:#1f1b16; --muted:#5c5346; --line:#eadfce; --accent:#b4431c; --accent-soft:#fdeadf; --amber:#8a5a00; --amber-soft:#fff4dc; --code-bg:#26211b; --code-fg:#f7efe2; --code-line:#3d352b;
+  --font-display:'DM Sans',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'DM Mono',ui-monospace,Menlo,Consolas,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0c1418; --surface:#131f25; --fg:#e2edf1; --muted:#8ea1ac; --line:#25353e;
-  --accent:#3fc9ae; --accent-soft:#12332e; --amber:#e3ac52; --amber-soft:#33270f;
-  --code-bg:#091015; --code-fg:#d5e3e9; --code-line:#1f303a; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0c1418; --surface:#131f25; --fg:#e2edf1; --muted:#8ea1ac; --line:#25353e;
-  --accent:#3fc9ae; --accent-soft:#12332e; --amber:#e3ac52; --amber-soft:#33270f;
-  --code-bg:#091015; --code-fg:#d5e3e9; --code-line:#1f303a; color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16120e; --surface:#211b16; --fg:#f3ece1; --muted:#b9ad9a; --line:#3a3228; --accent:#f08a5d; --accent-soft:#3a2216; --amber:#e3ac52; --amber-soft:#33270f; --code-bg:#0e0b08; --code-fg:#f3ece1; --code-line:#2e271f; color-scheme:dark;}}
+:root[data-theme="dark"]{--bg:#16120e; --surface:#211b16; --fg:#f3ece1; --muted:#b9ad9a; --line:#3a3228; --accent:#f08a5d; --accent-soft:#3a2216; --amber:#e3ac52; --amber-soft:#33270f; --code-bg:#0e0b08; --code-fg:#f3ece1; --code-line:#2e271f; color-scheme:dark;}
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--font-body);
@@ -207,6 +199,37 @@ tr.rec td{background:var(--accent-soft)}
 .bak-in p{margin:0}
 .bak textarea{width:100%;font:13px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:8px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.bar>i,.mbar i{transition:none}}
+
+/* Tema C: coach, varm palett, avrundet, minimerbar meny */
+.index,.blk,.confirm,.bak,.thread,.topo{border-radius:20px}
+.btn,.tb,.chip,.jb{border-radius:999px;min-height:44px;padding-inline:16px}
+.chip{min-height:36px}
+.tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.tools .tb{display:inline-flex;align-items:center;gap:8px}
+.code{border-radius:16px}
+@media (min-width:861px){
+  .shell.slim{grid-template-columns:76px minmax(0,1fr)}
+  .shell.slim .flt,.shell.slim .index>summary,.shell.slim .lv h3,.shell.slim .row a,.shell.slim .lv:nth-child(-n+2){display:none}
+  .shell.slim .row{grid-template-columns:22px 1fr;padding:0 6px;cursor:pointer}
+  .shell.slim .row .n{text-align:center}
+  .shell.slim #sidebtn span{display:none}
+}
+#sidebtn{margin-bottom:10px;display:inline-flex;align-items:center;gap:8px}
+@media (max-width:860px){#sidebtn{display:none}}
+.coach{display:flex;flex-direction:column;gap:16px;margin-bottom:8px}
+.cx-pills{display:flex;flex-wrap:wrap;gap:8px}
+.cx-pills button{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 16px 0 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 14px var(--font-body);cursor:pointer}
+.cx-pills button[aria-current="step"]{border-color:var(--accent);background:var(--accent-soft)}
+.cx-pills i{font-style:normal;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:500 13px var(--font-mono);background:var(--line);color:var(--fg)}
+.cx-pills button.ok i{background:#2f7d5b;color:#fff}
+.cx-pills button[aria-current="step"] i{background:var(--accent);color:var(--surface)}
+.cx-actions{display:flex;flex-wrap:wrap;gap:10px}
+.cx-actions .go{background:var(--accent);color:var(--surface);border-color:var(--accent);font-weight:600}
+.cx-help{background:var(--amber-soft);border:1px solid var(--amber);border-radius:16px;padding:14px 18px;color:var(--fg)}
+.cx-help[hidden]{display:none}
+.coach-on .step.cx-off{display:none}
+.coach-on .step:not(.cx-expl) .cmdh,.coach-on .step:not(.cx-expl) dl.cmd{display:none}
+.cx-all{margin-left:auto}
 </style>
 
 <div class="wrap">
@@ -214,6 +237,7 @@ tr.rec td{background:var(--accent-soft)}
     <div>
       <h1>OT/IT Labløype</h1>
       <p>MQTT 5, OPC UA og industriell integrasjon, én øvelse om gangen. Kryss av når du har bekreftet at øvelsen fungerer.</p>
+      <div class="tools"><button class="tb" id="theme" type="button" aria-label="Bytt mellom lyst og mørkt tema"><span id="themeico" aria-hidden="true">◐</span><span id="themetxt">Tema</span></button></div>
     </div>
     <div class="prog" aria-live="polite">
       <div class="prog-row"><span>Fullførte øvelser</span><strong id="pcount">0 / 0</strong></div>
@@ -1896,6 +1920,42 @@ Eier og revisjonsdato:</code></pre></div></section>
     reader.insertBefore(bar,top[0]);
   }
 
+
+  var coachCur={};
+  function coachify(n){
+    var steps=[].slice.call(reader.querySelectorAll('.step')).filter(function(x){var c=x.querySelector('input[data-k]');return c&&/^ex\d+\.s\d+$/.test(c.getAttribute('data-k'))});
+    if(steps.length<2)return;
+    var sec=steps[0].closest('section'); if(!sec)return;
+    var box=document.createElement('div'); box.className='coach';
+    box.innerHTML='<div class="cx-pills" role="group" aria-label="Steg"></div><div class="cx-actions"><button type="button" class="btn go" data-cx="ok">Det funket</button><button type="button" class="btn" data-cx="expl" aria-pressed="false">Forklar kommandoene</button><button type="button" class="btn" data-cx="help" aria-pressed="false">Jeg står fast</button><button type="button" class="tb cx-all" data-cx="all" aria-pressed="false">Vis alle steg</button></div><div class="cx-help" hidden></div>';
+    sec.insertBefore(box,steps[0]);
+    var pills=box.querySelector('.cx-pills'), helpBox=box.querySelector('.cx-help'), on=true;
+    var cur=coachCur[n];
+    if(cur===undefined){cur=0;for(var i=0;i<steps.length;i++){if(!steps[i].querySelector('input').checked){cur=i;break}}}
+    function label(st){var sp=st.querySelector('label.chk span');return sp?sp.textContent.replace(/^Steg\s*\d+:\s*/,''):''}
+    function draw(){
+      sec.classList.toggle('coach-on',on);
+      steps.forEach(function(st,i){st.classList.toggle('cx-off',on&&i!==cur)});
+      pills.innerHTML=steps.map(function(st,i){var d=st.querySelector('input').checked;return '<button type="button" data-i="'+i+'" class="'+(d?'ok':'')+'"'+(i===cur?' aria-current="step"':'')+'><i>'+(d?'✓':(i+1))+'</i>'+label(st)+'</button>'}).join('');
+      var st=steps[cur]; st.classList.toggle('cx-expl',box.querySelector('[data-cx="expl"]').getAttribute('aria-pressed')==='true');
+      box.querySelector('[data-cx="ok"]').textContent=cur===steps.length-1?'Det funket, ferdig':'Det funket, neste steg';
+    }
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-cx],[data-i]'); if(!b)return;
+      if(b.hasAttribute('data-i')){cur=+b.getAttribute('data-i');coachCur[n]=cur;helpBox.hidden=true;box.querySelector('[data-cx="help"]').setAttribute('aria-pressed','false');draw();return}
+      var a=b.getAttribute('data-cx');
+      if(a==='ok'){var c=steps[cur].querySelector('input'); if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change',{bubbles:true}))}
+        if(cur<steps.length-1)cur++; coachCur[n]=cur; helpBox.hidden=true; box.querySelector('[data-cx="help"]').setAttribute('aria-pressed','false'); draw(); sec.scrollIntoView({block:'start',behavior:'smooth'})}
+      else if(a==='expl'){var p=b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',p?'true':'false'); draw()}
+      else if(a==='help'){var h=helpBox.hidden; helpBox.hidden=!h; b.setAttribute('aria-pressed',h?'true':'false');
+        if(h){helpBox.innerHTML='<b>Står du fast?</b> Les feilmeldingen ordrett, og sammenlign den med tabellen under Feilsøking. Sjekk også at forrige steg faktisk ga forventet resultat. <button type="button" class="tb" data-cx="ts">Åpne feilsøking</button>'}}
+      else if(a==='ts'){var ss=[].slice.call(reader.querySelectorAll('section.blk')).filter(function(x){return /Feilsøking/.test(x.firstElementChild.textContent)})[0]; if(ss){ss.classList.remove('closed');ss.firstElementChild.setAttribute('aria-expanded','true');ss.scrollIntoView({block:'start',behavior:'smooth'})}}
+      else if(a==='all'){on=!on; b.setAttribute('aria-pressed',on?'false':'true'); b.textContent=on?'Vis alle steg':'Ett steg om gangen'; draw()}
+    });
+    reader.addEventListener('change',function f(ev){if(!box.isConnected){reader.removeEventListener('change',f);return} if(ev.target.matches('input[data-k]'))draw()});
+    draw();
+  }
+
   function renderReader(){
     if(stopAnim){stopAnim();stopAnim=null}
     if(stopTopo){stopTopo();stopTopo=null}
@@ -1932,6 +1992,7 @@ Eier og revisjonsdato:</code></pre></div></section>
       syncChecks();
     }
     collapsify(e.n);
+    if(e.ready)coachify(e.n);
   }
 
   function refresh(){buildIndex();updateProgress();var s=$('stag');if(s){var n=sel;s.textContent=isDone(n)?'Fullført':(EX[n-1].ready?'Aktiv':'Planlagt');s.classList.toggle('ok',isDone(n))}}
@@ -1969,6 +2030,29 @@ Eier og revisjonsdato:</code></pre></div></section>
     flt.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b?'true':'false')});
     buildIndex();
   });
+
+
+  /* Tema og minimerbar meny */
+  (function(){
+    var root=document.documentElement, tb=document.getElementById('theme');
+    function eff(){var t=root.getAttribute('data-theme');if(t)return t;return window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+    function paint(){var d=eff()==='dark';document.getElementById('themeico').textContent=d?'☾':'☀';document.getElementById('themetxt').textContent=d?'Mørkt tema':'Lyst tema'}
+    try{var st=localStorage.getItem('otit-theme');if(st==='dark'||st==='light')root.setAttribute('data-theme',st)}catch(e){}
+    paint();
+    tb.addEventListener('click',function(){var n=eff()==='dark'?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('otit-theme',n)}catch(e){}paint()});
+    var shell=document.querySelector('.shell'), sb=document.createElement('button');
+    sb.type='button'; sb.id='sidebtn'; sb.className='tb';
+    function sp(){var sl=shell.classList.contains('slim');sb.innerHTML='<b aria-hidden="true">'+(sl?'»':'«')+'</b><span>Minimer meny</span>';sb.setAttribute('aria-label',sl?'Vis menyen':'Minimer menyen');sb.setAttribute('aria-expanded',sl?'false':'true')}
+    try{if(localStorage.getItem('otit-side')==='slim')shell.classList.add('slim')}catch(e){}
+    sp();
+    sb.addEventListener('click',function(){shell.classList.toggle('slim');try{localStorage.setItem('otit-side',shell.classList.contains('slim')?'slim':'open')}catch(e){}sp()});
+    idx.parentNode.insertBefore(sb,idx.parentNode.firstChild);
+    idx.addEventListener('click',function(ev){
+      if(!shell.classList.contains('slim'))return;
+      var li=ev.target.closest('li.row[data-n]');if(!li||ev.target.closest('input'))return;
+      go(+li.getAttribute('data-n'));
+    });
+  })();
 
   /* Case 1 animation: point-to-point vs broker */
   var INIT={1:initCase1,2:initCase2}, stopAnim=null;
