@@ -138,6 +138,8 @@ th{font:600 12px var(--font-display);letter-spacing:.06em;text-transform:upperca
 .dt.broker{fill:var(--accent)}
 .nd rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
 .nd text{fill:var(--fg);font:12px var(--font-body);text-anchor:middle;dominant-baseline:central}
+.nd.hit rect{stroke:var(--accent);stroke-width:2.5}
+.nd.dim{opacity:.55}
 .nd.hot rect{stroke:var(--amber);stroke-width:2.5}
 .nd.new rect{stroke:var(--accent);stroke-dasharray:4 2}
 .nd.brk rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
@@ -504,12 +506,12 @@ c.disconnect()</code></pre></div>
 
   <section class="blk"><h3><span class="no">11</span>Wireshark</h3>
     <div class="step">
-      <label class="chk"><input type="checkbox" data-k="ex1.ws"><span>Fanget og leste MQTT-pakkene i Wireshark</span></label>
+      <label class="chk"><input type="checkbox" data-k="ex1.ws"><span>Så pakkene (Wireshark, eller <code>mosquitto_sub -d</code> hvis du ikke kan bruke Wireshark)</span></label>
       <p>Trafikken går internt i WSL2, så fang den der og pipe til Wireshark. Kjør fra PowerShell:</p>
       <div class="code"><pre><code>wsl -d Ubuntu sudo tcpdump -U -i lo -w - "port 1883" | &amp; "C:\Program Files\Wireshark\Wireshark.exe" -k -i -</code></pre></div>
       <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>wsl -d Ubuntu</dt><dd>Kjører resten av kommandoen inne i WSL-distroen <code>Ubuntu</code> fra PowerShell.</dd><dt>sudo tcpdump</dt><dd>Fanger nettverkspakker. Trenger administratorrettigheter.</dd><dt>-U</dt><dd>Skriver hver pakke ut med en gang i stedet for å buffre. Nødvendig for live visning i Wireshark.</dd><dt>-i lo</dt><dd>Fanger på loopback-grensesnittet, der trafikk til <code>localhost</code> går.</dd><dt>-w -</dt><dd>Skriver rå pcap-data til standard ut. Tegnet <code>-</code> betyr stdout.</dd><dt>"port 1883"</dt><dd>Capture-filter: bare pakker på port 1883.</dd><dt>|</dt><dd>Sender utdataen til neste kommando (pipe).</dd><dt>&amp; "C:\Program Files\Wireshark\Wireshark.exe"</dt><dd>I PowerShell kjører <code>&amp;</code> en fil gitt med sti i anførselstegn.</dd><dt>-k -i -</dt><dd><code>-k</code> starter fangsten med en gang, og <code>-i -</code> leser pakker fra standard inn, altså pipen.</dd></dl>
       <p>Finn distronavnet med <code>wsl -l</code> hvis det ikke er <code>Ubuntu</code>. Alternativt: <code>sudo tcpdump -i lo -w ex01.pcap port 1883</code> i WSL, og åpne filen i Wireshark.</p>
-      <p>Bruk displayfilter <code>mqtt</code>. Se etter CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Utvid <i>MQTT Header → Version</i> og sjekk at den viser 5. Klikk på CONNECT og finn <i>Properties</i>, for eksempel Session Expiry Interval.</p>
+      <p class="lab">Uten Wireshark</p><p>Klienten kan skrive ut hver pakke den sender og mottar. Det gir deg det samme innblikket i protokollen.</p><div class="code"><pre><code>mosquitto_sub -d -h localhost -p 1883 -V mqttv5 -t "lab/ex01/#"</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>-d</dt><dd>Debug: skriver hver MQTT-pakk klienten sender og mottar, for eksempel <code>sending CONNECT</code>, <code>received CONNACK</code>, <code>sending SUBSCRIBE</code> og <code>received PUBLISH</code>.</dd><dt>-h localhost -p 1883 -V mqttv5 -t …</dt><dd>Samme valg som i steg 3: vert, port, protokollversjon og topic-filter.</dd></dl><p>Publiser fra en annen terminal og se linjene dukke opp. Se etter protokollversjon og keep-alive i CONNECT, reason code i CONNACK og topic i PUBLISH. Utskriftens nøyaktige ordlyd varierer mellom versjoner av Mosquitto.</p><p>Bruk displayfilter <code>mqtt</code>. Se etter CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Utvid <i>MQTT Header → Version</i> og sjekk at den viser 5. Klikk på CONNECT og finn <i>Properties</i>, for eksempel Session Expiry Interval.</p>
     </div></section>
 
   <section class="blk" data-closed><h3><span class="no">12</span>Ekstra utfordring</h3>
@@ -525,6 +527,362 @@ c.disconnect()</code></pre></div>
   <div class="confirm">
     <label class="chk"><input type="checkbox" data-k="ex1"><span>Øvelse 1 fungerer</span></label>
     <p>Skriv en kort beskrivelse til Claude av hva du så i Wireshark, for eksempel hvilke properties som lå i CONNECT. Da får du øvelse 2: Topics, wildcards og topic-design (UNS-struktur).</p>
+  </div>
+</template>
+
+<template id="tpl-2">
+  <section class="blk case" id="c2">
+    <h3><span class="no">CASE</span>Nordlys Meieri: «temp2_ny_FINAL»</h3>
+    <p class="lab">Rollene</p>
+    <ul class="cast">
+      <li><b>Bjørg, produksjonssjef</b>Vil ha ett dashboard som viser alle temperaturer. Ikke fire dashboard, ett for hvert navnesystem.</li>
+      <li><b>Håkon, automasjonstekniker</b>Har laget topic-navn siden 2019. Hvert navn ga perfekt mening den dagen han skrev det.</li>
+      <li><b>Terje, IT-sjef i konsernet</b>Skal bygge dashboardet og har oppdaget at han må kjenne hvert eneste navn utenat.</li>
+      <li><b>Du, OT-arkitekt</b>Skal gi meieriet et navnerom som også virker om fem år.</li>
+    </ul>
+    <p class="lab">Utfordringen</p>
+    <p>Meieriet publiserer seks signaler fra tre områder til brokeren fra øvelse 1. Navnene er <code>temp2_ny_FINAL</code>, <code>Kjol/TEMP</code>, <code>/kjoleromB/temp</code> og <code>tank3/t</code>, blant andre. For å lese alle temperaturene trenger dashboardet fire ulike filtre, og et nytt kjølerom betyr en ny linje i hvert system som leser data. Revisoren spurte hva <code>tank3/t</code> er. Håkon svarte «temperatur, åpenbart». Leverandøren som skal overvåke kjølingen kan ikke få lesetilgang kun til kjøling, fordi ingen felles prefiks finnes.</p>
+    <p class="lab">Prøv selv: abonner med et filter</p>
+    <div class="anim">
+      <div class="ctl">
+        <button class="btn" type="button" data-act="before" aria-pressed="true">Før: dagens navn</button>
+        <button class="btn" type="button" data-act="after" aria-pressed="false">Etter: navnerom</button>
+        <button class="btn" type="button" data-act="pause" aria-pressed="false">Pause</button>
+      </div>
+      <div class="ctl" data-o="filters"></div>
+      <p class="cap" style="min-height:0">Filter: <code data-o="filter"></code></p>
+      <svg viewBox="0 0 560 330" role="img" aria-label="Seks sensorer publiserer til en broker. Dashboardet abonnerer med et filter, og bare de topicene som passer filteret sendes videre."></svg>
+      <div class="meters">
+        <div class="meter"><span>Topics som passer filteret</span><b data-o="hits">0 av 6</b></div>
+        <div class="meter"><span>Filtre som trengs for alle temperaturer</span><b data-o="need">4</b><div class="mbar" data-o="mbar"><i style="width:0"></i></div></div>
+      </div>
+      <p class="cap" data-o="cap" aria-live="polite"></p>
+    </div>
+    <p class="lab">Valgene</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Alternativ</th><th>Brownfield</th><th>Økosystem</th><th>Økonomi</th><th>Tid</th></tr></thead>
+      <tbody>
+        <tr><td><b>A.</b> Behold navnene og dokumenter dem i Excel</td><td>Ingenting må endres i PLC-er eller leverandørens utstyr.</td><td>Hver konsument må ha oppslagsfilen. Verktøy forstår ikke strukturen.</td><td>Billig i dag. Hver ny konsument og hvert nytt signal koster manuelt arbeid.</td><td>Én ettermiddag. Vedlikehold for alltid.</td></tr>
+        <tr class="rec"><td><b>B.</b> Fast hierarki (navnerom) og oversettelse i gatewayen</td><td>Håkons navn blir værende i PLC-ene. Gatewayen publiserer dem om til nytt navn.</td><td>Wildcards, tilgangskontroll per prefiks og verktøy som MQTT Explorer virker som de skal.</td><td>Lite utviklingsarbeid. Det tunge er å bli enig om konvensjonen.</td><td>Noen dager for en pilot. Utrulling per område.</td></tr>
+        <tr><td><b>C.</b> Ett flatt topic og alt i JSON-payloaden</td><td>Enkelt å starte.</td><td>Alle konsumenter får alt og må filtrere selv. Ingen ACL per område.</td><td>Mer nettverkstrafikk og mer kode i hver konsument.</td><td>Rask start, men blir dyrt senere.</td></tr>
+      </tbody></table></div>
+    <p class="note">Tidsanslag og kostnadsnivå er illustrative for dette caset.</p>
+    <p class="lab">Hvorfor B</p>
+    <ul>
+      <li>Ett filter per konsument i stedet for ett per signal. Nye signaler og nye kjølerom treffer filtrene uten endring.</li>
+      <li>Strukturen bærer tilgangsstyring. En leverandør får <code>nordlys/meieri/kjoling/#</code> og ingenting annet.</li>
+      <li>Navnene i PLC-ene røres ikke. Oversettelsen gjøres i gatewayen vi bygger i øvelse 8 og 17.</li>
+    </ul>
+    <p class="lab">Der løsningen har grenser</p>
+    <ul>
+      <li>Konvensjonen må ha en eier. Å endre et områdenavn senere er en breaking change for alle som abonnerer.</li>
+      <li>Hierarkiet løser ikke datamodellen. Hva et signal betyr (enhet, oppløsning, kvalitet) hører til i payloaden og dokumentasjonen.</li>
+    </ul>
+    <div class="callout"><b>IEC 62443:</b> Topic-prefikset er grunnlaget for autorisasjon (FR2, SR 2.1: hvem får lese og skrive hva). Tilgangskontrollen i øvelse 24 bygger på navnestrukturen du lager her.</div>
+  </section>
+
+
+  <section class="blk" id="cust2">
+    <h3><span class="no">KUNDE</span>Hva du må hente fra kunden</h3>
+    <p>Svarene avgjør hvor mye av navnerommet som kan bygges nytt, og hvor mye som må oversettes fra eksisterende navn.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Spørsmål</th><th>Hvorfor det betyr noe</th><th>Rødt flagg</th></tr></thead>
+      <tbody>
+        <tr><td>Finnes det en navnekonvensjon i dag, skriftlig eller i hodet til noen?</td><td>Avgjør om du bygger nytt eller oversetter.</td><td>«Spør Håkon.»</td></tr>
+        <tr><td>Hvem lager nye signalnavn, og hvem godkjenner dem?</td><td>Uten eier splitter konvensjonen seg igjen.</td><td>Leverandører og teknikere navngir hver for seg.</td></tr>
+        <tr><td>Finnes det et anleggsregister med utstyrs-ID (funksjonssteder, tag-lister)?</td><td>Navnene bør hente ID-er derfra, så samme utstyr heter det samme overalt.</td><td>Registeret og anlegget er ikke i samsvar.</td></tr>
+        <tr><td>Hvilke nivåer finnes: enterprise, anlegg, område, linje, enhet?</td><td>Bestemmer dybden i hierarkiet.</td><td>Ingen vet hvilke områder anlegget består av.</td></tr>
+        <tr><td>Hvor mange anlegg, linjer og signaler er det i dag, og om tre år?</td><td>Dimensjonerer treet og brokeren.</td><td>«Alle signalene vi har.»</td></tr>
+        <tr><td>Hvem skal lese hva? Egne ansatte, leverandører, andre selskaper.</td><td>Prefiksene må følge tilgangsgrensene.</td><td>Alle har lest alt til nå.</td></tr>
+        <tr><td>Hvilke språk og tegn brukes i navn og dokumentasjon?</td><td>Norske tegn og mellomrom gir problemer i verktøy og skript.</td><td>Æ, ø og å i topic-navn.</td></tr>
+        <tr><td>Hvordan håndteres navneendringer? Finnes det en endringsprosess?</td><td>Å endre et topic er en breaking change for alle abonnenter.</td><td>Endringer gjøres rett i produksjon.</td></tr>
+      </tbody></table></div>
+  </section>
+
+  <section class="blk" id="arch2">
+    <h3><span class="no">ARK</span>TOGAF og systemteknikk i caset</h3>
+    <div class="two">
+      <div>
+        <p class="lab">TOGAF</p>
+        <ul>
+          <li><b>Fase C, dataarkitektur:</b> navnerommet er en del av dataarkitekturen. Det beskriver hvilke data som finnes og hvor de hører hjemme.</li>
+          <li><b>Prinsipper:</b> «Navn beskriver hva, ikke hvordan.» «Ett navn per signal i hele virksomheten.»</li>
+          <li><b>Standards Information Base:</b> navnekonvensjonen registreres som en standard som nye prosjekter må følge.</li>
+          <li><b>Fase G, styring:</b> en arkitekturkontrakt med leverandører om å følge konvensjonen, og en enkel gjennomgang når nye topics innføres.</li>
+          <li><b>Fase E og F:</b> migrering per område. Gatewayen oversetter gamle navn til nye så lenge de gamle finnes.</li>
+        </ul>
+      </div>
+      <div>
+        <p class="lab">Systemteknikk</p>
+        <ul>
+          <li><b>Grensesnittbeskrivelse (ICD):</b> hvert topic får topic, payload-format, enhet, frekvens, QoS og eier. Konvensjonen er selv en del av grensesnittet.</li>
+          <li><b>Krav:</b> «Alle topics følger konvensjonen.» Et testbart krav, og en linter kan verifisere det automatisk.</li>
+          <li><b>Trade study:</b> dybde mot fleksibilitet. Et dypt hierarki gir presis tilgangsstyring, men lange navn.</li>
+          <li><b>Konfigurasjonsstyring:</b> konvensjonen har versjon og endringslogg.</li>
+          <li><b>Risiko:</b> et navn som endres uten varsel stopper et dashboard uten at noen får feilmelding.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="uns2">
+    <h3><span class="no">UNS</span>Navnerommet som Unified Namespace</h3>
+    <p>I en Unified Namespace følger topic-hierarkiet gjerne ISA-95-nivåene. Konvensjonen fra denne øvelsen er en forenklet variant av det.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Nivå i øvelsen</th><th>ISA-95-begrep</th><th>Eksempel</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Enterprise</td><td><code>nordlys</code></td></tr>
+        <tr><td>2</td><td>Site</td><td><code>meieri</code></td></tr>
+        <tr><td>3</td><td>Area</td><td><code>kjoling</code></td></tr>
+        <tr><td>4</td><td>Line, cell eller utstyr</td><td><code>rom-a</code></td></tr>
+        <tr><td>5</td><td>Signal</td><td><code>temperatur</code></td></tr>
+      </tbody></table></div>
+    <p>Modellen for batch og prosedyre (ISA-88) og PackML kommer i en senere øvelse. Her holder det å velge en konvensjon og bruke den likt overalt.</p>
+  </section>
+
+  <section class="blk">
+    <h3><span class="no">1</span>Konseptet</h3>
+    <p>Et <b>topic</b> er en hierarkisk tekststreng med <code>/</code> mellom nivåene, for eksempel <code>nordlys/meieri/kjoling/rom-a/temperatur</code>. Topics trenger ikke opprettes på forhånd. Brokeren husker dem ikke, den bruker dem bare til å rute meldinger.</p>
+    <p>En abonnent bruker et <b>filter</b>. Filteret kan inneholde to jokertegn:</p>
+    <ul>
+      <li><code>+</code> matcher ett nivå. <code>nordlys/meieri/+/+/temperatur</code> treffer alle temperaturer på fem nivåer.</li>
+      <li><code>#</code> matcher alle nivåer under, og må stå sist. <code>nordlys/meieri/kjoling/#</code> treffer alt i kjøling.</li>
+    </ul>
+    <p>Jokertegn brukes bare i filtre og aldri i topicet du publiserer på. Topics er <b>case-sensitive</b>, og topics som starter med <code>$</code> er reservert til brokeren (for eksempel <code>$SYS</code>) og treffes ikke av filter som starter med <code>#</code> eller <code>+</code>.</p>
+    <p class="lab">Konvensjonen vi bruker i løypa</p>
+    <div class="code"><pre><code>nordlys / meieri / kjoling / rom-a / temperatur
+enterprise / anlegg / område / enhet / signal</code></pre></div>
+    <ul>
+      <li>Fra generelt til spesifikt. Samme dybde i hele treet, slik at <code>+</code> alltid treffer samme nivå.</li>
+      <li>Små bokstaver, ingen mellomrom og ingen æøå. Bindestrek mellom ord.</li>
+      <li>Ingen skråstrek først eller sist. Begge gir et tomt nivå.</li>
+      <li>Stabile navn i topicet. Verdier og tidspunkt hører hjemme i payloaden.</li>
+      <li>Aldri <code>$</code> først, og aldri jokertegn i publiserte topics.</li>
+    </ul></section>
+
+  <section class="blk"><h3><span class="no">2</span>Bruk i industrien</h3>
+    <p>Navnerommet blir bærebjelken i en Unified Namespace. Hierarkiet følger gjerne ISA-95-nivåene (enterprise, site, area, line, cell). Utstyrs-ID-ene bør hentes fra vedlikeholdssystemet eller ERP, for eksempel funksjonssted i SAP PM, slik at samme navn brukes overalt. Tilgangsstyring, historikk og dashboards bygges på prefiksene.</p></section>
+
+  <section class="blk"><h3><span class="no">3</span>Arkitektur</h3>
+    <div class="code"><pre><code> pasteur1 ──temperatur──┐                       ┌──▶ [nordlys/meieri/+/+/temperatur]  Dashboard
+ pasteur1 ──trykk───────┤                       ├──▶ [nordlys/meieri/kjoling/#]       Leverandør (kun lese)
+ rom-a ─────temperatur──┼──▶ BROKER (1883) ─────┤
+ rom-b ─────temperatur──┤    ruter på topic     └──▶ [nordlys/meieri/#]               Historian
+ tank3 ─────nivaa───────┤
+ tank3 ─────temperatur──┘
+        publiserer på                               abonnerer med filter
+        nordlys/meieri/&lt;område&gt;/&lt;enhet&gt;/&lt;signal&gt;</code></pre></div></section>
+  <section class="blk"><h3><span class="no">4–5</span>Steg og kommandoer (Ubuntu/WSL2)</h3>
+    <p>Du trenger fire terminaler i Ubuntu: broker (1), abonnent (2), utgiver (3) og en til tester (4).</p>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.s1"><span>Steg 1: Start brokeren i ny mappe (terminal 1)</span></label>
+      <div class="code"><pre><code>mkdir -p ~/lab/ex02 &amp;&amp; cd ~/lab/ex02
+cp ../ex01/mosquitto.conf .
+mosquitto -c mosquitto.conf -v</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>mkdir -p ~/lab/ex02 &amp;&amp; cd ~/lab/ex02</dt><dd>Lager mappen for øvelsen og går inn i den.</dd><dt>cp ../ex01/mosquitto.conf .</dt><dd>Kopierer konfigfilen fra øvelse 1. <code>..</code> er mappen over, og <code>.</code> er mappen du står i.</dd><dt>mosquitto -c mosquitto.conf -v</dt><dd>Starter brokeren i forgrunnen med konfigfilen. <code>-v</code> skriver alle tilkoblinger, abonnementer og meldinger til loggen.</dd></dl>
+      <p>Hvis du får <code>address already in use</code>, kjører brokeren fra øvelse 1 fortsatt. Stopp den med Ctrl+C i terminalen der den kjører.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.s2"><span>Steg 2: Se kaoset (terminal 2 og 3)</span></label>
+      <p>Terminal 2 lytter på alt. Terminal 3 publiserer dagens navn.</p>
+      <div class="code"><pre><code>mosquitto_sub -h localhost -V mqttv5 -t "#" -v</code></pre></div><div class="code"><pre><code>B="-h localhost -V mqttv5"
+mosquitto_pub $B -t "temp2_ny_FINAL" -m 72.1
+mosquitto_pub $B -t "PASTEUR_trykk" -m 2.1
+mosquitto_pub $B -t "Kjol/TEMP" -m 4.0
+mosquitto_pub $B -t "/kjoleromB/temp" -m 4.5
+mosquitto_pub $B -t "tank3/niv" -m 63
+mosquitto_pub $B -t "tank3/t" -m 6.0</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>-t "#"</dt><dd>Filter som treffer alle topics, bortsett fra de som starter med <code>$</code>. <code>-v</code> skriver topic foran meldingen.</dd><dt>B="-h localhost -V mqttv5"</dt><dd>Lagrer felles valg i en variabel, så du slipper å skrive dem seks ganger. <code>$B</code> byttes ut med innholdet når kommandoen kjører.</dd><dt>-m 72.1</dt><dd>Meldingens innhold (payload). Her bare et tall.</dd></dl>
+      <p>Alle seks kommer frem i terminal 2, men prøv deretter å lese bare temperaturene:</p>
+      <div class="code"><pre><code>mosquitto_sub -h localhost -V mqttv5 -t "meieri/+/temperatur" -v -W 5</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>-W 5</dt><dd>Avslutter etter 5 sekunder uten meldinger. Uten den ville kommandoen stått for alltid.</dd></dl>
+      <p>Det kommer ingenting. Filteret kjenner ikke de merkelige navnene. Alle konsumenter må kjenne alle fire temperaturnavn.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.s3"><span>Steg 3: Publiser med navnerom (terminal 3)</span></label>
+      <div class="code"><pre><code>cat &gt; publish_meieri.sh &lt;&lt;'EOF'
+#!/usr/bin/env bash
+B="-h localhost -V mqttv5"
+mosquitto_pub $B -t nordlys/meieri/pasteur/pasteur1/temperatur -m '{"v":72.1,"u":"C"}'
+mosquitto_pub $B -t nordlys/meieri/pasteur/pasteur1/trykk      -m '{"v":2.1,"u":"bar"}'
+mosquitto_pub $B -t nordlys/meieri/kjoling/rom-a/temperatur    -m '{"v":4.0,"u":"C"}'
+mosquitto_pub $B -t nordlys/meieri/kjoling/rom-b/temperatur    -m '{"v":4.5,"u":"C"}'
+mosquitto_pub $B -t nordlys/meieri/tank/tank3/nivaa            -m '{"v":63,"u":"%"}'
+mosquitto_pub $B -t nordlys/meieri/tank/tank3/temperatur       -m '{"v":6.0,"u":"C"}'
+EOF
+chmod +x publish_meieri.sh</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>cat &gt; publish_meieri.sh &lt;&lt;'EOF' … EOF</dt><dd>Skriver alt mellom <code>EOF</code>-linjene til filen. Enkeltfnuttene rundt <code>EOF</code> hindrer at skallet tolker tegn som <code>$</code> og <code>%</code> i teksten.</dd><dt>#!/usr/bin/env bash</dt><dd>Første linje i skriptet. Den sier hvilket program som skal kjøre filen.</dd><dt>-m '{"v":72.1,"u":"C"}'</dt><dd>Payload som JSON med verdi (<code>v</code>) og enhet (<code>u</code>). Enkeltfnutter beskytter anførselstegnene inni.</dd><dt>chmod +x publish_meieri.sh</dt><dd>Gjør filen kjørbar.</dd></dl>
+      <p>Start deretter terminal 2 på nytt (Ctrl+C og så samme kommando), og kjør skriptet i terminal 3:</p>
+      <div class="code"><pre><code>./publish_meieri.sh</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>./publish_meieri.sh</dt><dd>Kjører skriptet i mappen du står i. <code>./</code> betyr «fra denne mappen».</dd></dl>
+      <p>Terminal 2 viser nå seks topics med samme oppbygning. Brokerloggen i terminal 1 viser seks <code>Received PUBLISH</code>.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.s4"><span>Steg 4: Abonner med jokertegn (terminal 2, ett filter om gangen)</span></label>
+      <div class="code"><pre><code>mosquitto_sub -h localhost -V mqttv5 -t "nordlys/meieri/+/+/temperatur" -v -W 10
+mosquitto_sub -h localhost -V mqttv5 -t "nordlys/meieri/kjoling/#" -v -W 10
+mosquitto_sub -h localhost -V mqttv5 -t "nordlys/meieri/+/tank3/+" -v -W 10</code></pre></div>
+      <p>Start ett filter i terminal 2 og kjør <code>./publish_meieri.sh</code> i terminal 3. Gjenta for hvert filter. Forventet antall meldinger per kjøring: <b>4</b>, <b>2</b> og <b>2</b>.</p>
+    </div>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.s5"><span>Steg 5: Prøv reglene (terminal 3 og 4)</span></label>
+      <p>Hver test har en forventning. Start abonnenten først, og publiser deretter.</p>
+      <div class="code"><pre><code># a) Jokertegn i publiserte topics er ikke lov
+mosquitto_pub -h localhost -V mqttv5 -t "nordlys/meieri/+/temperatur" -m 1
+
+# b) Store og små bokstaver er ulike topics
+mosquitto_sub -h localhost -V mqttv5 -t "nordlys/meieri/#" -v -W 10      # terminal 4
+mosquitto_pub -h localhost -V mqttv5 -t "Nordlys/Meieri/test" -m 1       # terminal 3
+
+# c) Skråstrek først gir et tomt nivå
+mosquitto_sub -h localhost -V mqttv5 -t "+/nordlys/#" -v -W 10           # terminal 4
+mosquitto_pub -h localhost -V mqttv5 -t "/nordlys/meieri/test" -m 1      # terminal 3
+
+# d) $SYS: brokerens egne topics
+mosquitto_sub -h localhost -V mqttv5 -t '$SYS/broker/version' -v -C 1 -W 12
+mosquitto_sub -h localhost -V mqttv5 -t "#" -v -W 12</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt># a)</dt><dd>Forventet: en feilmelding om at topicet er ugyldig, og ingenting publiseres. Ordlyden kan variere mellom versjoner.</dd><dt># b)</dt><dd>Forventet: abonnenten på <code>nordlys/meieri/#</code> mottar ingenting, fordi <code>Nordlys/Meieri/test</code> er et annet topic.</dd><dt># c)</dt><dd>Forventet: <code>+/nordlys/#</code> treffer, fordi topicet har et tomt første nivå. Det er sjelden det du vil ha.</dd><dt>'$SYS/broker/version'</dt><dd>Enkeltfnutter hindrer skallet i å tolke <code>$SYS</code> som en variabel. <code>-C 1</code> avslutter etter første melding.</dd><dt>-t "#" … -W 12</dt><dd>Forventet: du ser ingen <code>$SYS</code>-linjer, selv om brokeren publiserer dem. Filter som starter med <code>#</code> eller <code>+</code> treffer ikke topics som starter med <code>$</code>.</dd></dl>
+    </div>
+  </section>
+
+  <section class="blk"><h3><span class="no">6</span>Node-RED (valgfritt)</h3>
+    <p>Hopp over dette hvis du ikke har Node-RED ennå. Det kommer i øvelse 8. Importer flowen via menyen, <i>Import</i>, og lim inn. Trykk <i>Deploy</i> og kjør <code>./publish_meieri.sh</code>. Debug-fanen skal vise fire meldinger. Nodenes oppsett kan avvike mellom Node-RED-versjoner.</p>
+    <div class="code"><pre><code>[{"id":"flow2","type":"tab","label":"Øvelse 2","disabled":false,"info":""},{"id":"n_in","type":"mqtt in","z":"flow2","name":"alle temperaturer","topic":"nordlys/meieri/+/+/temperatur","qos":"0","datatype":"json","broker":"n_brk","nl":false,"rap":true,"rh":0,"inputs":0,"x":170,"y":80,"wires":[["n_dbg"]]},{"id":"n_dbg","type":"debug","z":"flow2","name":"vis","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","x":390,"y":80,"wires":[]},{"id":"n_brk","type":"mqtt-broker","name":"lab","broker":"localhost","port":"1883","clientid":"","autoConnect":true,"usetls":false,"protocolVersion":"5","keepalive":"60","cleansession":true}]</code></pre></div></section>
+
+  <section class="blk"><h3><span class="no">7</span>Python-klient</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.py"><span>Python-utgiver, -abonnent og filtertest fungerer</span></label>
+      <div class="code"><pre><code>cd ~/lab/ex02
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install paho-mqtt</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>python3 -m venv .venv</dt><dd>Lager et isolert Python-miljø i mappen <code>.venv</code>.</dd><dt>source .venv/bin/activate</dt><dd>Aktiverer miljøet i denne terminalen.</dd><dt>pip install paho-mqtt</dt><dd>Installerer MQTT-biblioteket.</dd></dl>
+      <p>Først en test som ikke trenger broker. Den bruker samme jokertegn-regler som brokeren:</p>
+      <div class="code hasfn"><span class="fn">filtertest.py</span><pre><code>from paho.mqtt.client import topic_matches_sub
+
+TOPICS = [
+    "nordlys/meieri/pasteur/pasteur1/temperatur",
+    "nordlys/meieri/pasteur/pasteur1/trykk",
+    "nordlys/meieri/kjoling/rom-a/temperatur",
+    "nordlys/meieri/kjoling/rom-b/temperatur",
+    "nordlys/meieri/tank/tank3/nivaa",
+    "nordlys/meieri/tank/tank3/temperatur",
+    "Nordlys/Meieri/pasteur/pasteur1/temperatur",    # feil: store bokstaver
+    "nordlys/meieri/pasteur/pasteur1/temperatur/",   # feil: skråstrek sist
+]
+FILTRE = [
+    "nordlys/meieri/+/+/temperatur",
+    "nordlys/meieri/kjoling/#",
+    "nordlys/meieri/+/tank3/+",
+    "nordlys/meieri/#",
+    "#",
+]
+
+for f in FILTRE:
+    treff = [t for t in TOPICS if topic_matches_sub(f, t)]
+    print(f"{f:34} {len(treff)} treff")
+    for t in treff:
+        print("    ", t)</code></pre></div>
+      <p>Kjør <code>python filtertest.py</code>. Forventet antall treff: <b>4, 2, 2, 7 og 8</b>. Forklar hvorfor <code>nordlys/meieri/#</code> gir 7 og ikke 6.</p>
+      <div class="code hasfn"><span class="fn">pub_meieri.py</span><pre><code>import json
+import random
+import time
+import paho.mqtt.client as mqtt
+
+SIGNALER = {
+    "nordlys/meieri/pasteur/pasteur1/temperatur": ("C", 72.0, 0.4),
+    "nordlys/meieri/pasteur/pasteur1/trykk": ("bar", 2.1, 0.05),
+    "nordlys/meieri/kjoling/rom-a/temperatur": ("C", 4.0, 0.3),
+    "nordlys/meieri/kjoling/rom-b/temperatur": ("C", 4.5, 0.3),
+    "nordlys/meieri/tank/tank3/nivaa": ("%", 63.0, 1.0),
+    "nordlys/meieri/tank/tank3/temperatur": ("C", 6.0, 0.2),
+}
+
+c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
+                client_id="py-meieri-pub", protocol=mqtt.MQTTv5)
+c.connect("localhost", 1883)
+c.loop_start()
+info = None
+for _ in range(10):
+    for topic, (enhet, midt, spredning) in SIGNALER.items():
+        payload = {"v": round(random.gauss(midt, spredning), 2),
+                   "u": enhet, "ts": time.time()}
+        info = c.publish(topic, json.dumps(payload), qos=0)
+    time.sleep(1)
+info.wait_for_publish()
+c.loop_stop()
+c.disconnect()</code></pre></div><div class="code hasfn"><span class="fn">sub_meieri.py</span><pre><code>import json
+import sys
+import paho.mqtt.client as mqtt
+
+FILTER = sys.argv[1] if len(sys.argv) &gt; 1 else "nordlys/meieri/+/+/temperatur"
+
+def on_connect(client, userdata, flags, reason_code, properties):
+    print("Koblet til:", reason_code, "| filter:", FILTER)
+    client.subscribe(FILTER)
+
+def on_message(client, userdata, msg):
+    nivaa = msg.topic.split("/")
+    if len(nivaa) != 5:
+        print(msg.topic, "(annen struktur)")
+        return
+    omraade, enhet, signal = nivaa[2], nivaa[3], nivaa[4]
+    data = json.loads(msg.payload)
+    print(f"{omraade:9} {enhet:9} {signal:12} {data['v']} {data['u']}")
+
+c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
+                client_id="py-meieri-sub", protocol=mqtt.MQTTv5)
+c.on_connect = on_connect
+c.on_message = on_message
+c.connect("localhost", 1883)
+c.loop_forever()</code></pre></div>
+      <p>Kjør <code>python sub_meieri.py</code> i én terminal og <code>python pub_meieri.py</code> i en annen. Prøv også <code>python sub_meieri.py "nordlys/meieri/kjoling/#"</code>.</p><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>topic_matches_sub(f, t)</dt><dd>Funksjon i paho som sjekker om et topic passer et filter, med samme regler som brokeren.</dd><dt>sys.argv[1]</dt><dd>Første argument på kommandolinjen. Her filteret du vil teste.</dd><dt>msg.topic.split("/")</dt><dd>Deler topicet i nivåer, slik at du kan hente ut område, enhet og signal.</dd></dl>
+    </div>
+  </section>
+
+  <section class="blk"><h3><span class="no">8</span>Verifisering</h3>
+    <ul>
+      <li>Steg 2: ingen meldinger når du bruker <code>meieri/+/temperatur</code>. Steg 4: 4, 2 og 2 meldinger per kjøring av skriptet.</li>
+      <li>Steg 5: ugyldig publisering avvises, store bokstaver gir et annet topic, og <code>$SYS</code> vises bare når du abonnerer eksplisitt.</li>
+      <li><code>filtertest.py</code> gir 4, 2, 2, 7 og 8 treff.</li>
+      <li>Brokerloggen viser hver <code>Received SUBSCRIBE</code> med filteret abonnenten brukte.</li>
+    </ul></section>
+
+  <section class="blk" data-closed><h3><span class="no">9</span>Feilsøking</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Symptom</th><th>Årsak / tiltak</th></tr></thead>
+      <tbody>
+        <tr><td>Ingen meldinger i steg 4</td><td>Abonnenten startet etter publiseringen, og QoS 0 lagres ikke. Start abonnenten først.</td></tr>
+        <tr><td><code>+</code> eller <code>#</code> gir uventet treff eller ikke treff</td><td>Tell nivåene. <code>+</code> matcher nøyaktig ett nivå, og <code>#</code> må stå sist.</td></tr>
+        <tr><td><code>$SYS</code> vises ikke</td><td>Du må abonnere eksplisitt på <code>$SYS/#</code> eller et konkret <code>$SYS</code>-topic. Statistikken kommer med faste mellomrom, vanligvis hvert 10. sekund.</td></tr>
+        <tr><td>Skallet bytter ut <code>$SYS</code></td><td>Bruk enkeltfnutter rundt topicet: <code>'$SYS/#'</code>.</td></tr>
+        <tr><td><code>address already in use</code></td><td>Brokeren fra øvelse 1 kjører fortsatt. Stopp den.</td></tr>
+        <tr><td><code>command not found: mosquitto_pub</code></td><td>Mosquitto-klientene er ikke installert. Se forutsetningene i øvelse 1.</td></tr>
+        <tr><td><code>Permission denied</code> på <code>./publish_meieri.sh</code></td><td>Filen mangler kjørerett. Kjør <code>chmod +x publish_meieri.sh</code>.</td></tr>
+      </tbody></table></div></section>
+
+  <section class="blk" data-closed><h3><span class="no">10</span>Hva skjer på protokollnivå</h3>
+    <ol>
+      <li><b>SUBSCRIBE</b> inneholder en liste med topic-filtre og opsjoner per filter (maks QoS, no local, retain handling). Jokertegnene sendes uendret til brokeren, som gjør matchingen.</li>
+      <li><b>SUBACK</b> svarer med en reason code per filter. 0 betyr tildelt QoS 0. Verdier fra 0x80 og oppover betyr feil, for eksempel 0x8F (ugyldig topic-filter) og 0x87 (ikke autorisert).</li>
+      <li><b>PUBLISH</b> har et topic name med minst ett tegn, i UTF-8, uten jokertegn. Brokeren sammenligner det byte for byte mot filtrene, derfor er det case-sensitivt.</li>
+      <li>Reglene for <code>$</code>: filtre som starter med <code>#</code> eller <code>+</code> matcher ikke topics som starter med <code>$</code>.</li>
+      <li><code>#</code> matcher også foreldrenivået. Filteret <code>nordlys/meieri/#</code> treffer derfor også topicet <code>nordlys/meieri</code>.</li>
+    </ol></section>
+
+  <section class="blk" data-closed><h3><span class="no">11</span>Wireshark (valgfritt)</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.ws"><span>Så SUBSCRIBE og PUBLISH (Wireshark, eller <code>-d</code>)</span></label>
+      <p>Trafikken går internt i WSL2. Bruk samme fangst som i øvelse 1, og velg displayfilteret <code>mqtt.msgtype == 8 || mqtt.msgtype == 3</code> (SUBSCRIBE og PUBLISH). Åpne SUBSCRIBE og les <i>Topic Filter</i>. Åpne SUBACK og les reason code.</p>
+      <p class="lab">Uten Wireshark</p>
+      <div class="code"><pre><code>mosquitto_sub -d -h localhost -V mqttv5 -t "nordlys/meieri/+/+/temperatur" -W 10</code></pre></div><p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>-d</dt><dd>Debug: skriver ut hver pakke klienten sender og mottar. Se etter linjene med <code>SUBSCRIBE</code>, <code>SUBACK</code> og <code>PUBLISH</code>, og lese topic filteret og reason code.</dd><dt>-W 10</dt><dd>Avslutter etter 10 sekunder uten meldinger.</dd></dl>
+    </div></section>
+
+  <section class="blk" data-closed><h3><span class="no">12</span>Ekstra utfordring</h3>
+    <div class="step">
+      <label class="chk"><input type="checkbox" data-k="ex2.ch"><span>Utfordringen er løst</span></label>
+      <ol>
+        <li>Lag navnerom for Agder Fiskeforedling fra øvelse 1 (pakking, fryser, vekt) i samme konvensjon. Skriv ned tre filtre for tre konsumenter: dashboard, historian og leverandør.</li>
+        <li>Skriv en <code>lint_topic(topic)</code>-funksjon i Python som sjekker at et topic har fem nivå, bare små bokstaver, ingen mellomrom og ingen skråstrek først eller sist. Test den på de åtte topicene fra <code>filtertest.py</code>.</li>
+        <li>Forklar hvorfor <code>nordlys/meieri/+/temperatur</code> ikke treffer noe i meieriet, og hva som måtte gjøres for at det skulle gjøre det.</li>
+      </ol>
+    </div></section>
+
+  <div class="confirm">
+    <label class="chk"><input type="checkbox" data-k="ex2"><span>Øvelse 2 fungerer</span></label>
+    <p>Skriv en kort beskrivelse til Claude av hva du så i steg 2 og 4, og hvilket resultat du fikk fra <code>filtertest.py</code>. Da får du øvelse 3: QoS 0, 1 og 2.</p>
   </div>
 </template>
 
@@ -599,7 +957,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   ];
   var RAW=[
     ['b','Broker og klienter','Mosquitto, pub/sub, Python, Wireshark',1],
-    ['b','Topics, wildcards og topic-design (UNS)','+ og #, navnerom, UNS-struktur'],
+    ['b','Topics, wildcards og topic-design (UNS)','+ og #, navnerom, UNS-struktur',1],
     ['b','QoS 0, 1 og 2','Leveringsgarantier og handshake'],
     ['b','Retained messages','Siste kjente verdi'],
     ['b','OPC UA: Address Space og noder','Prosys-server og OPC UA Browser'],
@@ -994,7 +1352,7 @@ Eier og revisjonsdato:</code></pre></div></section>
 
   /* Rød tråd: ett konsern gjennom alle øvelsene. [anlegg, hva du legger til, hvorfor den følger forrige] */
   var ACTS=[
-    {id:'b',n:1,name:'Akt 1: Støy i ett anlegg',sum:'Fra punkt-til-punkt til en broker og et navnerom. Terje får sin TV.'},
+    {id:'b',n:1,name:'Akt 1: Støy i ett anlegg',sum:'Fra punkt-til-punkt til en broker og et navnerom, og så en TV i kantina.'},
     {id:'i',n:2,name:'Akt 2: Flere kilder, ERP og roboten',sum:'Flere anlegg og protokoller kobles på, ERP-simulatoren kommer, og SO-101 flytter inn i robotlabben.'},
     {id:'a',n:3,name:'Akt 3: Sikkert, toveis og ekte data',sum:'Revisoren kommer. Sikkerhet, toveis kommunikasjon, Sparkplug, ERP-sporbarhet og robotstyring.'},
     {id:'e',n:4,name:'Akt 4: Konsernet',sum:'Arkitektur for alle anlegg, kamera, trening av modeller og hele kjeden samlet.'},
@@ -1003,7 +1361,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   var CORP={
     name:'Nordlys Mat AS',
     intro:'Nordlys Mat er et familieeid matkonsern i Agder med seks anlegg: fiskeforedling, meieri, settefisk, pakkeri, sentrallager og et lite brygghus. Det kjøres på blandede PLC-er, ERP er Infor M3 (SAP eller Dynamics 365 brukes som sammenligning), og nylig kjøpte de en robotlab. Alt i øvelsene er fiktivt. Hver øvelse viser en typisk situasjon fra en bransje, og i løypa er den lagt til et av Nordlys sine anlegg.',
-    cast:[['Terje','driftssjef som gjerne ser det han kan peke på'],['Ingrid','IT-sjef som vil ha færre integrasjoner å passe på'],['Silje','revisor som vil se tegninger'],['Du','arkitekten som skal få det til å henge sammen']]
+    cast:[['Gunnhild','driftssjef på fiskeforedlingen som vil ha ett tall'],['Terje','IT-sjef i konsernet, og serverrommet er kosteskapet'],['Knut','automasjonstekniker med 31 år i huset'],['Randi','økonomisjef som vil vite når det slutter å koste'],['Bjørg og Håkon','produksjonssjef og automasjonstekniker på meieriet'],['Silje','revisor som vil se tegninger'],['Du','arkitekten som skal få det til å henge sammen']]
   };
   var THREAD=[
     ['Fiskeforedlingen','Mosquitto-broker, PLC-simulator og de første klientene','Startpunktet: alle spør PLC-en direkte, og brokeren tar over rollen som mellomledd.'],
@@ -1013,7 +1371,7 @@ Eier og revisjonsdato:</code></pre></div></section>
     ['Pakkeriet','OPC UA-modell for pakkeriet (Prosys)','Pakkeriet har fire PLC-merker, og en felles modell trengs før noe kan flyttes.'],
     ['Prosessvann på Fiskeforedlingen','OPC UA-klient mot variablene','Vannbehandlingen går fortsatt på gammel OPC DA, og vi leser først, sikkert.'],
     ['Kvalitetsavdelingen','Python-klient som lytter på navnerommet','Kvalitet vil ha avvik uten tilgang til PLC-en, og leser fra brokeren du har bygget.'],
-    ['Meieriet','Node-RED-dashboard (Terjes TV)','Det første synlige resultatet på toppen av navnerommet.'],
+    ['Meieriet','Node-RED-dashboard (TV i kantina)','Det første synlige resultatet på toppen av navnerommet.'],
     ['Pumpestasjonene','Last Will for RTU-status','Fjernstasjoner dør uten å si fra, og status må være eksplisitt.'],
     ['Kjølebåten','Utløpstid for økter og meldinger','Kjølebåten mister og får dekning, og gamle verdier skal ikke utløse alarmer.'],
     ['Fjernanlegg på smalbånd','Topic Alias og User Properties','Hver byte koster, så meldingene må slankes uten å miste metadata.'],
@@ -1095,10 +1453,6 @@ Eier og revisjonsdato:</code></pre></div></section>
       nodes:nodes.map(function(q){var p=q.split('|');return {id:p[0],l:p[1],k:p[2],c:+p[3],r:+p[4]}}),
       links:links.map(function(q){var m=q.split('|'),ab=m[0].split('>');return {a:ab[0],b:ab[1],l:m[1]||''}})};
   }
-  T(2,['OT','Edge','IT'],['p1|PLC pasteur|plc|0|0','p2|PLC kjøl|plc|0|1','p3|Tank-RTU|rtu|0|2','b|Broker|brk|1|1','d|Dashboard|app|2|0','h|Historian|hist|2|1','e|ERP|erp|2|2'],
-    ['p1>b|temp2_ny_FINAL','p2>b|Temp/kjøl_NEW','p3>b|tank3/t','b>d|abonnerer','b>h|abonnerer','b>e|abonnerer'],
-    [{t:'Utfordring',warn:1,flow:[0,1,2],bad:['d','h','e'],d:'Hvert anlegg finner på egne topic-navn. Hver konsument må kjenne alle navnene, og ingen vet hva «NEW» betyr.'},
-     {t:'Med navnerom',flow:[0,1,2,3,4,5],lab:{0:'meieri/pasteur/temp',1:'meieri/kjol/temp',2:'meieri/tank3/temp',3:'meieri/+/temp'},d:'Samme struktur for alle. Konsumentene abonnerer med wildcard og slipper å kjenne enkeltnavnene.'}]);
   T(3,['Settefisk (OT)','Mobilnett','Sentral'],['o|O₂-sensor|sens|0|0','g|Gateway|gw|0|1','n|Mobilnett|fw|1|1','b|Broker|brk|2|1','a|Alarm|app|2|0','h|Historian|hist|2|2'],
     ['o>g|måling','g>n|QoS 0','n>b|nett blinker','b>a|alarm','b>h|logg'],
     [{t:'Utfordring',warn:1,flow:[0,1],badl:[2],d:'Med QoS 0 forsvinner meldingen når mobilnettet faller ut. Alarmen ser et hull i kurven.'},
@@ -1371,8 +1725,8 @@ Eier og revisjonsdato:</code></pre></div></section>
 
   /* Forutsetninger, recap og kjernepunkter per øvelse (indeks = øvelsesnummer minus 1) */
   var PRE=[
-    ['WSL2 med Ubuntu (kommandoen <code>wsl -l</code> viser distroen din)','Installer i Ubuntu: <code>sudo apt update &amp;&amp; sudo apt install -y mosquitto mosquitto-clients python3-venv tcpdump</code>. <code>apt update</code> henter pakkelisten, <code>install -y</code> installerer uten å spørre, og <code>&amp;&amp;</code> kjører neste bare hvis forrige lyktes','MQTT Explorer og Wireshark installert i Windows','Ingen tidligere øvelser kreves'],
-    ['Øvelse 1 er bekreftet: brokeren kjører og du har sett CONNECT og PUBLISH i Wireshark','<code>mosquitto.conf</code> fra øvelse 1 finnes i <code>~/lab/ex01</code>','MQTT Explorer kan koble til brokeren'],
+    ['WSL2 med Ubuntu (kommandoen <code>wsl -l</code> viser distroen din)','Installer i Ubuntu: <code>sudo apt update &amp;&amp; sudo apt install -y mosquitto mosquitto-clients python3-venv tcpdump</code>. <code>apt update</code> henter pakkelisten, <code>install -y</code> installerer uten å spørre, og <code>&amp;&amp;</code> kjører neste bare hvis forrige lyktes','MQTT Explorer installert i Windows. Wireshark er valgfritt, og uten det bruker du <code>mosquitto_sub -d</code>','Ingen tidligere øvelser kreves'],
+    ['Øvelse 1 er bekreftet: brokeren kjører og du har sett CONNECT og PUBLISH (i Wireshark eller med <code>mosquitto_sub -d</code>)','<code>mosquitto.conf</code> fra øvelse 1 finnes i <code>~/lab/ex01</code>','MQTT Explorer kan koble til brokeren'],
     ['Øvelse 1 og 2 er fullført','Python-miljøet med paho-mqtt fra øvelse 1','Du kan stoppe og starte brokeren, slik at du kan simulere nettbrudd'],
     ['Øvelse 1 og 2 er fullført','Mosquitto kjører, og du kan restarte klienter'],
     ['Prosys OPC UA Simulation Server installert (Windows)','En OPC UA-klient installert, for eksempel UaExpert','Ingen MQTT-krav, men øvelse 1 anbefales for å se likhetene mellom modellene'],
@@ -1427,7 +1781,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   ];
   var REFS=[[],[1],[1,2],[1,2,3],[1],[5],[1,2],[1,2,7],[1,3,4],[3,4,9],[1,2],[1,3],[1,2,12],[5,6],[5,14],[6,15],[6,8,16],[17,2],[7],[17,19],[],[21],[1,9],[23],[23,24],[1,11],[5,23],[27],[14,16],[14,17],[18,30],[17,30],[2,9,4],[12,33],[5,15],[19,20],[20,36],[13,24,21],[14,15,21],[19,20,38],[25,33],[21],[22],[43],[44],[21,31,36,37],[23,24,25],[47],[7,25],[15,39],[41],[2,36],[38,39]];
   var KEY=[
-    ['Klienter snakker aldri direkte. Brokeren ruter mellom utgiver og abonnent (løs kobling).','Handshaken er CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Du ser den i Wireshark på port 1883.','QoS 0 lagres ikke. Abonnenten må være startet før publiseringen.'],
+    ['Klienter snakker aldri direkte. Brokeren ruter mellom utgiver og abonnent (løs kobling).','Handshaken er CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Du ser den i Wireshark på port 1883, eller med <code>mosquitto_sub -d</code>.','QoS 0 lagres ikke. Abonnenten må være startet før publiseringen.'],
     ['Topic-navn er et API. En fast struktur (anlegg, linje, maskin, signal) gjør wildcards nyttige.','<code>+</code> matcher ett nivå og <code>#</code> matcher alle nivåer under.','Konvensjonen må avtales tidlig. Omdøping senere rammer alle konsumenter.'],
     ['QoS 0, 1 og 2 gir ulike leveringsgarantier, og valget gjøres per signaltype.','QoS 1 kan gi duplikater. QoS 2 koster mer og brukes sjelden.','QoS gjelder per hopp, og effektiv QoS er den laveste av utgiver og abonnent.'],
     ['Retained gir en ny abonnent siste kjente verdi med en gang.','En retained melding slettes ved å publisere tom payload med retain.','Bruk retained til status og tilstand og ikke til enkelthendelser.'],
@@ -1617,7 +1971,7 @@ Eier og revisjonsdato:</code></pre></div></section>
   });
 
   /* Case 1 animation: point-to-point vs broker */
-  var INIT={1:initCase1}, stopAnim=null;
+  var INIT={1:initCase1,2:initCase2}, stopAnim=null;
   function initCase1(){
     var box=document.getElementById('c1'); if(!box)return null;
     var svg=box.querySelector('svg'), NS='http://www.w3.org/2000/svg';
@@ -1682,6 +2036,104 @@ Eier og revisjonsdato:</code></pre></div></section>
       update();
     });
     build(); update(); if(!paused)start();
+    return function(){cancelAnimationFrame(raf);paused=true};
+  }
+
+
+  function initCase2(){
+    var box=document.getElementById('c2'); if(!box)return null;
+    var svg=box.querySelector('svg'), NS='http://www.w3.org/2000/svg';
+    var NAMES={
+      before:['temp2_ny_FINAL','PASTEUR_trykk','Kjol/TEMP','/kjoleromB/temp','tank3/niv','tank3/t'],
+      after:['nordlys/meieri/pasteur/pasteur1/temperatur','nordlys/meieri/pasteur/pasteur1/trykk','nordlys/meieri/kjoling/rom-a/temperatur','nordlys/meieri/kjoling/rom-b/temperatur','nordlys/meieri/tank/tank3/nivaa','nordlys/meieri/tank/tank3/temperatur']
+    };
+    var TEMPS={before:[0,2,3,5],after:[0,2,3,5]};
+    var FILT=[['nordlys/meieri/+/+/temperatur','alle temperaturer'],['nordlys/meieri/kjoling/#','kun kjøling'],['nordlys/meieri/+/tank3/+','tank 3'],['nordlys/meieri/#','alt i meieriet'],['#','#']];
+    var CAPS={
+      before:['Ingen treff. Filteret kjenner ikke navnene. Terje må legge inn fire filtre, ett per merkelige navn.',
+              'Ingen treff. Det finnes ikke noe «kjoling»-prefiks, så leverandøren kan ikke få tilgang til bare kjøling.',
+              'Ingen treff. «tank3» finnes, men uten fast struktur rundt.',
+              'Ingen treff. Det finnes ikke noe felles prefiks å abonnere på.',
+              'Alt treffer. Men da får Terje også alle dårlig navngitte topics, og kan ikke avgrense noe.'],
+      after:['Fire treff med ett filter. Et nytt kjølerom i morgen? Det treffer også, uten endring i dashboardet.',
+             'To treff. Leverandøren får lese kjøling og ingenting annet, uten en eneste ekstra regel per signal.',
+             'To treff. Samme filter virker for andre tanker hvis du bytter tank3 med +.',
+             'Alle seks treffer. Historian kan abonnere på ett filter og få alt.',
+             'Alle treffer, men bruk aldri # alene i produksjon. Det gir deg alt, også det du ikke skal ha.']
+    };
+    var mode='before', fi=0, paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches, dots=[], raf=0, tt=paused?0.5:0, last=0;
+    function match(f,t){
+      var fs=f.split('/'), ts=t.split('/');
+      if(t.charAt(0)==='$'&&(fs[0]==='#'||fs[0]==='+'))return false;
+      for(var i=0;i<fs.length;i++){
+        if(fs[i]==='#')return true;
+        if(i>=ts.length)return false;
+        if(fs[i]!=='+'&&fs[i]!==ts[i])return false;
+      }
+      return fs.length===ts.length;
+    }
+    function el(name,attrs,parent){var e=document.createElementNS(NS,name);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+    function out(k){return box.querySelector('[data-o="'+k+'"]')}
+    function cy(i){return 37+i*50}
+    function draw(){dots.forEach(function(d){
+      var p=(tt*0.4+d.ph)%1, x,y;
+      if(p<0.5){var q=p/0.5;x=d.a[0]+(d.a[2]-d.a[0])*q;y=d.a[1]+(d.a[3]-d.a[1])*q;d.c.style.display=''}
+      else if(d.hit){var q2=(p-0.5)/0.5;x=d.b[0]+(d.b[2]-d.b[0])*q2;y=d.b[1]+(d.b[3]-d.b[1])*q2;d.c.style.display=''}
+      else{d.c.style.display='none';return}
+      d.c.setAttribute('cx',x);d.c.setAttribute('cy',y);
+    })}
+    function loop(now){if(!last)last=now;if(!paused)tt+=(now-last)/1000;last=now;draw();if(!paused)raf=requestAnimationFrame(loop)}
+    function start(){cancelAnimationFrame(raf);last=0;raf=requestAnimationFrame(loop)}
+    function build(){
+      svg.textContent='';dots=[];
+      var names=NAMES[mode], f=FILT[fi][0], hits=names.map(function(n){return match(f,n)});
+      var gl=el('g',{},svg),gd=el('g',{},svg),gn=el('g',{},svg);
+      el('text',{x:130,y:12,'class':'col'},svg).textContent='SENSORER (OT): TOPIC';
+      el('text',{x:493,y:12,'class':'col'},svg).textContent='ABONNENT';
+      names.forEach(function(n,i){
+        var y=cy(i);
+        el('line',{x1:254,y1:y,x2:300,y2:162,'class':'ln'},gl);
+        if(hits[i])el('line',{x1:350,y1:162,x2:430,y2:162,'class':'ln'},gl);
+        var g=el('g',{'class':'nd '+(hits[i]?'hit':'dim')},gn);
+        el('rect',{x:4,y:y-17,width:250,height:34,rx:4},g);
+        var t=el('text',{x:129,y:y},g);t.textContent=n;t.setAttribute('style','font:9.5px var(--font-mono)');
+        dots.push({a:[254,y,300,162],b:[350,162,430,162],hit:hits[i],ph:(i*0.173)%1,c:el('circle',{r:3.2,'class':'dt '+(hits[i]?'broker':'p2p')},gd)});
+      });
+      var b=el('g',{'class':'nd brk'},gn);
+      el('rect',{x:300,y:127,width:50,height:70,rx:4},b);
+      el('text',{x:325,y:155},b).textContent='Broker';
+      var t2=el('text',{x:325,y:175},b);t2.textContent=':1883';t2.setAttribute('style','font-size:10px;font-weight:400');
+      var s=el('g',{'class':'nd '+(hits.some(Boolean)?'new':'')},gn);
+      el('rect',{x:430,y:137,width:126,height:50,rx:4},s);
+      el('text',{x:493,y:155},s).textContent='Dashboard';
+      var t3=el('text',{x:493,y:173},s);t3.textContent=hits.filter(Boolean).length+' treff';t3.setAttribute('style','font-size:10px;font-weight:400');
+      draw();
+      return hits.filter(Boolean).length;
+    }
+    function update(){
+      var n=build();
+      out('filter').textContent=FILT[fi][0];
+      out('hits').textContent=n+' av 6';
+      var need=mode==='before'?4:1; out('need').textContent=need+(need===1?' filter':' filtre');
+      var mb=out('mbar'); mb.firstElementChild.style.width=(need/4*100)+'%'; mb.classList.toggle('warn',need>=4);
+      out('cap').textContent=CAPS[mode][fi];
+      box.querySelectorAll('[data-act="before"],[data-act="after"]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-act')===mode?'true':'false')});
+      box.querySelectorAll('[data-f]').forEach(function(b){b.setAttribute('aria-pressed',+b.getAttribute('data-f')===fi?'true':'false')});
+      var p=box.querySelector('[data-act="pause"]'); p.setAttribute('aria-pressed',paused?'true':'false'); p.textContent=paused?'Spill av':'Pause';
+    }
+    var fbox=out('filters');
+    FILT.forEach(function(f,i){var b=document.createElement('button');b.type='button';b.className='btn';b.setAttribute('data-f',i);b.setAttribute('aria-pressed','false');b.textContent=f[1];fbox.appendChild(b)});
+    box.addEventListener('click',function(ev){
+      var b=ev.target.closest('[data-act],[data-f]'); if(!b)return;
+      if(b.hasAttribute('data-f')){fi=+b.getAttribute('data-f')}
+      else{
+        var a=b.getAttribute('data-act');
+        if(a==='before'||a==='after'){mode=a}
+        else if(a==='pause'){paused=!paused;if(paused){cancelAnimationFrame(raf);draw()}else{start()}}
+      }
+      update();
+    });
+    update(); if(!paused)start();
     return function(){cancelAnimationFrame(raf);paused=true};
   }
 
