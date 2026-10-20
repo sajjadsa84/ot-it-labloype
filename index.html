@@ -74,7 +74,7 @@ a{color:var(--accent)}
 .row.done .lamp{border-color:var(--accent);background:var(--accent)}
 
 /* reader */
-.reader{min-width:0;display:flex;flex-direction:column;gap:18px}
+.reader{min-width:0;display:flex;flex-direction:column;gap:30px}
 .head{display:flex;flex-direction:column;gap:8px;padding-bottom:14px;border-bottom:2px solid var(--fg)}
 .kick{font:500 12px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .head h2{font-size:34px;font-weight:700}
@@ -82,17 +82,17 @@ a{color:var(--accent)}
 .tag{font:12px var(--font-mono);border:1px solid var(--line);padding:2px 8px;border-radius:3px;color:var(--muted);background:var(--surface)}
 .tag.st{color:var(--amber);border-color:var(--amber);background:var(--amber-soft)}
 .tag.st.ok{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
-.blk{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.blk{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:24px 28px;display:flex;flex-direction:column;gap:16px;min-width:0;line-height:1.65}
 .blk h3{font-size:19px;font-weight:600;display:flex;gap:10px;align-items:baseline}
 .blk h3 .no{font:500 12px var(--font-mono);color:var(--muted);min-width:2ch;font-variant-numeric:tabular-nums}
 .blk p,.blk ul,.blk ol{margin:0}
 .blk ul,.blk ol{padding-left:1.3em}
 .blk li+li{margin-top:4px}
-.step{display:flex;flex-direction:column;gap:8px;min-width:0}
+.step{display:flex;flex-direction:column;gap:12px;min-width:0}
 .chk{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font:600 16px/1.35 var(--font-display)}
 .chk input{margin:2px 0 0;width:18px;height:18px;flex:none;accent-color:var(--accent)}
 .chk input:checked+span{color:var(--muted);text-decoration:line-through}
-.step+.step{border-top:1px dashed var(--line);padding-top:12px}
+.step+.step{border-top:1px dashed var(--line);padding-top:20px;margin-top:6px}
 code{font:13px var(--font-mono);background:var(--bg);border:1px solid var(--line);padding:0 4px;border-radius:3px;overflow-wrap:anywhere}
 .code{position:relative;min-width:0}
 .code pre{margin:0;background:var(--code-bg);color:var(--code-fg);border:1px solid var(--code-line);border-radius:5px;padding:12px 14px;overflow-x:auto;font:13px/1.55 var(--font-mono);tab-size:4}
@@ -151,7 +151,7 @@ tr.rec td{background:var(--accent-soft)}
 .chip{font:12px var(--font-mono);border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:12px;padding:2px 9px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
 .bd{font:10px var(--font-mono);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:5px;white-space:nowrap;vertical-align:1px}
-.thread{border-left:3px solid var(--accent);background:var(--surface);padding:10px 14px;margin:0 0 18px;border-radius:0 5px 5px 0;display:flex;flex-direction:column;gap:4px}
+.thread{border-left:3px solid var(--accent);background:var(--surface);padding:14px 18px;margin:0;border-radius:0 6px 6px 0;display:flex;flex-direction:column;gap:6px}
 .thread p{margin:0;font-size:14px}
 .thread .nx{color:var(--muted)}
 .tl{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
@@ -175,12 +175,20 @@ tr.rec td{background:var(--accent-soft)}
 .restore input{flex:1;min-width:0;font:12px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:4px 8px}
 .restore .tb{padding:3px 10px;font-size:12px}
 .blk.closed>*:not(h3){display:none}
-.blk.closed{gap:0}
+.blk.closed{gap:0;padding-top:18px;padding-bottom:18px}
+.blk.group{background:transparent;border-style:dashed}
+.blk.group .blk{background:var(--surface);margin-top:6px}
+.blk.group>.gnote{color:var(--muted);font-size:14px}
+.blk.group.closed>.gnote{display:none}
+.jump{display:flex;flex-wrap:wrap;gap:6px;flex:1;min-width:0}
+.jb{font:500 12px var(--font-mono);padding:3px 10px;border:1px solid var(--line);border-radius:99px;background:var(--bg);color:var(--muted);cursor:pointer}
+.jb:hover{color:var(--fg);border-color:var(--accent)}
+.foldctl{display:flex;gap:8px;flex:none}
 .blk h3.fh{cursor:pointer;user-select:none}
 .blk h3.fh::before{content:'▾';color:var(--muted);font-size:14px;width:1ch;flex:none}
 .blk.closed h3.fh::before{content:'▸'}
 .blk h3.fh:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
-.foldbar{display:flex;gap:8px;justify-content:flex-end}
+.foldbar{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;margin-bottom:-10px}
 .calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 16px}
 .calc label{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
 .calc input{font:14px var(--font-mono);background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:4px;padding:6px 8px;width:100%;min-width:0}
@@ -471,7 +479,7 @@ c.disconnect()</code></pre></div>
       <li>Meldinger på <code>lab/ex01/...</code> vises, men ikke på <code>annet/topic</code>.</li>
     </ul></section>
 
-  <section class="blk"><h3><span class="no">9</span>Feilsøking</h3>
+  <section class="blk" data-closed><h3><span class="no">9</span>Feilsøking</h3>
     <div class="tbl"><table>
       <thead><tr><th>Symptom</th><th>Årsak / tiltak</th></tr></thead>
       <tbody>
@@ -483,7 +491,7 @@ c.disconnect()</code></pre></div>
       </tbody></table></div>
     <p class="cmdh">Hva kommandoene gjør</p><dl class="cmd"><dt>ss -tlnp</dt><dd>Viser lyttende porter. <code>-t</code> TCP, <code>-l</code> lyttende, <code>-n</code> tall i stedet for navn, <code>-p</code> hvilken prosess.</dd><dt>| grep 1883</dt><dd>Filtrerer utdataen til linjer som inneholder 1883.</dd><dt>hostname -I</dt><dd>Viser maskinens IP-adresser. Brukes for å finne WSL-adressen.</dd></dl></section>
 
-  <section class="blk"><h3><span class="no">10</span>Hva skjer på protokollnivå</h3>
+  <section class="blk" data-closed><h3><span class="no">10</span>Hva skjer på protokollnivå</h3>
     <ol>
       <li>TCP-handshake mot port 1883.</li>
       <li><b>CONNECT</b>: klient-ID, protokollnivå 5, keep-alive, clean start, session expiry.</li>
@@ -504,7 +512,7 @@ c.disconnect()</code></pre></div>
       <p>Bruk displayfilter <code>mqtt</code>. Se etter CONNECT, CONNACK, SUBSCRIBE, SUBACK og PUBLISH. Utvid <i>MQTT Header → Version</i> og sjekk at den viser 5. Klikk på CONNECT og finn <i>Properties</i>, for eksempel Session Expiry Interval.</p>
     </div></section>
 
-  <section class="blk"><h3><span class="no">12</span>Ekstra utfordring</h3>
+  <section class="blk" data-closed><h3><span class="no">12</span>Ekstra utfordring</h3>
     <div class="step">
       <label class="chk"><input type="checkbox" data-k="ex1.ch"><span>Utfordringen er løst</span></label>
       <ol>
@@ -1483,7 +1491,7 @@ Eier og revisjonsdato:</code></pre></div></section>
     if(R.length){
       body='<ul>'+R.map(function(m){return '<li><a href="#ex'+m+'" data-go="'+m+'">Øvelse '+m+', '+EX[m-1].t+'</a>: '+KEY[m-1][0]+'</li>'}).join('')+'</ul>';
     }else{
-      body='<p>Nytt spor eller første øvelse. Ingen direkte avhengighet av tidligere øvelser ut over forutsetningene over.</p>';
+      return '';
     }
     return '<section class="blk" id="recap"><h3><span class="no">RECAP</span>Det du allerede har lært som du bruker her</h3>'+body+'</section>';
   }
@@ -1496,8 +1504,11 @@ Eier og revisjonsdato:</code></pre></div></section>
   function storeFold(o){try{localStorage.setItem('otit-fold-v1',JSON.stringify(o))}catch(x){}}
   function collapsify(n){
     var st=loadFold();
-    var secs=[].slice.call(reader.children).filter(function(x){return x.tagName==='SECTION'&&x.firstElementChild&&x.firstElementChild.tagName==='H3'});
+    function heads(x){return x.tagName==='SECTION'&&x.firstElementChild&&x.firstElementChild.tagName==='H3'}
+    var top=[].slice.call(reader.children).filter(heads), secs=top.slice();
+    top.forEach(function(g){if(g.classList.contains('group'))[].slice.call(g.children).filter(heads).forEach(function(x){secs.push(x)})});
     if(!secs.length)return;
+    var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
     function setOpen(sec,open,save){
       var h=sec.firstElementChild,key=sec.getAttribute('data-fk');
       sec.classList.toggle('closed',!open); h.setAttribute('aria-expanded',open?'true':'false');
@@ -1507,17 +1518,28 @@ Eier og revisjonsdato:</code></pre></div></section>
       var h=sec.firstElementChild, key=n+':'+(sec.id||h.textContent.slice(0,40));
       sec.setAttribute('data-fk',key);
       h.setAttribute('role','button'); h.tabIndex=0; h.classList.add('fh');
-      setOpen(sec,st[key]!==false,false);
+      var def=!sec.hasAttribute('data-closed');
+      setOpen(sec,st[key]===undefined?def:st[key]!==false,false);
       h.addEventListener('click',function(){setOpen(sec,sec.classList.contains('closed'),true);storeFold(st)});
       h.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();h.click()}});
     });
     var bar=document.createElement('div'); bar.className='foldbar';
+    var jump=document.createElement('div'); jump.className='jump';
+    top.forEach(function(sec){
+      var h=sec.firstElementChild, no=h.querySelector('.no'), label=h.textContent.replace(no?no.textContent:'','').trim();
+      if(label.length>26)label=label.slice(0,25)+'…';
+      var bt=document.createElement('button'); bt.type='button'; bt.className='jb'; bt.textContent=label;
+      bt.addEventListener('click',function(){setOpen(sec,true,true);storeFold(st);sec.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'})});
+      jump.appendChild(bt);
+    });
+    var ctl=document.createElement('div'); ctl.className='foldctl';
     [['Skjul alle',false],['Vis alle',true]].forEach(function(b){
       var bt=document.createElement('button'); bt.type='button'; bt.className='tb'; bt.textContent=b[0];
       bt.addEventListener('click',function(){secs.forEach(function(sec){setOpen(sec,b[1],true)});storeFold(st)});
-      bar.appendChild(bt);
+      ctl.appendChild(bt);
     });
-    reader.insertBefore(bar,secs[0]);
+    bar.appendChild(jump); bar.appendChild(ctl);
+    reader.insertBefore(bar,top[0]);
   }
 
   function renderReader(){
@@ -1536,6 +1558,14 @@ Eier og revisjonsdato:</code></pre></div></section>
       var cf=reader.querySelector('.confirm'),kh=document.createElement('div');
       kh.innerHTML=keySec(e);
       if(kh.firstChild){if(cf)reader.insertBefore(kh.firstChild,cf);else reader.appendChild(kh.firstChild)}
+      var side=[].slice.call(reader.children).filter(function(x){return x.id&&/^(cust|arch|erp|uns|sec)\d+$/.test(x.id)});
+      if(side.length){
+        var gp=document.createElement('section'); gp.className='blk group'; gp.id='ford'; gp.setAttribute('data-closed','');
+        var gh=document.createElement('h3'); gh.innerHTML='<span class="no">VALGFRITT</span>Fordypning for kundemøter og arkitektur'; gp.appendChild(gh);
+        var gi=document.createElement('p'); gi.className='gnote'; gi.textContent='Kundespørsmål, TOGAF og systemteknikk, ERP, UNS og sikkerhet. Les dette når du forbereder et kundemøte. Du trenger det ikke for å gjøre labben.'; gp.appendChild(gi);
+        side.forEach(function(x){x.setAttribute('data-closed','');gp.appendChild(x)});
+        reader.appendChild(gp);
+      }
       addCopyButtons(reader);
       syncChecks();
       if(INIT[e.n])stopAnim=INIT[e.n]();
